@@ -136,11 +136,10 @@ export function FileRow({
 
       {/* Center: tamaños */}
       <div className="w-40 flex-shrink-0 px-2 py-2 text-center text-xs text-[#aaaaaa]">
-        {entry.isDirectory ? '' : (
-          entry.leftSize === entry.rightSize && entry.leftSize !== null
-            ? formatSize(entry.leftSize)
-            : <span>{formatSize(entry.leftSize)} <span className="text-[#555]">/</span> {formatSize(entry.rightSize)}</span>
-        )}
+        {entry.leftSize === entry.rightSize && entry.leftSize !== null
+          ? formatSize(entry.leftSize)
+          : <span>{formatSize(entry.leftSize)} <span className="text-[#555]">/</span> {formatSize(entry.rightSize)}</span>
+        }
       </div>
 
       {/* Right column */}

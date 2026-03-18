@@ -201,6 +201,25 @@ function buildTree(
     computeDirStatus(entry)
   }
 
+  // Calcular tamaños acumulados de carpetas
+  function computeDirSizes(entry: FileEntry): void {
+    if (!entry.isDirectory || !entry.children) return
+    for (const child of entry.children) {
+      computeDirSizes(child)
+    }
+    let leftTotal = 0, rightTotal = 0
+    let hasLeft = false, hasRight = false
+    for (const child of entry.children) {
+      if (child.leftSize !== null) { leftTotal += child.leftSize; hasLeft = true }
+      if (child.rightSize !== null) { rightTotal += child.rightSize; hasRight = true }
+    }
+    entry.leftSize = hasLeft ? leftTotal : null
+    entry.rightSize = hasRight ? rightTotal : null
+  }
+  for (const entry of rootEntries) {
+    computeDirSizes(entry)
+  }
+
   return { entries: rootEntries, stats }
 }
 
