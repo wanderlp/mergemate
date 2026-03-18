@@ -27,6 +27,10 @@ La app es un proyecto estándar de electron-vite con tres targets de compilació
 
 **Tipos compartidos** (`src/types.ts`) — importado tanto por main como por el renderer. `tsconfig.node.json` y `tsconfig.web.json` incluyen este archivo explícitamente.
 
+## Idioma
+
+Toda la comunicación con Claude, comentarios en el código y respuestas deben ser en **español**. Esto incluye explicaciones, sugerencias, mensajes de error y cualquier interacción durante el desarrollo.
+
 ## Restricciones importantes
 
 - `"type": "module"` NO debe estar en `package.json` — electron-vite genera CJS para main/preload, y agregarlo rompe Electron en tiempo de ejecución (causa ventana en negro).
