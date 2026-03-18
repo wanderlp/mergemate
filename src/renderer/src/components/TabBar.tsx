@@ -52,6 +52,7 @@ export function TabBar({ tabs, activeTabId, onSelectTab, onCloseTab }: TabBarPro
               maxWidth: 200,
             }}
             onClick={() => onSelectTab(tab.id)}
+            onAuxClick={(e) => { if (e.button === 1) { e.preventDefault(); onCloseTab(tab.id) } }}
             title={tab.id}
           >
             {icon}
