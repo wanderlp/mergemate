@@ -96,7 +96,9 @@ function buildTree(
       isDirectory: true,
       children: [],
       name,
-      extension: ''
+      extension: '',
+      leftSize: null,
+      rightSize: null
     }
     dirMap.set(relDir, entry)
     const parentDir = parts.slice(0, -1).join('/')
@@ -125,6 +127,8 @@ function buildTree(
 
     const parts = rel.split('/')
     const name = parts[parts.length - 1]
+    const leftSize = leftPath ? (() => { try { return fs.statSync(leftPath).size } catch { return null } })() : null
+    const rightSize = rightPath ? (() => { try { return fs.statSync(rightPath).size } catch { return null } })() : null
     const fileEntry: FileEntry = {
       relativePath: rel,
       leftPath,
@@ -132,7 +136,9 @@ function buildTree(
       status,
       isDirectory: false,
       name,
-      extension: ext
+      extension: ext,
+      leftSize,
+      rightSize
     }
 
     if (parts.length === 1) {

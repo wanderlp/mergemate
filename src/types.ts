@@ -11,6 +11,8 @@ export interface FileEntry {
   children?: FileEntry[]
   name: string
   extension: string
+  leftSize: number | null
+  rightSize: number | null
 }
 
 export interface ScanResult {

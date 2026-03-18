@@ -9,6 +9,9 @@ interface FileRowProps {
   onToggle: () => void
   onDoubleClick: () => void
   onHover: (path: string) => void
+  isFocused?: boolean
+  onFocusPath?: (path: string) => void
+  refCallback?: (el: HTMLDivElement | null) => void
 }
 
 const STATUS_COLORS: Record<FileStatus, string> = {
@@ -38,6 +41,14 @@ const EXT_ICONS: Record<string, string> = {
   pdf: '📕', zip: '📦', gz: '📦',
 }
 
+function formatSize(bytes: number | null): string {
+  if (bytes === null) return '—'
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`
+}
+
 function getIcon(entry: FileEntry): string {
   if (entry.isDirectory) return ''
   return EXT_ICONS[entry.extension] ?? '📄'
@@ -49,7 +60,10 @@ export function FileRow({
   expanded,
   onToggle,
   onDoubleClick,
-  onHover
+  onHover,
+  isFocused,
+  onFocusPath,
+  refCallback
 }: FileRowProps): React.JSX.Element {
   const color = STATUS_COLORS[entry.status]
   const indent = depth * 16
@@ -74,14 +88,17 @@ export function FileRow({
 
   return (
     <div
+      ref={refCallback}
       role={entry.isDirectory ? 'button' : 'row'}
       tabIndex={0}
       className="group flex cursor-pointer items-center border-b border-[#2a2d2e]/50 hover:bg-[#2a2d2e] focus:bg-[#2a2d2e] focus:outline-none transition-colors"
+      style={isFocused ? { backgroundColor: '#37373d' } : undefined}
       onDoubleClick={!entry.isDirectory ? onDoubleClick : undefined}
       onClick={entry.isDirectory ? onToggle : undefined}
       onKeyDown={handleKeyDown}
       onMouseEnter={() => onHover(entry.relativePath)}
       onMouseLeave={() => onHover('')}
+      onFocus={() => onFocusPath?.(entry.relativePath)}
       aria-label={`${entry.name} — ${label}`}
       aria-expanded={entry.isDirectory ? expanded : undefined}
       title={label}
@@ -117,9 +134,13 @@ export function FileRow({
         )}
       </div>
 
-      {/* Center: relative path */}
-      <div className="w-56 flex-shrink-0 truncate px-2 py-2 text-center text-xs text-[#aaaaaa]">
-        {entry.relativePath.replace(/\/$/, '')}
+      {/* Center: tamaños */}
+      <div className="w-40 flex-shrink-0 px-2 py-2 text-center text-xs text-[#aaaaaa]">
+        {entry.isDirectory ? '' : (
+          entry.leftSize === entry.rightSize && entry.leftSize !== null
+            ? formatSize(entry.leftSize)
+            : <span>{formatSize(entry.leftSize)} <span className="text-[#555]">/</span> {formatSize(entry.rightSize)}</span>
+        )}
       </div>
 
       {/* Right column */}
