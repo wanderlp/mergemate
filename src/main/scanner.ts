@@ -5,12 +5,47 @@ import type { FileEntry, ScanResult, ScanStats } from '../types'
 
 const IGNORE_DIRS = new Set([
   'node_modules', '.git', '__pycache__', 'dist', 'build',
-  '.next', 'out', 'target', '.gradle', '.idea', '.vscode'
+  '.next', 'out', 'target', '.gradle', '.idea', '.vscode',
+  // Carpetas del sistema Windows
+  '$RECYCLE.BIN', 'System Volume Information', 'Recovery',
+  // Carpetas del sistema macOS
+  '.Spotlight-V100', '.Trashes', '.fseventsd',
+  // Carpetas del sistema Linux
+  '.Trash-1000', '.cache'
 ])
 
-function shouldIgnore(name: string): boolean {
-  if (IGNORE_DIRS.has(name)) return true
+// Archivos de sistema exactos (nombre completo, insensible a mayúsculas)
+const IGNORE_FILES_EXACT = new Set([
+  // Windows
+  'thumbs.db', 'ehthumbs.db', 'ehthumbs_vista.db', 'desktop.ini',
+  'ntuser.dat', 'ntuser.ini', 'pagefile.sys', 'hiberfil.sys', 'swapfile.sys',
+  // macOS
+  '.ds_store', '.localized',
+  // Linux / KDE
+  '.directory',
+])
+
+// Extensiones o patrones de archivos de sistema
+const IGNORE_EXTENSIONS = new Set([
+  '.lnk',   // accesos directos de Windows
+  '.url',   // accesos directos de internet de Windows
+])
+
+function shouldIgnore(name: string, isDirectory: boolean): boolean {
+  if (isDirectory && IGNORE_DIRS.has(name)) return true
   if (name.endsWith('.bak')) return true
+
+  if (!isDirectory) {
+    if (IGNORE_FILES_EXACT.has(name.toLowerCase())) return true
+    if (IGNORE_EXTENSIONS.has(path.extname(name).toLowerCase())) return true
+    // Patrones: archivos temporales de editores y OS
+    if (name.endsWith('~')) return true          // backups de Vim/Emacs
+    if (name.startsWith('._')) return true        // resource forks de macOS
+    if (/^\.fuse_hidden/.test(name)) return true  // FUSE (Linux)
+    if (/^\.nfs/.test(name)) return true          // NFS lock files (Linux)
+    if (/^\.Trash-/.test(name)) return true       // papelera de Linux
+  }
+
   return false
 }
 
@@ -22,7 +57,7 @@ function collectPaths(dir: string, base: string, result: Map<string, string>): v
     return
   }
   for (const entry of entries) {
-    if (shouldIgnore(entry.name)) continue
+    if (shouldIgnore(entry.name, entry.isDirectory())) continue
     const rel = path.join(base, entry.name).replace(/\\/g, '/')
     const full = path.join(dir, entry.name)
     if (entry.isDirectory()) {
