@@ -1,6 +1,6 @@
 import React, { useRef, useCallback, useEffect } from 'react'
 import { DiffEditor, type DiffEditorProps } from '@monaco-editor/react'
-import { ArrowLeft, ChevronUp, ChevronDown, ArrowLeftRight, Save } from 'lucide-react'
+import { ChevronUp, ChevronDown, ArrowLeftRight, Save } from 'lucide-react'
 import type { FileEntry } from '../types'
 import type * as monaco from 'monaco-editor'
 
@@ -8,7 +8,6 @@ interface DiffViewerProps {
   file: FileEntry
   leftContent: string
   rightContent: string
-  onBack: () => void
   onSaveLeft: (content: string) => Promise<void>
   onSaveRight: (content: string) => Promise<void>
   onCopyToLeft: (content: string) => Promise<boolean>
@@ -47,7 +46,6 @@ export function DiffViewer({
   file,
   leftContent,
   rightContent,
-  onBack,
   onSaveLeft,
   onSaveRight,
   onCopyToLeft,
@@ -96,9 +94,7 @@ export function DiffViewer({
   // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent): void => {
-      if (e.key === 'Escape') {
-        onBack()
-      } else if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+      if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault()
         handleSaveRight()
       } else if (e.altKey && e.key === 'ArrowUp') {
@@ -111,7 +107,7 @@ export function DiffViewer({
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [onBack, handleSaveRight, navigateDiff])
+  }, [handleSaveRight, navigateDiff])
 
   const canCopyLeft = Boolean(file.leftPath)
   const canCopyRight = Boolean(file.rightPath)
@@ -123,17 +119,7 @@ export function DiffViewer({
     <div className="flex h-full flex-col bg-[#1e1e1e]">
       {/* Toolbar */}
       <div className="flex items-center gap-2 border-b border-[#3e3e42] bg-[#252526] px-3 py-2">
-        <button
-          onClick={onBack}
-          className={btnBase}
-          title="Volver (Escape)"
-          aria-label="Volver a la comparación de carpetas"
-        >
-          <ArrowLeft size={16} />
-          Volver
-        </button>
-
-        <div className="flex-1 truncate text-center text-sm text-[#cccccc]">
+        <div className="flex-1 truncate text-sm text-[#cccccc]">
           {file.relativePath}
         </div>
 

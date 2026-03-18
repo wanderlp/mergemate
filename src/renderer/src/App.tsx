@@ -281,7 +281,6 @@ export default function App(): React.JSX.Element {
                 file={tab.file}
                 leftContent={tab.leftContent}
                 rightContent={tab.rightContent}
-                onBack={() => showComparisonTab ? setActiveTabId('comparison') : handleCloseTab(id)}
                 onSaveLeft={saveLeft}
                 onSaveRight={saveRight}
                 onCopyToLeft={copyToLeft}
