@@ -9,11 +9,31 @@ import type { TabItem } from './components/TabBar'
 import { useFolderScan } from './hooks/useFolderScan'
 import type { FileEntry } from './types'
 
+const BINARY_EXTENSIONS = new Set([
+  // Imágenes
+  'png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico', 'tiff', 'tif', 'webp', 'avif', 'heic', 'heif', 'psd', 'ai',
+  // Archivos comprimidos
+  'zip', 'gz', 'tar', 'rar', '7z', 'bz2', 'xz', 'zst', 'cab', 'iso',
+  // Documentos de Office y PDF
+  'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+  // Ejecutables y bibliotecas
+  'exe', 'dll', 'so', 'dylib', 'bin', 'obj', 'o', 'a', 'lib', 'wasm', 'class', 'pyc', 'pyo',
+  // Multimedia
+  'mp3', 'mp4', 'wav', 'avi', 'mov', 'mkv', 'flac', 'ogg', 'webm', 'aac', 'm4a', 'm4v',
+  // Bases de datos y otros binarios
+  'db', 'sqlite', 'sqlite3', 'mdb', 'accdb', 'dat', 'pak', 'cache', 'jar', 'apk', 'ipa',
+])
+
+function isBinaryExtension(ext: string): boolean {
+  return BINARY_EXTENSIONS.has(ext.toLowerCase())
+}
+
 interface DiffTabData {
   file: FileEntry
   leftContent: string
   rightContent: string
   loading: boolean
+  unsupported: boolean
 }
 
 export default function App(): React.JSX.Element {
@@ -69,9 +89,18 @@ export default function App(): React.JSX.Element {
       setActiveTabId(id)
       return
     }
+    if (isBinaryExtension(file.extension)) {
+      setOpenTabs((prev) => {
+        const next = new Map(prev)
+        next.set(id, { file, leftContent: '', rightContent: '', loading: false, unsupported: true })
+        return next
+      })
+      setActiveTabId(id)
+      return
+    }
     setOpenTabs((prev) => {
       const next = new Map(prev)
-      next.set(id, { file, leftContent: '', rightContent: '', loading: true })
+      next.set(id, { file, leftContent: '', rightContent: '', loading: true, unsupported: false })
       return next
     })
     setActiveTabId(id)
@@ -81,7 +110,7 @@ export default function App(): React.JSX.Element {
     ])
     setOpenTabs((prev) => {
       const next = new Map(prev)
-      next.set(id, { file, leftContent: left, rightContent: right, loading: false })
+      next.set(id, { file, leftContent: left, rightContent: right, loading: false, unsupported: false })
       return next
     })
   }, [openTabs])
@@ -238,6 +267,14 @@ export default function App(): React.JSX.Element {
             {tab.loading ? (
               <div className="flex flex-1 items-center justify-center text-[#858585]">
                 Cargando archivo…
+              </div>
+            ) : tab.unsupported ? (
+              <div className="flex flex-1 flex-col items-center justify-center gap-3 text-[#858585]">
+                <div className="text-5xl">🚫</div>
+                <div className="text-lg font-semibold text-[#cccccc]">Formato no disponible</div>
+                <div className="text-sm">
+                  El archivo <span className="text-[#aaaaaa]">.{tab.file.extension}</span> es binario y no puede compararse como texto.
+                </div>
               </div>
             ) : (
               <DiffViewer
