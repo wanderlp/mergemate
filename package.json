@@ -1,0 +1,71 @@
+{
+  "name": "mergemate",
+  "version": "1.0.0",
+  "description": "MergeMate — Folder Comparison Tool",
+  "productName": "MergeMate",
+  "main": "./out/main/index.js",
+  "author": "MergeMate",
+  "homepage": ".",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "dist": "npm run build && electron-builder",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:linux": "npm run build && electron-builder --linux",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@electron-toolkit/tsconfig": "^2.0.0",
+    "@electron-toolkit/utils": "^4.0.0",
+    "@monaco-editor/react": "^4.6.0",
+    "diff-match-patch": "^1.0.5",
+    "electron-store": "^8.2.0",
+    "lucide-react": "^0.344.0",
+    "monaco-editor": "^0.47.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/diff-match-patch": "^1.0.36",
+    "@types/node": "^20.12.7",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.19",
+    "electron": "^30.0.1",
+    "electron-builder": "^24.13.3",
+    "electron-vite": "^2.1.0",
+    "postcss": "^8.4.38",
+    "tailwindcss": "^3.4.3",
+    "typescript": "^5.4.5",
+    "vite": "^5.2.11"
+  },
+  "build": {
+    "appId": "com.mergemate.app",
+    "productName": "MergeMate",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "out/**/*"
+    ],
+    "win": {
+      "target": "nsis",
+      "artifactName": "MergeMate-Setup.exe"
+    },
+    "mac": {
+      "target": "dmg",
+      "artifactName": "MergeMate.dmg"
+    },
+    "linux": {
+      "target": "AppImage",
+      "artifactName": "MergeMate.AppImage"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
