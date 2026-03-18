@@ -27,6 +27,12 @@ La app es un proyecto estándar de electron-vite con tres targets de compilació
 
 **Tipos compartidos** (`src/types.ts`) — importado tanto por main como por el renderer. `tsconfig.node.json` y `tsconfig.web.json` incluyen este archivo explícitamente.
 
+## Flujo de trabajo con Git
+
+- **Nunca** hacer commit, push ni crear PRs de forma automática o por iniciativa propia.
+- Esperar siempre a que el programador indique explícitamente cuándo hacer cada acción por separado: primero el commit, luego el push, luego el PR si aplica.
+- El programador necesita tiempo para probar los cambios antes de confirmarlos.
+
 ## Idioma
 
 Toda la comunicación con Claude, comentarios en el código y respuestas deben ser en **español**. Esto incluye explicaciones, sugerencias, mensajes de error y cualquier interacción durante el desarrollo.
