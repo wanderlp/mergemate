@@ -1,19 +1,19 @@
 # MergeMate
 
-**MergeMate — Folder Comparison Tool**
+**MergeMate — Comparador de Carpetas**
 
-A production-quality desktop app for comparing source code folders side by side. Classifies each file visually by color, and lets you double-click any file to open a full line-by-line Monaco diff viewer with merge capabilities.
+Aplicación de escritorio para comparar carpetas de código fuente lado a lado. Clasifica cada archivo visualmente por color y permite hacer doble clic en cualquier archivo para abrir un visor de diferencias línea por línea con capacidades de fusión.
 
 ---
 
-## Prerequisites
+## Requisitos
 
 - Node.js 18+
 - npm 9+
 
 ---
 
-## Getting Started
+## Cómo ejecutar
 
 ```bash
 npm install
@@ -22,62 +22,62 @@ npm run dev
 
 ---
 
-## Build for Distribution
+## Compilar para distribución
 
-| Command | Output |
-|---------|--------|
+| Comando | Resultado |
+|---------|-----------|
 | `npm run dist:win` | `dist/MergeMate-Setup.exe` |
 | `npm run dist:mac` | `dist/MergeMate.dmg` |
 | `npm run dist:linux` | `dist/MergeMate.AppImage` |
-| `npm run dist` | All platforms |
+| `npm run dist` | Todas las plataformas |
 
 ---
 
-## Features
+## Funcionalidades
 
-### Folder Comparison View
-- Open two folders and see all files merged into a unified tree
-- Color-coded file status:
-  - 🟢 **Green** — byte-for-byte identical (same SHA256 hash)
-  - 🔴 **Red** — meaningful code differences
-  - 🟡 **Yellow** — differ only in comments/whitespace
-  - 🔵 **Blue** — exists only in left folder
-  - 🟣 **Purple** — exists only in right folder
-- Folders are collapsible, sorted: directories first then files alphabetically
-- Status bar shows counts per category
+### Vista de comparación de carpetas
+- Abre dos carpetas y visualiza todos los archivos en un árbol unificado
+- Estado de cada archivo codificado por color:
+  - 🟢 **Verde** — idénticos byte a byte (mismo hash SHA256)
+  - 🔴 **Rojo** — diferencias de código significativas
+  - 🟡 **Amarillo** — difieren solo en comentarios o espacios en blanco
+  - 🔵 **Azul** — existe solo en la carpeta izquierda
+  - 🟣 **Morado** — existe solo en la carpeta derecha
+- Carpetas colapsables, ordenadas: directorios primero, luego archivos, ambos alfabéticamente
+- Barra de estado con conteo por categoría
 
-### Diff Viewer
-- Monaco Editor side-by-side diff (vs-dark theme)
-- Language auto-detection from file extension
-- Navigate between diff hunks with Prev/Next buttons
-- Copy left→right or right→left (creates .bak backup automatically)
-- Save either side independently
+### Visor de diferencias
+- Monaco Editor en modo lado a lado (tema vs-dark)
+- Detección automática de lenguaje por extensión de archivo
+- Navegación entre bloques de diferencia con botones Anterior/Siguiente
+- Copiar izquierda→derecha o derecha→izquierda (crea copia de seguridad .bak automáticamente)
+- Guardar cualquiera de los dos lados de forma independiente
 
-### Ignored Directories
+### Directorios ignorados
 `node_modules`, `.git`, `__pycache__`, `dist`, `build`, `.next`, `out`, `target`, `.gradle`, `.idea`, `.vscode`, `*.bak`
 
 ---
 
-## Keyboard Shortcuts
+## Atajos de teclado
 
-| Shortcut | Action |
-|----------|--------|
-| `Ctrl/Cmd + L` | Open Left Folder |
-| `Ctrl/Cmd + R` | Open Right Folder |
-| `Ctrl/Cmd + F5` | Refresh scan |
-| `Escape` | Back to folder view |
-| `Ctrl/Cmd + S` | Save right file in diff view |
-| `Alt + ↑` | Previous diff hunk |
-| `Alt + ↓` | Next diff hunk |
+| Atajo | Acción |
+|-------|--------|
+| `Ctrl/Cmd + L` | Abrir carpeta izquierda |
+| `Ctrl/Cmd + R` | Abrir carpeta derecha |
+| `Ctrl/Cmd + F5` | Actualizar escaneo |
+| `Escape` | Volver a la vista de carpetas |
+| `Ctrl/Cmd + S` | Guardar archivo derecho en el visor de diferencias |
+| `Alt + ↑` | Bloque de diferencia anterior |
+| `Alt + ↓` | Siguiente bloque de diferencia |
 
 ---
 
-## Tech Stack
+## Tecnologías
 
-- **Electron** — desktop shell
-- **React 18 + TypeScript** — UI (strict mode)
-- **Vite + electron-vite** — build tooling
-- **Monaco Editor** — diff viewer
-- **Tailwind CSS** — dark theme styling
-- **electron-store** — persist last used folder paths
-- **Lucide React** — icons
+- **Electron** — shell de escritorio
+- **React 18 + TypeScript** — interfaz de usuario (modo estricto)
+- **Vite + electron-vite** — herramientas de compilación
+- **Monaco Editor** — visor de diferencias
+- **Tailwind CSS** — estilos con tema oscuro
+- **electron-store** — persistencia de las últimas carpetas usadas
+- **Lucide React** — íconos
