@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { Toolbar } from './components/Toolbar'
 import { FileTree } from './components/FileTree'
 import { DiffViewer } from './components/DiffViewer'
+import { ImageViewer } from './components/ImageViewer'
 import { ProgressBar } from './components/ProgressBar'
 import { StatusBar } from './components/StatusBar'
 import { TabBar } from './components/TabBar'
@@ -9,9 +10,11 @@ import type { TabItem } from './components/TabBar'
 import { useFolderScan } from './hooks/useFolderScan'
 import type { FileEntry } from './types'
 
+const IMAGE_EXTENSIONS = new Set([
+  'png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico', 'tiff', 'tif', 'webp', 'avif', 'svg',
+])
+
 const BINARY_EXTENSIONS = new Set([
-  // Imágenes
-  'png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico', 'tiff', 'tif', 'webp', 'avif', 'heic', 'heif', 'psd', 'ai',
   // Archivos comprimidos
   'zip', 'gz', 'tar', 'rar', '7z', 'bz2', 'xz', 'zst', 'cab', 'iso',
   // Documentos de Office y PDF
@@ -20,9 +23,15 @@ const BINARY_EXTENSIONS = new Set([
   'exe', 'dll', 'so', 'dylib', 'bin', 'obj', 'o', 'a', 'lib', 'wasm', 'class', 'pyc', 'pyo',
   // Multimedia
   'mp3', 'mp4', 'wav', 'avi', 'mov', 'mkv', 'flac', 'ogg', 'webm', 'aac', 'm4a', 'm4v',
+  // Imágenes no soportadas por el navegador
+  'heic', 'heif', 'psd', 'ai', 'raw', 'cr2', 'nef',
   // Bases de datos y otros binarios
   'db', 'sqlite', 'sqlite3', 'mdb', 'accdb', 'dat', 'pak', 'cache', 'jar', 'apk', 'ipa',
 ])
+
+function isImageExtension(ext: string): boolean {
+  return IMAGE_EXTENSIONS.has(ext.toLowerCase())
+}
 
 function isBinaryExtension(ext: string): boolean {
   return BINARY_EXTENSIONS.has(ext.toLowerCase())
@@ -34,6 +43,7 @@ interface DiffTabData {
   rightContent: string
   loading: boolean
   unsupported: boolean
+  isImage: boolean
 }
 
 export default function App(): React.JSX.Element {
@@ -89,18 +99,30 @@ export default function App(): React.JSX.Element {
       setActiveTabId(id)
       return
     }
-    if (isBinaryExtension(file.extension)) {
+    // Imágenes: visor dedicado sin necesidad de leer contenido
+    if (isImageExtension(file.extension)) {
       setOpenTabs((prev) => {
         const next = new Map(prev)
-        next.set(id, { file, leftContent: '', rightContent: '', loading: false, unsupported: true })
+        next.set(id, { file, leftContent: '', rightContent: '', loading: false, unsupported: false, isImage: true })
         return next
       })
       setActiveTabId(id)
       return
     }
+    // Binarios no soportados
+    if (isBinaryExtension(file.extension)) {
+      setOpenTabs((prev) => {
+        const next = new Map(prev)
+        next.set(id, { file, leftContent: '', rightContent: '', loading: false, unsupported: true, isImage: false })
+        return next
+      })
+      setActiveTabId(id)
+      return
+    }
+    // Archivos de texto: cargar contenido
     setOpenTabs((prev) => {
       const next = new Map(prev)
-      next.set(id, { file, leftContent: '', rightContent: '', loading: true, unsupported: false })
+      next.set(id, { file, leftContent: '', rightContent: '', loading: true, unsupported: false, isImage: false })
       return next
     })
     setActiveTabId(id)
@@ -110,7 +132,7 @@ export default function App(): React.JSX.Element {
     ])
     setOpenTabs((prev) => {
       const next = new Map(prev)
-      next.set(id, { file, leftContent: left, rightContent: right, loading: false, unsupported: false })
+      next.set(id, { file, leftContent: left, rightContent: right, loading: false, unsupported: false, isImage: false })
       return next
     })
   }, [openTabs])
@@ -209,7 +231,6 @@ export default function App(): React.JSX.Element {
     }))
   ]
 
-  const activeTab = activeTabId !== 'comparison' && activeTabId !== '' ? openTabs.get(activeTabId) : null
   const noTabs = tabItems.length === 0
 
   return (
@@ -268,6 +289,8 @@ export default function App(): React.JSX.Element {
               <div className="flex flex-1 items-center justify-center text-[#858585]">
                 Cargando archivo…
               </div>
+            ) : tab.isImage ? (
+              <ImageViewer file={tab.file} />
             ) : tab.unsupported ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-3 text-[#858585]">
                 <div className="text-5xl">🚫</div>

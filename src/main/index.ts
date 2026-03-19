@@ -96,6 +96,12 @@ function createWindow(): void {
     return fs.readFileSync(filePath, 'utf-8')
   })
 
+  // IPC: read file as base64 (para imágenes)
+  ipcMain.handle('read-file-base64', async (_event, filePath: string) => {
+    const buf = fs.readFileSync(filePath)
+    return buf.toString('base64')
+  })
+
   // IPC: write file
   ipcMain.handle('write-file', async (_event, filePath: string, content: string) => {
     fs.writeFileSync(filePath, content, 'utf-8')

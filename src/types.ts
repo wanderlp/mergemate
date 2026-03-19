@@ -41,6 +41,7 @@ export interface ElectronAPI {
   copyFileWithBak: (src: string, dest: string) => Promise<void>
   showFolderDialog: () => Promise<string | null>
   getFileHash: (filePath: string) => Promise<string>
+  readFileBase64: (filePath: string) => Promise<string>
   onScanProgress: (callback: (progress: ScanProgress) => void) => () => void
   getLastFolders: () => Promise<{ left: string | null; right: string | null }>
   saveLastFolders: (left: string, right: string) => Promise<void>

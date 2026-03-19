@@ -30,6 +30,9 @@ const api: ElectronAPI = {
     }
   },
 
+  readFileBase64: (filePath) =>
+    ipcRenderer.invoke('read-file-base64', filePath),
+
   getLastFolders: () =>
     ipcRenderer.invoke('get-last-folders'),
 

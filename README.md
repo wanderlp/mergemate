@@ -46,12 +46,29 @@ npm run dev
 - Carpetas colapsables, ordenadas: directorios primero, luego archivos, ambos alfabéticamente
 - Barra de estado con conteo por categoría
 
-### Visor de diferencias
+### Visor de diferencias (archivos de texto)
 - Monaco Editor en modo lado a lado (tema vs-dark)
 - Detección automática de lenguaje por extensión de archivo
 - Navegación entre bloques de diferencia con botones Anterior/Siguiente
 - Copiar izquierda→derecha o derecha→izquierda (crea copia de seguridad .bak automáticamente)
 - Guardar cualquiera de los dos lados de forma independiente
+
+### Visor de imágenes
+Doble clic en cualquier imagen abre un visor dedicado con cuatro modos:
+- **Slider** — arrastra para revelar izquierda/derecha sobre la misma imagen (ideal para detectar cambios visuales sutiles)
+- **Lado a lado** — ambas versiones en paralelo
+- **Solo izquierda / Solo derecha** — vista individual
+- Zoom con botones + / − (25 % – 400 %) y botón de reinicio
+
+Formatos soportados: `png`, `jpg`, `jpeg`, `gif`, `bmp`, `ico`, `tiff`, `tif`, `webp`, `avif`, `svg`
+
+### Árbol de archivos — navegación por teclado
+| Tecla | Acción |
+|-------|--------|
+| `↑` / `↓` | Moverse entre filas |
+| `→` | Expandir carpeta (o ir al primer hijo si ya está expandida) |
+| `←` | Colapsar carpeta (o subir al directorio padre) |
+| `Enter` | Abrir archivo / expandir-colapsar carpeta |
 
 ### Directorios ignorados
 `node_modules`, `.git`, `__pycache__`, `dist`, `build`, `.next`, `out`, `target`, `.gradle`, `.idea`, `.vscode`, `*.bak`
@@ -80,4 +97,5 @@ npm run dev
 - **Monaco Editor** — visor de diferencias
 - **Tailwind CSS** — estilos con tema oscuro
 - **electron-store** — persistencia de las últimas carpetas usadas
+- **react-compare-slider** — visor comparativo de imágenes con slider
 - **Lucide React** — íconos
