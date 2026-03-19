@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider'
 import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
 import type { FileEntry } from '../types'
+import type { ImageDims } from './StatusBar'
 
 interface ImageViewerProps {
   file: FileEntry
+  onDimsLoaded?: (left: ImageDims | null, right: ImageDims | null) => void
 }
 
 // Mime type por extensión para la data URL
@@ -34,7 +36,16 @@ const MODE_LABELS: Record<ViewMode, string> = {
   right:      'Solo derecha',
 }
 
-export function ImageViewer({ file }: ImageViewerProps): React.JSX.Element {
+function getImageDims(url: string): Promise<ImageDims> {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight })
+    img.onerror = reject
+    img.src = url
+  })
+}
+
+export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX.Element {
   const [mode, setMode] = useState<ViewMode>('sidebyside')
   const [zoom, setZoom] = useState(1)
   const [leftUrl,  setLeftUrl]  = useState<string | null>(null)
@@ -46,24 +57,34 @@ export function ImageViewer({ file }: ImageViewerProps): React.JSX.Element {
     setLeftUrl(null)
     setRightUrl(null)
 
+    let leftDataUrl: string | null = null
+    let rightDataUrl: string | null = null
+
     const promises: Promise<void>[] = []
 
     if (file.leftPath) {
       promises.push(
         window.electronAPI.readFileBase64(file.leftPath)
-          .then((b64) => setLeftUrl(toDataUrl(b64, file.extension)))
+          .then((b64) => { leftDataUrl = toDataUrl(b64, file.extension); setLeftUrl(leftDataUrl) })
           .catch(() => setLeftUrl(null))
       )
     }
     if (file.rightPath) {
       promises.push(
         window.electronAPI.readFileBase64(file.rightPath)
-          .then((b64) => setRightUrl(toDataUrl(b64, file.extension)))
+          .then((b64) => { rightDataUrl = toDataUrl(b64, file.extension); setRightUrl(rightDataUrl) })
           .catch(() => setRightUrl(null))
       )
     }
 
-    Promise.all(promises).finally(() => setLoading(false))
+    Promise.all(promises).then(async () => {
+      if (!onDimsLoaded) return
+      const [leftDims, rightDims] = await Promise.all([
+        leftDataUrl  ? getImageDims(leftDataUrl).catch(() => null)  : Promise.resolve(null),
+        rightDataUrl ? getImageDims(rightDataUrl).catch(() => null) : Promise.resolve(null),
+      ])
+      onDimsLoaded(leftDims, rightDims)
+    }).finally(() => setLoading(false))
   }, [file.leftPath, file.rightPath, file.extension])
 
   const bothExist   = Boolean(leftUrl && rightUrl)

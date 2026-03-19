@@ -5,9 +5,11 @@ import { DiffViewer } from './components/DiffViewer'
 import { ImageViewer } from './components/ImageViewer'
 import { ProgressBar } from './components/ProgressBar'
 import { StatusBar } from './components/StatusBar'
+import type { StatusInfo, ImageDims } from './components/StatusBar'
 import { TabBar } from './components/TabBar'
 import type { TabItem } from './components/TabBar'
 import { useFolderScan } from './hooks/useFolderScan'
+import { computeDiffStats } from './utils/diffStats'
 import type { FileEntry } from './types'
 
 const IMAGE_EXTENSIONS = new Set([
@@ -44,6 +46,9 @@ interface DiffTabData {
   loading: boolean
   unsupported: boolean
   isImage: boolean
+  // stats para la barra de estado
+  diffStats?: { identical: number; different: number; commentsOnly: number; leftOnly: number; rightOnly: number; total: number }
+  imageDims?: { left: ImageDims | null; right: ImageDims | null }
 }
 
 export default function App(): React.JSX.Element {
@@ -129,9 +134,10 @@ export default function App(): React.JSX.Element {
       file.leftPath ? window.electronAPI.readFile(file.leftPath) : Promise.resolve(''),
       file.rightPath ? window.electronAPI.readFile(file.rightPath) : Promise.resolve('')
     ])
+    const diffStats = computeDiffStats(left, right)
     setOpenTabs((prev) => {
       const next = new Map(prev)
-      next.set(id, { file, leftContent: left, rightContent: right, loading: false, unsupported: false, isImage: false })
+      next.set(id, { file, leftContent: left, rightContent: right, loading: false, unsupported: false, isImage: false, diffStats })
       return next
     })
   }, [openTabs])
@@ -219,6 +225,14 @@ export default function App(): React.JSX.Element {
     return true
   }, [openTabs, activeTabId, scan])
 
+  const handleImageDimsLoaded = useCallback((id: string, left: ImageDims | null, right: ImageDims | null) => {
+    setOpenTabs((prev) => {
+      const t = prev.get(id)
+      if (!t) return prev
+      return new Map(prev).set(id, { ...t, imageDims: { left, right } })
+    })
+  }, [])
+
   // Construir lista de tabs visible
   const tabItems: TabItem[] = [
     ...(showComparisonTab ? [{ id: 'comparison', label: 'Comparación', extension: '', loading: false }] : []),
@@ -231,6 +245,28 @@ export default function App(): React.JSX.Element {
   ]
 
   const noTabs = tabItems.length === 0
+
+  // StatusInfo según el tab activo
+  const statusInfo: StatusInfo = (() => {
+    if (activeTabId === 'comparison' || activeTabId === '') {
+      return scanResult ? { kind: 'comparison', stats: scanResult.stats } : { kind: 'empty' }
+    }
+    const tab = openTabs.get(activeTabId)
+    if (!tab) return { kind: 'empty' }
+    if (tab.isImage) {
+      return {
+        kind: 'image',
+        leftDims: tab.imageDims?.left ?? null,
+        rightDims: tab.imageDims?.right ?? null,
+        leftSize: tab.file.leftSize,
+        rightSize: tab.file.rightSize,
+      }
+    }
+    if (tab.diffStats) {
+      return { kind: 'diff', ...tab.diffStats }
+    }
+    return { kind: 'empty' }
+  })()
 
   return (
     <div className="flex h-screen flex-col bg-[#1e1e1e]">
@@ -289,7 +325,10 @@ export default function App(): React.JSX.Element {
                 Cargando archivo…
               </div>
             ) : tab.isImage ? (
-              <ImageViewer file={tab.file} />
+              <ImageViewer
+                file={tab.file}
+                onDimsLoaded={(l, r) => handleImageDimsLoaded(id, l, r)}
+              />
             ) : tab.unsupported ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-3 text-[#858585]">
                 <div className="text-5xl">🚫</div>
@@ -313,7 +352,7 @@ export default function App(): React.JSX.Element {
         ))}
       </div>
 
-      <StatusBar stats={scanResult?.stats ?? null} />
+      <StatusBar info={statusInfo} />
     </div>
   )
 }
