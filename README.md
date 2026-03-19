@@ -35,6 +35,11 @@ npm run dev
 
 ## Funcionalidades
 
+### Sistema de tabs estilo VS Code
+- Cada archivo abierto aparece en su propio tab con el icono del tipo de archivo
+- Cierre con clic en la X, con el botón central del ratón o con `Escape` para volver a la vista de comparación
+- El tab de **Comparación** siempre está disponible mientras haya carpetas abiertas
+
 ### Vista de comparación de carpetas
 - Abre dos carpetas y visualiza todos los archivos en un árbol unificado
 - Estado de cada archivo codificado por color:
@@ -43,6 +48,7 @@ npm run dev
   - 🟡 **Amarillo** — difieren solo en comentarios o espacios en blanco
   - 🔵 **Azul** — existe solo en la carpeta izquierda
   - 🟣 **Morado** — existe solo en la carpeta derecha
+- Icono de tipo de archivo por extensión (TypeScript, C#, Python, PHP, C++, etc.) con logo oficial de devicon
 - Carpetas colapsables, ordenadas: directorios primero, luego archivos, ambos alfabéticamente
 - Barra de estado con conteo por categoría
 
@@ -55,10 +61,13 @@ npm run dev
 
 ### Visor de imágenes
 Doble clic en cualquier imagen abre un visor dedicado con cuatro modos:
+- **Lado a lado** — ambas versiones en paneles paralelos (modo por defecto)
 - **Slider** — arrastra para revelar izquierda/derecha sobre la misma imagen (ideal para detectar cambios visuales sutiles)
-- **Lado a lado** — ambas versiones en paralelo
 - **Solo izquierda / Solo derecha** — vista individual
-- Zoom con botones + / − (25 % – 400 %) y botón de reinicio
+- Zoom con botones + / − (25 % – 400 %), rueda del ratón (pasos de 15 %) y botón de reinicio
+- Navegación con drag cuando el zoom es mayor a 100 % (cursor de mano)
+- Si ambas imágenes son idénticas se muestran como una sola sin controles de modo
+- La barra de estado muestra dimensiones en píxeles y tamaño de archivo de cada versión
 
 Formatos soportados: `png`, `jpg`, `jpeg`, `gif`, `bmp`, `ico`, `tiff`, `tif`, `webp`, `avif`, `svg`
 
@@ -98,4 +107,5 @@ Formatos soportados: `png`, `jpg`, `jpeg`, `gif`, `bmp`, `ico`, `tiff`, `tif`, `
 - **Tailwind CSS** — estilos con tema oscuro
 - **electron-store** — persistencia de las últimas carpetas usadas
 - **react-compare-slider** — visor comparativo de imágenes con slider
-- **Lucide React** — íconos
+- **@iconify/react + @iconify/icons-devicon** — iconos de tipo de archivo por extensión
+- **Lucide React** — íconos de interfaz

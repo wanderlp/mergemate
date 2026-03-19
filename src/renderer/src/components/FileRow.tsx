@@ -1,5 +1,6 @@
 import React, { useRef } from 'react'
-import { ChevronRight, ChevronDown } from 'lucide-react'
+import { ChevronRight, ChevronDown, Folder, FolderOpen } from 'lucide-react'
+import { FileTypeIcon } from './FileTypeIcon'
 import type { FileEntry, FileStatus } from '../types'
 
 interface FileRowProps {
@@ -30,17 +31,6 @@ const STATUS_LABELS: Record<FileStatus, string> = {
   'right-only': 'Solo en derecha'
 }
 
-const EXT_ICONS: Record<string, string> = {
-  ts: '🟦', tsx: '🟦', js: '🟨', jsx: '🟨', mjs: '🟨',
-  py: '🐍', java: '☕', kt: '🟣', kts: '🟣',
-  cs: '🔷', c: '🔵', h: '🔵', cpp: '🔶', cc: '🔶', hpp: '🔶',
-  json: '📋', md: '📝', html: '🌐', css: '🎨', scss: '🎨',
-  xml: '📄', yaml: '📄', yml: '📄', toml: '📄', ini: '📄',
-  sh: '💻', bat: '💻', ps1: '💻',
-  png: '🖼', jpg: '🖼', jpeg: '🖼', gif: '🖼', svg: '🖼',
-  pdf: '📕', zip: '📦', gz: '📦',
-}
-
 const DOUBLE_CLICK_MS = 300
 
 function formatSize(bytes: number | null): string {
@@ -49,11 +39,6 @@ function formatSize(bytes: number | null): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`
-}
-
-function getIcon(entry: FileEntry): string {
-  if (entry.isDirectory) return ''
-  return EXT_ICONS[entry.extension] ?? '📄'
 }
 
 export function FileRow({
@@ -85,7 +70,6 @@ export function FileRow({
     onFocusPath?.(entry.relativePath)
     const now = Date.now()
     if (now - lastMouseDown.current <= DOUBLE_CLICK_MS) {
-      // Doble click manual: actuar de inmediato sin esperar el evento dblclick
       lastMouseDown.current = 0
       if (entry.isDirectory) onToggle()
       else onDoubleClick()
@@ -136,12 +120,14 @@ export function FileRow({
               {expanded
                 ? <ChevronDown size={16} className="flex-shrink-0 text-[#aaaaaa]" />
                 : <ChevronRight size={16} className="flex-shrink-0 text-[#aaaaaa]" />}
-              <span className="text-[#e8c27a]">📁</span>
+              {expanded
+                ? <FolderOpen size={16} className="flex-shrink-0 text-[#e8c27a]" />
+                : <Folder size={16} className="flex-shrink-0 text-[#e8c27a]" />}
               <span className="truncate text-[#cccccc]">{entry.name}</span>
             </>
           ) : (
             <>
-              <span className="flex-shrink-0">{getIcon(entry)}</span>
+              <FileTypeIcon extension={entry.extension} />
               <span className="truncate" style={{ color }}>{entry.name}</span>
             </>
           )
@@ -170,12 +156,14 @@ export function FileRow({
           entry.isDirectory ? (
             <>
               <span className="truncate text-[#cccccc]">{entry.name}</span>
-              <span className="text-[#e8c27a]">📁</span>
+              {expanded
+                ? <FolderOpen size={16} className="flex-shrink-0 text-[#e8c27a]" />
+                : <Folder size={16} className="flex-shrink-0 text-[#e8c27a]" />}
             </>
           ) : (
             <>
               <span className="truncate" style={{ color }}>{entry.name}</span>
-              <span className="flex-shrink-0">{getIcon(entry)}</span>
+              <FileTypeIcon extension={entry.extension} />
             </>
           )
         ) : (

@@ -1,16 +1,6 @@
 import React from 'react'
 import { X, FolderOpen } from 'lucide-react'
-
-const EXT_ICONS: Record<string, string> = {
-  ts: '🟦', tsx: '🟦', js: '🟨', jsx: '🟨', mjs: '🟨',
-  py: '🐍', java: '☕', kt: '🟣', kts: '🟣',
-  cs: '🔷', c: '🔵', h: '🔵', cpp: '🔶', cc: '🔶', hpp: '🔶',
-  json: '📋', md: '📝', html: '🌐', css: '🎨', scss: '🎨',
-  xml: '📄', yaml: '📄', yml: '📄', toml: '📄', ini: '📄',
-  sh: '💻', bat: '💻', ps1: '💻',
-  png: '🖼', jpg: '🖼', jpeg: '🖼', gif: '🖼', svg: '🖼',
-  pdf: '📕', zip: '📦', gz: '📦',
-}
+import { FileTypeIcon } from './FileTypeIcon'
 
 export interface TabItem {
   id: string
@@ -38,7 +28,9 @@ export function TabBar({ tabs, activeTabId, onSelectTab, onCloseTab }: TabBarPro
         const isActive = tab.id === activeTabId
         const icon = tab.id === 'comparison'
           ? <FolderOpen size={13} className="flex-shrink-0" />
-          : <span className="flex-shrink-0">{tab.loading ? '⏳' : (EXT_ICONS[tab.extension] ?? '📄')}</span>
+          : tab.loading
+            ? <span className="flex-shrink-0 text-xs">⏳</span>
+            : <FileTypeIcon extension={tab.extension} size={14} />
 
         return (
           <div
