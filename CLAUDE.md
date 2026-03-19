@@ -74,6 +74,18 @@ El proyecto usa **Framer Motion** para animaciones UI. Al revisar o modificar co
 
 No implementar la animación sin que el programador confirme primero.
 
+## shadcn/ui
+
+El proyecto usa **shadcn/ui** como sistema de componentes base. Todo código nuevo en el renderer debe respetar esta integración:
+
+- **Botones**: usar `<Button>` de `components/ui/button.tsx` en lugar de elementos `<button>` nativos. Variantes disponibles: `default` (fondo `#3e3e42`), `primary` (azul `#007acc`), `ghost` (transparente). Tamaños: `default` (`px-3 py-1.5`), `sm` (`px-2 py-1`), `icon` (`p-1.5` para botones solo con icono).
+- **Separadores**: usar `<Separator orientation="vertical" className="mx-1" />` de `components/ui/separator.tsx` en lugar del div `h-4 w-px bg-[#3e3e42]`.
+- **Barras de progreso**: usar `<Progress value={n} />` de `components/ui/progress.tsx`.
+- **Tooltips**: `<TooltipProvider>` ya está en `App.tsx`. Usar `<Tooltip>`, `<TooltipTrigger>`, `<TooltipContent>` de `components/ui/tooltip.tsx` cuando se quiera un tooltip accesible y animado.
+- **Utilidad `cn()`**: usar `cn()` de `lib/utils.ts` para combinar clases Tailwind de forma segura (evita conflictos con `twMerge`).
+- **CSS variables**: el tema está mapeado en `index.css` con variables HSL (`--background`, `--primary`, `--border`, etc.). Nuevos componentes shadcn deben seguir el mismo patrón.
+- **No crear botones nativos** cuando ya existe el componente `Button` — mantener consistencia y aprovechar el manejo centralizado de `disabled:opacity-40` y `focus-visible`.
+
 ## Restricciones importantes
 
 - `"type": "module"` NO debe estar en `package.json` — electron-vite genera CJS para main/preload, y agregarlo rompe Electron en tiempo de ejecución (causa ventana en negro).
