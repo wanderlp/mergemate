@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { FileRow } from './FileRow'
 import type { FileEntry } from '../types'
 
@@ -64,19 +65,30 @@ function FlattenedTree({
               else rowRefsMap.current.delete(entry.relativePath)
             }}
           />
-          {entry.isDirectory && expandedDirs.has(entry.relativePath) && entry.children && (
-            <FlattenedTree
-              entries={entry.children}
-              depth={depth + 1}
-              expandedDirs={expandedDirs}
-              onToggle={onToggle}
-              onFileOpen={onFileOpen}
-              onHover={onHover}
-              focusedPath={focusedPath}
-              onFocusPath={onFocusPath}
-              rowRefsMap={rowRefsMap}
-            />
-          )}
+          <AnimatePresence initial={false}>
+            {entry.isDirectory && expandedDirs.has(entry.relativePath) && entry.children && (
+              <motion.div
+                key={entry.relativePath + '-children'}
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2, ease: 'easeInOut' }}
+                style={{ overflow: 'hidden' }}
+              >
+                <FlattenedTree
+                  entries={entry.children}
+                  depth={depth + 1}
+                  expandedDirs={expandedDirs}
+                  onToggle={onToggle}
+                  onFileOpen={onFileOpen}
+                  onHover={onHover}
+                  focusedPath={focusedPath}
+                  onFocusPath={onFocusPath}
+                  rowRefsMap={rowRefsMap}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </React.Fragment>
       ))}
     </>
