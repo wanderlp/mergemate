@@ -4,6 +4,7 @@
 - Cada archivo abierto aparece en su propio tab con el icono del tipo de archivo
 - Cierre con clic en la X, con el botón central del ratón o con `Escape` para volver a la vista de comparación
 - El tab de **Comparación** siempre está disponible mientras haya carpetas abiertas
+- Los tabs aparecen y desaparecen con animación suave
 
 ---
 
@@ -15,8 +16,10 @@
   - 🟡 **Amarillo** — difieren solo en comentarios o espacios en blanco
   - 🔵 **Azul** — existe solo en la carpeta izquierda
   - 🟣 **Morado** — existe solo en la carpeta derecha
-- Icono de tipo de archivo por extensión (TypeScript, C#, Python, PHP, C++, etc.) con logo oficial de devicon
+- Icono de tipo de archivo por extensión con logos oficiales: devicon para lenguajes de código (TypeScript, C#, Python, PHP, C++, etc.) y MDI para formatos de imagen (PNG, JPG, GIF, etc.)
 - Carpetas colapsables, ordenadas: directorios primero, luego archivos, ambos alfabéticamente
+- Animación de llenado progresivo al cargar el resultado del escaneo
+- Expansión y colapso de carpetas con animación suave
 - Barra de estado con conteo por categoría
 
 ### Navegación por teclado en el árbol
