@@ -187,58 +187,116 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
       </div>
 
       {/* Contenido */}
-      <div
-        className="relative flex flex-1 items-center justify-center overflow-hidden bg-[#181818]"
-        style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
-        onMouseDown={handleMouseDown}
-        onMouseMove={handleMouseMove}
-        onMouseUp={handleMouseUp}
-        onMouseLeave={handleMouseUp}
-        onWheel={handleWheel}
-      >
-        {loading ? (
+      {loading ? (
+        <div className="flex flex-1 items-center justify-center bg-[#181818]">
           <span className="text-sm text-[#858585]">Cargando imagen…</span>
-        ) : (
+        </div>
+      ) : effectiveMode === 'slider' && leftUrl && rightUrl ? (
+        /* Slider: un solo panel con zoom/pan */
+        <div
+          className="relative flex flex-1 items-center justify-center overflow-hidden bg-[#181818]"
+          style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
+          onMouseDown={handleMouseDown}
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onWheel={handleWheel}
+        >
           <div style={{
             transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
             transformOrigin: 'center center',
             transition: isDragging ? 'none' : 'transform 0.15s ease',
             userSelect: 'none',
           }}>
-            {effectiveMode === 'slider' && leftUrl && rightUrl && (
-              <ReactCompareSlider
-                style={{ width: 800, maxWidth: '90vw', borderRadius: 4, overflow: 'hidden' }}
-                itemOne={<ReactCompareSliderImage src={leftUrl} alt="Izquierda" style={{ objectFit: 'contain' }} />}
-                itemTwo={<ReactCompareSliderImage src={rightUrl} alt="Derecha"   style={{ objectFit: 'contain' }} />}
-              />
-            )}
-
-            {effectiveMode === 'sidebyside' && leftUrl && rightUrl && (
-              <div className="flex gap-6">
-                <ImagePanel url={leftUrl} label="Izquierda" />
-                <ImagePanel url={rightUrl} label="Derecha" />
-              </div>
-            )}
-
-            {effectiveMode === 'left'  && leftUrl  && <ImagePanel url={leftUrl}  label={isIdentical ? '' : 'Izquierda'} />}
-            {effectiveMode === 'right' && rightUrl  && <ImagePanel url={rightUrl} label={isIdentical ? '' : 'Derecha'} />}
+            <ReactCompareSlider
+              style={{ width: 800, maxWidth: '90vw', borderRadius: 4, overflow: 'hidden' }}
+              itemOne={<ReactCompareSliderImage src={leftUrl} alt="Izquierda" style={{ objectFit: 'contain' }} />}
+              itemTwo={<ReactCompareSliderImage src={rightUrl} alt="Derecha"   style={{ objectFit: 'contain' }} />}
+            />
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        /* Paneles separados: label fijo + imagen zoomeable */
+        <div className="flex flex-1 overflow-hidden bg-[#181818]">
+          {(effectiveMode === 'sidebyside' || effectiveMode === 'left') && leftUrl && (
+            <ImagePanel
+              url={leftUrl}
+              label={isIdentical ? '' : 'Izquierda'}
+              zoom={zoom}
+              pan={pan}
+              isDragging={isDragging}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onWheel={handleWheel}
+            />
+          )}
+          {(effectiveMode === 'sidebyside' || effectiveMode === 'right') && rightUrl && (
+            <ImagePanel
+              url={rightUrl}
+              label={isIdentical ? '' : 'Derecha'}
+              zoom={zoom}
+              pan={pan}
+              isDragging={isDragging}
+              onMouseDown={handleMouseDown}
+              onMouseMove={handleMouseMove}
+              onMouseUp={handleMouseUp}
+              onWheel={handleWheel}
+            />
+          )}
+        </div>
+      )}
     </div>
   )
 }
 
-function ImagePanel({ url, label }: { url: string; label: string }): React.JSX.Element {
+interface ImagePanelProps {
+  url: string
+  label: string
+  zoom: number
+  pan: { x: number; y: number }
+  isDragging: boolean
+  onMouseDown: (e: React.MouseEvent) => void
+  onMouseMove: (e: React.MouseEvent) => void
+  onMouseUp: () => void
+  onWheel: (e: React.WheelEvent) => void
+}
+
+function ImagePanel({ url, label, zoom, pan, isDragging, onMouseDown, onMouseMove, onMouseUp, onWheel }: ImagePanelProps): React.JSX.Element {
   return (
-    <div className="flex flex-col items-center gap-2">
-      {label && <span className="text-xs font-semibold uppercase tracking-wider text-[#858585]">{label}</span>}
-      <img
-        src={url}
-        alt={label}
-        style={{ maxWidth: 560, maxHeight: '65vh', objectFit: 'contain', borderRadius: 4 }}
-        className="border border-[#3e3e42]"
-      />
+    <div className="flex flex-1 flex-col overflow-hidden">
+      {/* Área de imagen zoomeable */}
+      <div
+        className="relative flex flex-1 items-center justify-center overflow-hidden p-12"
+        style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
+        onMouseDown={onMouseDown}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+        onMouseLeave={onMouseUp}
+        onWheel={onWheel}
+      >
+        <img
+          src={url}
+          alt={label}
+          draggable={false}
+          style={{
+            maxWidth: '100%',
+            maxHeight: '100%',
+            objectFit: 'contain',
+            borderRadius: 4,
+            transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
+            transformOrigin: 'center center',
+            transition: isDragging ? 'none' : 'transform 0.15s ease',
+            userSelect: 'none',
+          }}
+        />
+      </div>
+      {/* Label fijo en la parte inferior, sin bordes */}
+      {label && (
+        <div className="flex-shrink-0 py-1.5 text-center text-xs font-semibold uppercase tracking-wider text-[#858585]">
+          {label}
+        </div>
+      )}
     </div>
   )
 }
