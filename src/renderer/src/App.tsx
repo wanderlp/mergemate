@@ -59,7 +59,6 @@ export default function App(): React.JSX.Element {
     clear
   } = useFolderScan()
 
-  const [hoveredPath, setHoveredPath] = useState('')
   const [openTabs, setOpenTabs] = useState<Map<string, DiffTabData>>(new Map())
   const [activeTabId, setActiveTabId] = useState<string>('')
   const [showComparisonTab, setShowComparisonTab] = useState(false)
@@ -274,7 +273,7 @@ export default function App(): React.JSX.Element {
             <FileTree
               entries={scanResult?.files ?? []}
               onFileOpen={handleFileOpen}
-              onHover={setHoveredPath}
+              onHover={() => {}}
             />
           </div>
         )}
@@ -314,7 +313,7 @@ export default function App(): React.JSX.Element {
         ))}
       </div>
 
-      <StatusBar stats={scanResult?.stats ?? null} hoveredPath={hoveredPath} />
+      <StatusBar stats={scanResult?.stats ?? null} />
     </div>
   )
 }

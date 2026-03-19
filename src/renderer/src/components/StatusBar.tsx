@@ -3,10 +3,9 @@ import type { ScanStats } from '../types'
 
 interface StatusBarProps {
   stats: ScanStats | null
-  hoveredPath: string
 }
 
-export function StatusBar({ stats, hoveredPath }: StatusBarProps): React.JSX.Element {
+export function StatusBar({ stats }: StatusBarProps): React.JSX.Element {
   return (
     <div className="flex h-8 items-center gap-4 border-t border-[#3e3e42] bg-[#007acc] px-3 text-sm text-white">
       {stats && (
@@ -34,9 +33,6 @@ export function StatusBar({ stats, hoveredPath }: StatusBarProps): React.JSX.Ele
           <span className="ml-2 text-white/60">|</span>
           <span>{stats.total} archivos en total</span>
         </>
-      )}
-      {hoveredPath && (
-        <span className="ml-auto truncate text-white/80">{hoveredPath}</span>
       )}
     </div>
   )
