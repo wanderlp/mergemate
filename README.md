@@ -52,6 +52,7 @@ npm run dev
 - **Vite + electron-vite** — herramientas de compilación
 - **Monaco Editor** — visor de diferencias
 - **Tailwind CSS** — estilos con tema oscuro
+- **shadcn/ui** — componentes de UI accesibles (Button, Separator, Progress, Tooltip) basados en Radix UI
 - **electron-store** — persistencia de las últimas carpetas usadas
 - **react-compare-slider** — visor comparativo de imágenes con slider
 - **@iconify/react + @iconify/icons-devicon** — iconos de tipo de archivo por extensión
