@@ -92,6 +92,7 @@ export function FileTree({
   const [focusedPath, setFocusedPath] = useState<string | null>(null)
   const rowRefsMap = useRef<Map<string, HTMLDivElement>>(new Map())
   const containerRef = useRef<HTMLDivElement>(null)
+  const keyboardNav = useRef(false)
 
   const handleToggle = useCallback((path: string) => {
     setExpandedDirs((prev) => {
@@ -112,9 +113,10 @@ export function FileTree({
     if (entries.length === 0) hadEntries.current = false
   }, [entries.length])
 
-  // Foca el elemento del DOM cuando cambia focusedPath
+  // Foca el elemento del DOM solo cuando la navegación viene del teclado
   useEffect(() => {
-    if (focusedPath) {
+    if (focusedPath && keyboardNav.current) {
+      keyboardNav.current = false
       const el = rowRefsMap.current.get(focusedPath)
       if (el) {
         el.focus({ preventScroll: true })
@@ -135,33 +137,35 @@ export function FileTree({
 
     if (e.key === 'ArrowDown') {
       const next = visible[currentIndex + 1] ?? visible[0]
+      keyboardNav.current = true
       setFocusedPath(next.relativePath)
 
     } else if (e.key === 'ArrowUp') {
       const prev = currentIndex > 0 ? visible[currentIndex - 1] : visible[visible.length - 1]
+      keyboardNav.current = true
       setFocusedPath(prev.relativePath)
 
     } else if (e.key === 'ArrowRight' && current?.isDirectory) {
       if (!expandedDirs.has(current.relativePath)) {
-        // Expandir
         setExpandedDirs((prev) => new Set([...prev, current.relativePath]))
       } else if (current.children && current.children.length > 0) {
-        // Ya expandida → ir al primer hijo
+        keyboardNav.current = true
         setFocusedPath(current.children[0].relativePath)
       }
 
     } else if (e.key === 'ArrowLeft') {
       if (current?.isDirectory && expandedDirs.has(current.relativePath)) {
-        // Colapsar directorio
         setExpandedDirs((prev) => {
           const next = new Set(prev)
           next.delete(current.relativePath)
           return next
         })
       } else {
-        // Ir al directorio padre (sin cerrarlo)
         const parentPath = getParentPath(current?.relativePath ?? '')
-        if (parentPath) setFocusedPath(parentPath)
+        if (parentPath) {
+          keyboardNav.current = true
+          setFocusedPath(parentPath)
+        }
       }
 
     } else if (e.key === 'Enter' && current) {

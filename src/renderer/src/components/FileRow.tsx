@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 import { ChevronRight, ChevronDown } from 'lucide-react'
 import type { FileEntry, FileStatus } from '../types'
 
@@ -41,6 +41,8 @@ const EXT_ICONS: Record<string, string> = {
   pdf: '📕', zip: '📦', gz: '📦',
 }
 
+const DOUBLE_CLICK_MS = 300
+
 function formatSize(bytes: number | null): string {
   if (bytes === null) return '—'
   if (bytes < 1024) return `${bytes} B`
@@ -72,10 +74,24 @@ export function FileRow({
   const leftExists = Boolean(entry.leftPath)
   const rightExists = Boolean(entry.rightPath)
 
-  // Side that is absent gets a dimmed hatched background
+  const lastMouseDown = useRef(0)
+
   const absentSideStyle: React.CSSProperties = {
     background: 'repeating-linear-gradient(135deg, transparent, transparent 4px, rgba(0,0,0,0.18) 4px, rgba(0,0,0,0.18) 8px)',
     opacity: 0.45
+  }
+
+  const handleMouseDown = (): void => {
+    onFocusPath?.(entry.relativePath)
+    const now = Date.now()
+    if (now - lastMouseDown.current <= DOUBLE_CLICK_MS) {
+      // Doble click manual: actuar de inmediato sin esperar el evento dblclick
+      lastMouseDown.current = 0
+      if (entry.isDirectory) onToggle()
+      else onDoubleClick()
+    } else {
+      lastMouseDown.current = now
+    }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent): void => {
@@ -94,8 +110,7 @@ export function FileRow({
       tabIndex={0}
       className="group flex cursor-pointer items-center border-b border-[#2a2d2e]/50 hover:bg-[#2a2d2e] focus:bg-[#2a2d2e] focus:outline-none transition-colors select-none"
       style={isFocused ? { backgroundColor: '#37373d' } : undefined}
-      onDoubleClick={entry.isDirectory ? onToggle : onDoubleClick}
-      onClick={() => onFocusPath?.(entry.relativePath)}
+      onMouseDown={handleMouseDown}
       onKeyDown={handleKeyDown}
       onMouseEnter={() => onHover(entry.relativePath)}
       onMouseLeave={() => onHover('')}
@@ -168,7 +183,7 @@ export function FileRow({
         )}
       </div>
 
-      {/* Status badge — solo cuando el archivo existe en ambos lados */}
+      {/* Status badge */}
       <div className="w-6 flex-shrink-0 text-center">
         {leftExists && rightExists && (
           <span
