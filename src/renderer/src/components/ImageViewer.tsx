@@ -194,6 +194,8 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
       ) : effectiveMode === 'slider' && leftUrl && rightUrl ? (
         /* Slider: un solo panel con zoom/pan */
         <div
+          role="img"
+          aria-label={`Comparación de imagen: ${file.relativePath}. Usa la rueda del ratón para hacer zoom y arrastra para navegar.`}
           className="relative flex flex-1 items-center justify-center overflow-hidden bg-[#181818] p-12"
           style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
           onMouseDown={handleMouseDown}
@@ -269,6 +271,8 @@ function ImagePanel({ url, label, zoom, pan, isDragging, onMouseDown, onMouseMov
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Área de imagen zoomeable */}
       <div
+        role="img"
+        aria-label={`${label || 'Imagen'}. Usa la rueda del ratón para hacer zoom y arrastra para navegar.`}
         className="relative flex flex-1 items-center justify-center overflow-hidden p-12"
         style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
         onMouseDown={onMouseDown}

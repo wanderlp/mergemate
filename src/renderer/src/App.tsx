@@ -291,11 +291,11 @@ export default function App(): React.JSX.Element {
       <div className="relative flex flex-1 flex-col overflow-hidden">
         {/* Sin tabs: pantalla de bienvenida */}
         {noTabs && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-4 text-[#858585]">
-            <div className="text-7xl">📂↔️📂</div>
+          <div className="flex flex-1 flex-col items-center justify-center gap-4 text-[#858585]" role="main" aria-label="Pantalla de bienvenida">
+            <div className="text-7xl" aria-hidden="true">📂↔️📂</div>
             <div className="text-3xl font-bold text-[#cccccc]">MergeMate</div>
             <div className="text-sm">Abre dos carpetas para comenzar a comparar</div>
-            <div className="mt-2 flex gap-4 text-sm text-[#aaaaaa]">
+            <div className="mt-2 flex gap-4 text-sm text-[#aaaaaa]" aria-label="Atajos de teclado disponibles">
               <span>Ctrl+L — Abrir izquierda</span>
               <span>Ctrl+R — Abrir derecha</span>
               <span>Ctrl+F5 — Actualizar</span>
@@ -305,7 +305,10 @@ export default function App(): React.JSX.Element {
 
         {/* Tab: Comparación */}
         {showComparisonTab && (
-          <div className={activeTabId === 'comparison' ? 'flex flex-1 flex-col overflow-hidden' : 'hidden'}>
+          <div
+            className={activeTabId === 'comparison' ? 'flex flex-1 flex-col overflow-hidden' : 'hidden'}
+            aria-hidden={activeTabId !== 'comparison' ? true : undefined}
+          >
             <AnimatePresence>
               {scanning && progress && <ProgressBar progress={progress} />}
             </AnimatePresence>
@@ -322,9 +325,10 @@ export default function App(): React.JSX.Element {
           <div
             key={id}
             className={activeTabId === id ? 'flex flex-1 flex-col overflow-hidden' : 'hidden'}
+            aria-hidden={activeTabId !== id ? true : undefined}
           >
             {tab.loading ? (
-              <div className="flex flex-1 items-center justify-center text-[#858585]">
+              <div className="flex flex-1 items-center justify-center text-[#858585]" role="status" aria-live="polite">
                 Cargando archivo…
               </div>
             ) : tab.isImage ? (
@@ -333,8 +337,8 @@ export default function App(): React.JSX.Element {
                 onDimsLoaded={(l, r) => handleImageDimsLoaded(id, l, r)}
               />
             ) : tab.unsupported ? (
-              <div className="flex flex-1 flex-col items-center justify-center gap-3 text-[#858585]">
-                <div className="text-5xl">🚫</div>
+              <div className="flex flex-1 flex-col items-center justify-center gap-3 text-[#858585]" role="alert">
+                <div className="text-5xl" aria-hidden="true">🚫</div>
                 <div className="text-lg font-semibold text-[#cccccc]">Formato no disponible</div>
                 <div className="text-sm">
                   El archivo <span className="text-[#aaaaaa]">.{tab.file.extension}</span> es binario y no puede compararse como texto.

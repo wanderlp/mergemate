@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { FileRow } from './FileRow'
 import type { FileEntry } from '../types'
 
@@ -31,14 +31,16 @@ function getParentPath(relativePath: string): string | null {
   return parts.slice(0, -1).join('/')
 }
 
-const ROW_VARIANTS = {
-  hidden: { opacity: 0, x: -10 },
-  visible: (i: number) => ({
-    opacity: 1,
-    x: 0,
-    transition: { duration: 0.15, delay: Math.min(i * 0.018, 0.6) },
-  }),
-  exit: { opacity: 0, x: -10, transition: { duration: 0.1 } },
+function makeRowVariants(reduced: boolean) {
+  return {
+    hidden: { opacity: 0, x: reduced ? 0 : -10 },
+    visible: (i: number) => ({
+      opacity: 1,
+      x: 0,
+      transition: { duration: reduced ? 0 : 0.15, delay: reduced ? 0 : Math.min(i * 0.018, 0.6) },
+    }),
+    exit: { opacity: 0, x: reduced ? 0 : -10, transition: { duration: reduced ? 0 : 0.1 } },
+  }
 }
 
 export function FileTree({
@@ -89,6 +91,9 @@ export function FileTree({
       }
     }
   }, [focusedPath])
+
+  const shouldReduceMotion = useReducedMotion()
+  const rowVariants = makeRowVariants(shouldReduceMotion ?? false)
 
   const visible = flattenVisible(entries, expandedDirs)
 
@@ -170,7 +175,7 @@ export function FileTree({
             <motion.div
               key={`${scanKey.current}-${entry.relativePath}`}
               custom={index}
-              variants={ROW_VARIANTS}
+              variants={rowVariants}
               initial="hidden"
               animate="visible"
               exit="exit"

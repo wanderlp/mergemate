@@ -132,7 +132,7 @@ export function FileRow({
             </>
           )
         ) : (
-          <span className="truncate text-[#555]">—</span>
+          <span className="truncate text-[#6e6e6e]">—</span>
         )}
       </div>
 
@@ -140,7 +140,7 @@ export function FileRow({
       <div className="w-40 flex-shrink-0 px-2 py-2 text-center text-xs text-[#aaaaaa]">
         {entry.leftSize === entry.rightSize && entry.leftSize !== null
           ? formatSize(entry.leftSize)
-          : <span>{formatSize(entry.leftSize)} <span className="text-[#555]">/</span> {formatSize(entry.rightSize)}</span>
+          : <span>{formatSize(entry.leftSize)} <span className="text-[#6e6e6e]">/</span> {formatSize(entry.rightSize)}</span>
         }
       </div>
 
@@ -167,7 +167,7 @@ export function FileRow({
             </>
           )
         ) : (
-          <span className="truncate text-[#555]">—</span>
+          <span className="truncate text-[#6e6e6e]">—</span>
         )}
       </div>
 
