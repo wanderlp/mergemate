@@ -3,6 +3,8 @@ import { DiffEditor, type DiffEditorProps } from '@monaco-editor/react'
 import { ChevronUp, ChevronDown, ArrowLeftRight, Save } from 'lucide-react'
 import type { FileEntry } from '../types'
 import type * as monaco from 'monaco-editor'
+import { Button } from './ui/button'
+import { Separator } from './ui/separator'
 
 interface DiffViewerProps {
   file: FileEntry
@@ -112,9 +114,6 @@ export function DiffViewer({
   const canCopyLeft = Boolean(file.leftPath)
   const canCopyRight = Boolean(file.rightPath)
 
-  const btnBase = 'flex items-center gap-1.5 rounded bg-[#3e3e42] px-3 py-1.5 text-sm text-[#cccccc] hover:bg-[#505050] transition-colors'
-  const btnDisabled = 'disabled:opacity-40'
-
   return (
     <div className="flex h-full flex-col bg-[#1e1e1e]">
       {/* Toolbar */}
@@ -124,69 +123,63 @@ export function DiffViewer({
         </div>
 
         <div className="flex items-center gap-1">
-          <button
+          <Button
             onClick={() => navigateDiff('prev')}
-            className={btnBase}
             title="Diferencia anterior (Alt+↑)"
             aria-label="Ir a diferencia anterior"
           >
-            <ChevronUp size={16} />
+            <ChevronUp size={16} aria-hidden="true" />
             Anterior
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => navigateDiff('next')}
-            className={btnBase}
             title="Siguiente diferencia (Alt+↓)"
             aria-label="Ir a siguiente diferencia"
           >
-            <ChevronDown size={16} />
+            <ChevronDown size={16} aria-hidden="true" />
             Siguiente
-          </button>
+          </Button>
         </div>
 
-        <div className="mx-2 h-4 w-px bg-[#3e3e42]" />
+        <Separator orientation="vertical" className="mx-1" />
 
-        <button
+        <Button
           onClick={handleCopyToLeft}
           disabled={!canCopyLeft || !canCopyRight}
-          className={`${btnBase} ${btnDisabled}`}
           title="Copiar derecha → izquierda"
           aria-label="Copiar contenido a carpeta izquierda"
         >
-          <ArrowLeftRight size={16} />← Copiar a izquierda
-        </button>
-        <button
+          <ArrowLeftRight size={16} aria-hidden="true" />← Copiar a izquierda
+        </Button>
+        <Button
           onClick={handleCopyToRight}
           disabled={!canCopyLeft || !canCopyRight}
-          className={`${btnBase} ${btnDisabled}`}
           title="Copiar izquierda → derecha"
           aria-label="Copiar contenido a carpeta derecha"
         >
-          Copiar a derecha →<ArrowLeftRight size={16} />
-        </button>
+          Copiar a derecha →<ArrowLeftRight size={16} aria-hidden="true" />
+        </Button>
 
-        <div className="mx-2 h-4 w-px bg-[#3e3e42]" />
+        <Separator orientation="vertical" className="mx-1" />
 
-        <button
+        <Button
           onClick={handleSaveLeft}
           disabled={!canCopyLeft}
-          className={`${btnBase} ${btnDisabled}`}
           title="Guardar archivo izquierdo (Ctrl+S)"
           aria-label="Guardar archivo izquierdo"
         >
-          <Save size={16} />
+          <Save size={16} aria-hidden="true" />
           Guardar izquierda
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleSaveRight}
           disabled={!canCopyRight}
-          className={`${btnBase} ${btnDisabled}`}
           title="Guardar archivo derecho (Ctrl+S)"
           aria-label="Guardar archivo derecho"
         >
-          <Save size={16} />
+          <Save size={16} aria-hidden="true" />
           Guardar derecha
-        </button>
+        </Button>
       </div>
 
       {/* Monaco Diff Editor */}

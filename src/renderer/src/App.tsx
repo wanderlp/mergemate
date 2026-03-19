@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { AnimatePresence } from 'framer-motion'
+import { TooltipProvider } from './components/ui/tooltip'
 import { Toolbar } from './components/Toolbar'
 import { FileTree } from './components/FileTree'
 import { DiffViewer } from './components/DiffViewer'
@@ -270,6 +271,7 @@ export default function App(): React.JSX.Element {
   })()
 
   return (
+    <TooltipProvider delayDuration={400}>
     <div className="flex h-screen flex-col bg-[#1e1e1e]">
       <Toolbar
         leftFolder={leftFolder}
@@ -361,5 +363,6 @@ export default function App(): React.JSX.Element {
 
       <StatusBar info={statusInfo} />
     </div>
+    </TooltipProvider>
   )
 }

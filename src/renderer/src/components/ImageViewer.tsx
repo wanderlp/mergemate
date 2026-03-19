@@ -3,6 +3,8 @@ import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slide
 import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
 import type { FileEntry } from '../types'
 import type { ImageDims } from './StatusBar'
+import { Button } from './ui/button'
+import { Separator } from './ui/separator'
 
 interface ImageViewerProps {
   file: FileEntry
@@ -145,17 +147,14 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
 
         <div className="ml-auto flex items-center gap-1">
           {bothExist && !isIdentical && (Object.keys(MODE_LABELS) as ViewMode[]).map((m) => (
-            <button
+            <Button
               key={m}
+              size="sm"
+              variant={mode === m ? 'primary' : 'default'}
               onClick={() => setMode(m)}
-              className={`rounded px-3 py-1.5 text-xs transition-colors ${
-                mode === m
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-[#3e3e42] text-[#cccccc] hover:bg-[#505050]'
-              }`}
             >
               {MODE_LABELS[m]}
-            </button>
+            </Button>
           ))}
           {isIdentical && (
             <span className="rounded bg-green-900/40 px-2 py-1 text-xs text-green-400">
@@ -163,26 +162,20 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
             </span>
           )}
 
-          <div className="mx-2 h-4 w-px bg-[#3e3e42]" />
+          <Separator orientation="vertical" className="mx-1" />
 
-          <button onClick={handleZoomOut} disabled={zoom <= 0.25}
-            className="rounded bg-[#3e3e42] p-1.5 text-[#cccccc] hover:bg-[#505050] disabled:opacity-40 transition-colors"
-            title="Alejar">
-            <ZoomOut size={14} />
-          </button>
+          <Button size="icon" onClick={handleZoomOut} disabled={zoom <= 0.25} title="Alejar" aria-label="Alejar">
+            <ZoomOut size={14} aria-hidden="true" />
+          </Button>
           <span className="w-12 text-center text-xs text-[#aaaaaa]">
             {Math.round(zoom * 100)}%
           </span>
-          <button onClick={handleZoomIn} disabled={zoom >= 4}
-            className="rounded bg-[#3e3e42] p-1.5 text-[#cccccc] hover:bg-[#505050] disabled:opacity-40 transition-colors"
-            title="Acercar">
-            <ZoomIn size={14} />
-          </button>
-          <button onClick={handleReset}
-            className="rounded bg-[#3e3e42] p-1.5 text-[#cccccc] hover:bg-[#505050] transition-colors"
-            title="Restablecer zoom">
-            <RotateCcw size={14} />
-          </button>
+          <Button size="icon" onClick={handleZoomIn} disabled={zoom >= 4} title="Acercar" aria-label="Acercar">
+            <ZoomIn size={14} aria-hidden="true" />
+          </Button>
+          <Button size="icon" onClick={handleReset} title="Restablecer zoom" aria-label="Restablecer zoom">
+            <RotateCcw size={14} aria-hidden="true" />
+          </Button>
         </div>
       </div>
 
