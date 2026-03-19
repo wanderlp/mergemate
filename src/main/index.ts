@@ -33,8 +33,9 @@ function createWindow(): void {
     minWidth: 1200,
     minHeight: 700,
     show: false,
+    frame: false,
     icon: join(__dirname, '../../resources/icon.ico'),
-    title: 'MergeMate (Uso personal)',
+    title: 'MergeMate',
     backgroundColor: '#1e1e1e',
     autoHideMenuBar: true,
     webPreferences: {
@@ -66,6 +67,9 @@ function createWindow(): void {
       maximized: isMaximized
     })
   })
+
+  mainWindow.on('maximize',   () => mainWindow.webContents.send('window-maximize-change', true))
+  mainWindow.on('unmaximize', () => mainWindow.webContents.send('window-maximize-change', false))
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
@@ -129,6 +133,12 @@ function createWindow(): void {
   ipcMain.handle('get-file-hash', async (_event, filePath: string) => {
     return hashFile(filePath)
   })
+
+  // IPC: window controls
+  ipcMain.handle('window-minimize',    () => mainWindow.minimize())
+  ipcMain.handle('window-maximize',    () => mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize())
+  ipcMain.handle('window-close',       () => mainWindow.close())
+  ipcMain.handle('window-is-maximized',() => mainWindow.isMaximized())
 
   // IPC: get last folders
   ipcMain.handle('get-last-folders', async () => {

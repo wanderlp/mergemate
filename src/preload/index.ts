@@ -37,7 +37,20 @@ const api: ElectronAPI = {
     ipcRenderer.invoke('get-last-folders'),
 
   saveLastFolders: (left, right) =>
-    ipcRenderer.invoke('save-last-folders', left, right)
+    ipcRenderer.invoke('save-last-folders', left, right),
+
+  minimizeWindow: () => ipcRenderer.invoke('window-minimize'),
+  maximizeWindow: () => ipcRenderer.invoke('window-maximize'),
+  closeWindow:    () => ipcRenderer.invoke('window-close'),
+  isMaximized:    () => ipcRenderer.invoke('window-is-maximized'),
+
+  onMaximizeChange: (callback) => {
+    const listener = (_event: Electron.IpcRendererEvent, maximized: boolean): void => {
+      callback(maximized)
+    }
+    ipcRenderer.on('window-maximize-change', listener)
+    return () => ipcRenderer.removeListener('window-maximize-change', listener)
+  }
 }
 
 contextBridge.exposeInMainWorld('electronAPI', api)

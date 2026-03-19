@@ -45,6 +45,12 @@ export interface ElectronAPI {
   onScanProgress: (callback: (progress: ScanProgress) => void) => () => void
   getLastFolders: () => Promise<{ left: string | null; right: string | null }>
   saveLastFolders: (left: string, right: string) => Promise<void>
+  // Window controls
+  minimizeWindow: () => Promise<void>
+  maximizeWindow: () => Promise<void>
+  closeWindow: () => Promise<void>
+  isMaximized: () => Promise<boolean>
+  onMaximizeChange: (callback: (maximized: boolean) => void) => () => void
 }
 
 declare global {
