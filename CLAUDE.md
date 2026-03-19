@@ -37,6 +37,21 @@ La app es un proyecto estándar de electron-vite con tres targets de compilació
 
 Toda la comunicación con Claude, comentarios en el código y respuestas deben ser en **español**. Esto incluye explicaciones, sugerencias, mensajes de error y cualquier interacción durante el desarrollo.
 
+## Consistencia visual
+
+Todo código nuevo en el renderer debe respetar el sistema visual existente:
+
+- **Fondos**: `#1e1e1e` (principal), `#252526` (toolbars/headers), `#2d2d2d` (tabbar), `#181818` (áreas de contenido oscuro)
+- **Bordes**: `#3e3e42`
+- **Botones**: `bg-[#3e3e42]` con `hover:bg-[#505050]`, padding `px-3 py-1.5` para botones con texto, `p-1.5` para botones solo con icono
+- **Texto**: `#cccccc` (primario), `#aaaaaa` (secundario), `#858585` (atenuado)
+- **Disabled**: siempre `disabled:opacity-40`
+- **Separadores**: `mx-2 h-4 w-px bg-[#3e3e42]`
+- **Colores de acento**: usar hex directamente (`#007acc` para azul VS Code) — no usar clases de color de Tailwind como `bg-blue-500`
+- **Transiciones**: `transition-colors` en botones e interacciones
+
+Antes de agregar cualquier componente nuevo, verificar que siga estas convenciones.
+
 ## Animaciones
 
 El proyecto usa **Framer Motion** para animaciones UI. Al revisar o modificar componentes del renderer, si se identifica un lugar donde una animación mejoraría la experiencia (entrada/salida de elementos, transiciones de estado, feedback visual), **sugerir proactivamente la animación al programador** antes de implementarla, explicando:
