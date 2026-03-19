@@ -151,8 +151,8 @@ export function ImageViewer({ file }: ImageViewerProps): React.JSX.Element {
               </div>
             )}
 
-            {effectiveMode === 'left'  && leftUrl  && <ImagePanel url={leftUrl}  label="Izquierda" />}
-            {effectiveMode === 'right' && rightUrl  && <ImagePanel url={rightUrl} label="Derecha" />}
+            {effectiveMode === 'left'  && leftUrl  && <ImagePanel url={leftUrl}  label={isIdentical ? '' : 'Izquierda'} />}
+            {effectiveMode === 'right' && rightUrl  && <ImagePanel url={rightUrl} label={isIdentical ? '' : 'Derecha'} />}
           </div>
         )}
       </div>
@@ -163,7 +163,7 @@ export function ImageViewer({ file }: ImageViewerProps): React.JSX.Element {
 function ImagePanel({ url, label }: { url: string; label: string }): React.JSX.Element {
   return (
     <div className="flex flex-col items-center gap-2">
-      <span className="text-xs font-semibold uppercase tracking-wider text-[#858585]">{label}</span>
+      {label && <span className="text-xs font-semibold uppercase tracking-wider text-[#858585]">{label}</span>}
       <img
         src={url}
         alt={label}
