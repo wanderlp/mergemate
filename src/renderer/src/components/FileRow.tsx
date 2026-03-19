@@ -81,6 +81,7 @@ export function FileRow({
   const handleKeyDown = (e: React.KeyboardEvent): void => {
     if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault()
+      e.stopPropagation()
       if (entry.isDirectory) onToggle()
       else onDoubleClick()
     }
@@ -93,8 +94,8 @@ export function FileRow({
       tabIndex={0}
       className="group flex cursor-pointer items-center border-b border-[#2a2d2e]/50 hover:bg-[#2a2d2e] focus:bg-[#2a2d2e] focus:outline-none transition-colors"
       style={isFocused ? { backgroundColor: '#37373d' } : undefined}
-      onDoubleClick={!entry.isDirectory ? onDoubleClick : undefined}
-      onClick={entry.isDirectory ? onToggle : undefined}
+      onDoubleClick={entry.isDirectory ? onToggle : onDoubleClick}
+      onClick={() => onFocusPath?.(entry.relativePath)}
       onKeyDown={handleKeyDown}
       onMouseEnter={() => onHover(entry.relativePath)}
       onMouseLeave={() => onHover('')}
