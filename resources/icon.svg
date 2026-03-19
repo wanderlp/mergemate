@@ -1,39 +1,43 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Fondo redondeado -->
-  <rect width="512" height="512" rx="96" fill="#1e1e1e"/>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1a8cd8"/>
+      <stop offset="100%" stop-color="#005a9e"/>
+    </linearGradient>
+  </defs>
 
-  <!-- ── Archivo izquierdo ─────────────────────────── -->
-  <rect x="48" y="96" width="176" height="224" rx="16" fill="#252526" stroke="#3e3e42" stroke-width="5"/>
-  <!-- Esquina doblada (dog-ear) -->
-  <path d="M 176 96 L 224 144 L 176 144 Z" fill="#1a1a1a"/>
-  <line x1="176" y1="96" x2="176" y2="144" stroke="#3e3e42" stroke-width="5"/>
-  <line x1="176" y1="144" x2="224" y2="144" stroke="#3e3e42" stroke-width="5"/>
+  <!-- Fondo redondeado vibrante (estilo Windows 11 Fluent) -->
+  <rect width="512" height="512" rx="100" fill="url(#bg)"/>
 
-  <!-- Líneas diff izquierdo -->
-  <rect x="80" y="176" width="96" height="14" rx="7" fill="#ef4444" opacity="0.9"/>
-  <rect x="80" y="214" width="68" height="14" rx="7" fill="#6b6b6b" opacity="0.7"/>
-  <rect x="80" y="252" width="80" height="14" rx="7" fill="#ef4444" opacity="0.9"/>
-  <rect x="80" y="290" width="52" height="14" rx="7" fill="#6b6b6b" opacity="0.7"/>
+  <!-- ── Documento izquierdo ─────────────────────────── -->
+  <!-- Cuerpo del documento (pentágono: esquina superior-derecha recortada) -->
+  <path d="M 60,148 L 188,148 L 228,188 L 228,364 L 60,364 Z" fill="white" opacity="0.95"/>
+  <!-- Solapa del dog-ear (triángulo ligeramente sombreado) -->
+  <path d="M 188,148 L 228,148 L 228,188 Z" fill="#c8dff0"/>
+  <!-- Líneas de pliegue -->
+  <line x1="188" y1="148" x2="228" y2="188" stroke="#a0c4e0" stroke-width="1.5"/>
 
-  <!-- ── Archivo derecho ────────────────────────────── -->
-  <rect x="288" y="192" width="176" height="224" rx="16" fill="#252526" stroke="#3e3e42" stroke-width="5"/>
-  <!-- Esquina doblada -->
-  <path d="M 416 192 L 464 240 L 416 240 Z" fill="#1a1a1a"/>
-  <line x1="416" y1="192" x2="416" y2="240" stroke="#3e3e42" stroke-width="5"/>
-  <line x1="416" y1="240" x2="464" y2="240" stroke="#3e3e42" stroke-width="5"/>
+  <!-- 3 líneas de diff en documento izquierdo -->
+  <rect x="84"  y="216" width="104" height="14" rx="7" fill="#ef4444"/>
+  <rect x="84"  y="248" width="76"  height="14" rx="7" fill="#c8d8ea"/>
+  <rect x="84"  y="280" width="92"  height="14" rx="7" fill="#ef4444"/>
 
-  <!-- Líneas diff derecho -->
-  <rect x="320" y="272" width="96" height="14" rx="7" fill="#22c55e" opacity="0.9"/>
-  <rect x="320" y="310" width="68" height="14" rx="7" fill="#6b6b6b" opacity="0.7"/>
-  <rect x="320" y="348" width="80" height="14" rx="7" fill="#22c55e" opacity="0.9"/>
-  <rect x="320" y="386" width="52" height="14" rx="7" fill="#6b6b6b" opacity="0.7"/>
+  <!-- ── Documento derecho ────────────────────────────── -->
+  <path d="M 284,148 L 412,148 L 452,188 L 452,364 L 284,364 Z" fill="white" opacity="0.95"/>
+  <path d="M 412,148 L 452,148 L 452,188 Z" fill="#c8dff0"/>
+  <line x1="412" y1="148" x2="452" y2="188" stroke="#a0c4e0" stroke-width="1.5"/>
 
-  <!-- ── Flechas centrales (azul VS Code) ─────────── -->
-  <!-- Flecha → -->
-  <line x1="228" y1="224" x2="316" y2="224" stroke="#007acc" stroke-width="14" stroke-linecap="round"/>
-  <path d="M 296 200 L 340 224 L 296 248 Z" fill="#007acc"/>
+  <!-- 3 líneas de diff en documento derecho -->
+  <rect x="308" y="216" width="104" height="14" rx="7" fill="#22c55e"/>
+  <rect x="308" y="248" width="76"  height="14" rx="7" fill="#c8d8ea"/>
+  <rect x="308" y="280" width="92"  height="14" rx="7" fill="#22c55e"/>
 
-  <!-- Flecha ← -->
-  <line x1="284" y1="288" x2="196" y2="288" stroke="#007acc" stroke-width="14" stroke-linecap="round"/>
-  <path d="M 216 264 L 172 288 L 216 312 Z" fill="#007acc"/>
+  <!-- ── Flechas bidireccionales en blanco ─────────────── -->
+  <!-- Flecha → (izquierda a derecha) -->
+  <line x1="238" y1="232" x2="278" y2="232" stroke="white" stroke-width="13" stroke-linecap="round"/>
+  <path d="M 263,214 L 294,232 L 263,250 Z" fill="white"/>
+
+  <!-- Flecha ← (derecha a izquierda) -->
+  <line x1="274" y1="280" x2="234" y2="280" stroke="white" stroke-width="13" stroke-linecap="round"/>
+  <path d="M 249,262 L 218,280 L 249,298 Z" fill="white"/>
 </svg>
