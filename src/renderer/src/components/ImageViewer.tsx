@@ -194,7 +194,7 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
       ) : effectiveMode === 'slider' && leftUrl && rightUrl ? (
         /* Slider: un solo panel con zoom/pan */
         <div
-          className="relative flex flex-1 items-center justify-center overflow-hidden bg-[#181818]"
+          className="relative flex flex-1 items-center justify-center overflow-hidden bg-[#181818] p-12"
           style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -203,13 +203,15 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
           onWheel={handleWheel}
         >
           <div style={{
+            width: '100%',
+            height: '100%',
             transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
             transformOrigin: 'center center',
             transition: isDragging ? 'none' : 'transform 0.15s ease',
             userSelect: 'none',
           }}>
             <ReactCompareSlider
-              style={{ width: 800, maxWidth: '90vw', borderRadius: 4, overflow: 'hidden' }}
+              style={{ width: '100%', height: '100%', borderRadius: 4, overflow: 'hidden' }}
               itemOne={<ReactCompareSliderImage src={leftUrl} alt="Izquierda" style={{ objectFit: 'contain' }} />}
               itemTwo={<ReactCompareSliderImage src={rightUrl} alt="Derecha"   style={{ objectFit: 'contain' }} />}
             />
