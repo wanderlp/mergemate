@@ -9,12 +9,17 @@ interface FileTreeProps {
   onHover: (path: string) => void
 }
 
-function flattenVisible(entries: FileEntry[], expandedDirs: Set<string>): FileEntry[] {
-  const result: FileEntry[] = []
+interface FlatEntry {
+  entry: FileEntry
+  depth: number
+}
+
+function flattenVisible(entries: FileEntry[], expandedDirs: Set<string>, depth = 0): FlatEntry[] {
+  const result: FlatEntry[] = []
   for (const entry of entries) {
-    result.push(entry)
+    result.push({ entry, depth })
     if (entry.isDirectory && expandedDirs.has(entry.relativePath) && entry.children) {
-      result.push(...flattenVisible(entry.children, expandedDirs))
+      result.push(...flattenVisible(entry.children, expandedDirs, depth + 1))
     }
   }
   return result
@@ -26,73 +31,14 @@ function getParentPath(relativePath: string): string | null {
   return parts.slice(0, -1).join('/')
 }
 
-function FlattenedTree({
-  entries,
-  depth,
-  expandedDirs,
-  onToggle,
-  onFileOpen,
-  onHover,
-  focusedPath,
-  onFocusPath,
-  rowRefsMap
-}: {
-  entries: FileEntry[]
-  depth: number
-  expandedDirs: Set<string>
-  onToggle: (path: string) => void
-  onFileOpen: (file: FileEntry) => void
-  onHover: (path: string) => void
-  focusedPath: string | null
-  onFocusPath: (path: string) => void
-  rowRefsMap: React.MutableRefObject<Map<string, HTMLDivElement>>
-}): React.JSX.Element {
-  return (
-    <>
-      {entries.map((entry) => (
-        <React.Fragment key={entry.relativePath}>
-          <FileRow
-            entry={entry}
-            depth={depth}
-            expanded={expandedDirs.has(entry.relativePath)}
-            onToggle={() => onToggle(entry.relativePath)}
-            onDoubleClick={() => !entry.isDirectory && onFileOpen(entry)}
-            onHover={onHover}
-            isFocused={focusedPath === entry.relativePath}
-            onFocusPath={onFocusPath}
-            refCallback={(el) => {
-              if (el) rowRefsMap.current.set(entry.relativePath, el)
-              else rowRefsMap.current.delete(entry.relativePath)
-            }}
-          />
-          <AnimatePresence initial={false}>
-            {entry.isDirectory && expandedDirs.has(entry.relativePath) && entry.children && (
-              <motion.div
-                key={entry.relativePath + '-children'}
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.2, ease: 'easeInOut' }}
-                style={{ overflow: 'hidden' }}
-              >
-                <FlattenedTree
-                  entries={entry.children}
-                  depth={depth + 1}
-                  expandedDirs={expandedDirs}
-                  onToggle={onToggle}
-                  onFileOpen={onFileOpen}
-                  onHover={onHover}
-                  focusedPath={focusedPath}
-                  onFocusPath={onFocusPath}
-                  rowRefsMap={rowRefsMap}
-                />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </React.Fragment>
-      ))}
-    </>
-  )
+const ROW_VARIANTS = {
+  hidden: { opacity: 0, x: -10 },
+  visible: (i: number) => ({
+    opacity: 1,
+    x: 0,
+    transition: { duration: 0.15, delay: Math.min(i * 0.018, 0.6) },
+  }),
+  exit: { opacity: 0, x: -10, transition: { duration: 0.1 } },
 }
 
 export function FileTree({
@@ -106,6 +52,15 @@ export function FileTree({
   const containerRef = useRef<HTMLDivElement>(null)
   const keyboardNav = useRef(false)
 
+  // Clave que cambia con cada nuevo escaneo para re-disparar las animaciones
+  const scanKey = useRef(0)
+  const prevEntries = useRef(entries)
+  if (prevEntries.current !== entries) {
+    if (entries.length > 0) scanKey.current++
+    prevEntries.current = entries
+    setExpandedDirs(new Set())
+  }
+
   const handleToggle = useCallback((path: string) => {
     setExpandedDirs((prev) => {
       const next = new Set(prev)
@@ -115,7 +70,6 @@ export function FileTree({
     })
   }, [])
 
-  // Foca el contenedor cuando llegan entries (p.ej. al terminar el escaneo)
   const hadEntries = useRef(false)
   useEffect(() => {
     if (entries.length > 0 && !hadEntries.current) {
@@ -125,7 +79,6 @@ export function FileTree({
     if (entries.length === 0) hadEntries.current = false
   }, [entries.length])
 
-  // Foca el elemento del DOM solo cuando la navegación viene del teclado
   useEffect(() => {
     if (focusedPath && keyboardNav.current) {
       keyboardNav.current = false
@@ -137,43 +90,43 @@ export function FileTree({
     }
   }, [focusedPath])
 
+  const visible = flattenVisible(entries, expandedDirs)
+
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(e.key)) return
     e.preventDefault()
 
-    const visible = flattenVisible(entries, expandedDirs)
     if (visible.length === 0) return
-
-    const currentIndex = focusedPath ? visible.findIndex((v) => v.relativePath === focusedPath) : -1
+    const currentIndex = focusedPath ? visible.findIndex((v) => v.entry.relativePath === focusedPath) : -1
     const current = currentIndex >= 0 ? visible[currentIndex] : null
 
     if (e.key === 'ArrowDown') {
       const next = visible[currentIndex + 1] ?? visible[0]
       keyboardNav.current = true
-      setFocusedPath(next.relativePath)
+      setFocusedPath(next.entry.relativePath)
 
     } else if (e.key === 'ArrowUp') {
       const prev = currentIndex > 0 ? visible[currentIndex - 1] : visible[visible.length - 1]
       keyboardNav.current = true
-      setFocusedPath(prev.relativePath)
+      setFocusedPath(prev.entry.relativePath)
 
-    } else if (e.key === 'ArrowRight' && current?.isDirectory) {
-      if (!expandedDirs.has(current.relativePath)) {
-        setExpandedDirs((prev) => new Set([...prev, current.relativePath]))
-      } else if (current.children && current.children.length > 0) {
+    } else if (e.key === 'ArrowRight' && current?.entry.isDirectory) {
+      if (!expandedDirs.has(current.entry.relativePath)) {
+        setExpandedDirs((prev) => new Set([...prev, current.entry.relativePath]))
+      } else if (current.entry.children && current.entry.children.length > 0) {
         keyboardNav.current = true
-        setFocusedPath(current.children[0].relativePath)
+        setFocusedPath(current.entry.children[0].relativePath)
       }
 
     } else if (e.key === 'ArrowLeft') {
-      if (current?.isDirectory && expandedDirs.has(current.relativePath)) {
+      if (current?.entry.isDirectory && expandedDirs.has(current.entry.relativePath)) {
         setExpandedDirs((prev) => {
           const next = new Set(prev)
-          next.delete(current.relativePath)
+          next.delete(current.entry.relativePath)
           return next
         })
       } else {
-        const parentPath = getParentPath(current?.relativePath ?? '')
+        const parentPath = getParentPath(current?.entry.relativePath ?? '')
         if (parentPath) {
           keyboardNav.current = true
           setFocusedPath(parentPath)
@@ -181,10 +134,10 @@ export function FileTree({
       }
 
     } else if (e.key === 'Enter' && current) {
-      if (current.isDirectory) handleToggle(current.relativePath)
-      else onFileOpen(current)
+      if (current.entry.isDirectory) handleToggle(current.entry.relativePath)
+      else onFileOpen(current.entry)
     }
-  }, [focusedPath, expandedDirs, entries, handleToggle, onFileOpen])
+  }, [focusedPath, expandedDirs, visible, handleToggle, onFileOpen])
 
   if (entries.length === 0) {
     return (
@@ -214,17 +167,34 @@ export function FileTree({
         onKeyDown={handleKeyDown}
         tabIndex={0}
       >
-        <FlattenedTree
-          entries={entries}
-          depth={0}
-          expandedDirs={expandedDirs}
-          onToggle={handleToggle}
-          onFileOpen={onFileOpen}
-          onHover={onHover}
-          focusedPath={focusedPath}
-          onFocusPath={setFocusedPath}
-          rowRefsMap={rowRefsMap}
-        />
+        <AnimatePresence mode="popLayout" initial={true}>
+          {visible.map(({ entry, depth }, index) => (
+            <motion.div
+              key={`${scanKey.current}-${entry.relativePath}`}
+              custom={index}
+              variants={ROW_VARIANTS}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              layout={false}
+            >
+              <FileRow
+                entry={entry}
+                depth={depth}
+                expanded={expandedDirs.has(entry.relativePath)}
+                onToggle={() => handleToggle(entry.relativePath)}
+                onDoubleClick={() => !entry.isDirectory && onFileOpen(entry)}
+                onHover={onHover}
+                isFocused={focusedPath === entry.relativePath}
+                onFocusPath={setFocusedPath}
+                refCallback={(el) => {
+                  if (el) rowRefsMap.current.set(entry.relativePath, el)
+                  else rowRefsMap.current.delete(entry.relativePath)
+                }}
+              />
+            </motion.div>
+          ))}
+        </AnimatePresence>
       </div>
     </div>
   )
