@@ -25,7 +25,7 @@ export function Toolbar({
       <button
         onClick={onOpenLeft}
         disabled={scanning}
-        className="flex items-center gap-2 rounded bg-[#3e3e42] px-4 py-2 text-sm text-[#cccccc] hover:bg-[#505050] disabled:opacity-50 transition-colors"
+        className="flex items-center gap-2 rounded bg-[#3e3e42] px-3 py-1.5 text-sm text-[#cccccc] hover:bg-[#505050] disabled:opacity-40 transition-colors"
         title="Abrir carpeta izquierda (Ctrl+L)"
         aria-label="Abrir carpeta izquierda"
       >
@@ -40,7 +40,7 @@ export function Toolbar({
       <button
         onClick={onOpenRight}
         disabled={scanning}
-        className="flex items-center gap-2 rounded bg-[#3e3e42] px-4 py-2 text-sm text-[#cccccc] hover:bg-[#505050] disabled:opacity-50 transition-colors"
+        className="flex items-center gap-2 rounded bg-[#3e3e42] px-3 py-1.5 text-sm text-[#cccccc] hover:bg-[#505050] disabled:opacity-40 transition-colors"
         title="Abrir carpeta derecha (Ctrl+R)"
         aria-label="Abrir carpeta derecha"
       >
@@ -55,7 +55,7 @@ export function Toolbar({
       <button
         onClick={onRefresh}
         disabled={scanning || !leftFolder || !rightFolder}
-        className="flex items-center gap-2 rounded bg-[#3e3e42] px-4 py-2 text-sm text-[#cccccc] hover:bg-[#505050] disabled:opacity-50 transition-colors"
+        className="flex items-center gap-2 rounded bg-[#3e3e42] px-3 py-1.5 text-sm text-[#cccccc] hover:bg-[#505050] disabled:opacity-40 transition-colors"
         title="Comparar carpetas (Ctrl+F5)"
         aria-label="Comparar carpetas"
       >
@@ -66,7 +66,7 @@ export function Toolbar({
       <button
         onClick={onClear}
         disabled={scanning || (!leftFolder && !rightFolder)}
-        className="flex items-center gap-2 rounded bg-[#3e3e42] px-4 py-2 text-sm text-[#cccccc] hover:bg-[#505050] disabled:opacity-50 transition-colors"
+        className="flex items-center gap-2 rounded bg-[#3e3e42] px-3 py-1.5 text-sm text-[#cccccc] hover:bg-[#505050] disabled:opacity-40 transition-colors"
         title="Limpiar y empezar de nuevo"
         aria-label="Limpiar selección"
       >

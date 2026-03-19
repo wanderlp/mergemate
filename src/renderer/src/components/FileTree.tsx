@@ -141,10 +141,8 @@ export function FileTree({
 
   if (entries.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-4 text-[#858585]">
-        <div className="text-6xl">📂↔️📂</div>
-        <div className="text-2xl font-semibold text-[#cccccc]">MergeMate</div>
-        <div className="text-sm">Abre dos carpetas para comenzar a comparar</div>
+      <div className="flex flex-1 flex-col items-center justify-center gap-2 text-[#858585]">
+        <div className="text-sm">No se encontraron archivos en las carpetas seleccionadas</div>
       </div>
     )
   }

@@ -112,7 +112,7 @@ export function DiffViewer({
   const canCopyLeft = Boolean(file.leftPath)
   const canCopyRight = Boolean(file.rightPath)
 
-  const btnBase = 'flex items-center gap-1.5 rounded bg-[#3e3e42] px-3 py-2 text-sm text-[#cccccc] hover:bg-[#505050] transition-colors'
+  const btnBase = 'flex items-center gap-1.5 rounded bg-[#3e3e42] px-3 py-1.5 text-sm text-[#cccccc] hover:bg-[#505050] transition-colors'
   const btnDisabled = 'disabled:opacity-40'
 
   return (
@@ -144,7 +144,7 @@ export function DiffViewer({
           </button>
         </div>
 
-        <div className="mx-1 h-5 w-px bg-[#3e3e42]" />
+        <div className="mx-2 h-4 w-px bg-[#3e3e42]" />
 
         <button
           onClick={handleCopyToLeft}
@@ -165,7 +165,7 @@ export function DiffViewer({
           Copiar a derecha →<ArrowLeftRight size={16} />
         </button>
 
-        <div className="mx-1 h-5 w-px bg-[#3e3e42]" />
+        <div className="mx-2 h-4 w-px bg-[#3e3e42]" />
 
         <button
           onClick={handleSaveLeft}
