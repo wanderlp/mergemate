@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider'
 import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
 import type { FileEntry } from '../types'
@@ -94,9 +94,48 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
   const effectiveMode: ViewMode =
     !bothExist || isIdentical ? (onlyLeft || isIdentical ? 'left' : 'right') : mode
 
+  // Pan state
+  const [pan, setPan] = useState({ x: 0, y: 0 })
+  const dragging = useRef(false)
+  const dragStart = useRef({ x: 0, y: 0 })
+  const panStart = useRef({ x: 0, y: 0 })
+  const [isDragging, setIsDragging] = useState(false)
+
+  // Resetear pan al cambiar zoom a 1 o cambiar imagen
+  useEffect(() => { if (zoom === 1) setPan({ x: 0, y: 0 }) }, [zoom])
+  useEffect(() => { setPan({ x: 0, y: 0 }) }, [file.leftPath, file.rightPath])
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    if (zoom <= 1) return
+    dragging.current = true
+    dragStart.current = { x: e.clientX, y: e.clientY }
+    panStart.current = pan
+    setIsDragging(true)
+    e.preventDefault()
+  }, [zoom, pan])
+
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!dragging.current) return
+    setPan({
+      x: panStart.current.x + (e.clientX - dragStart.current.x),
+      y: panStart.current.y + (e.clientY - dragStart.current.y),
+    })
+  }, [])
+
+  const handleMouseUp = useCallback(() => {
+    dragging.current = false
+    setIsDragging(false)
+  }, [])
+
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault()
+    const delta = e.deltaY < 0 ? 0.15 : -0.15
+    setZoom((z) => Math.min(4, Math.max(0.25, parseFloat((z + delta).toFixed(2)))))
+  }, [])
+
   function handleZoomIn():  void { setZoom((z) => Math.min(z + 0.25, 4)) }
   function handleZoomOut(): void { setZoom((z) => Math.max(z - 0.25, 0.25)) }
-  function handleReset():   void { setZoom(1) }
+  function handleReset():   void { setZoom(1); setPan({ x: 0, y: 0 }) }
 
   return (
     <div className="flex h-full flex-col bg-[#1e1e1e]">
@@ -148,14 +187,23 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
       </div>
 
       {/* Contenido */}
-      <div className="flex flex-1 items-center justify-center overflow-auto bg-[#181818] p-4">
+      <div
+        className="relative flex flex-1 items-center justify-center overflow-hidden bg-[#181818]"
+        style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
+        onMouseLeave={handleMouseUp}
+        onWheel={handleWheel}
+      >
         {loading ? (
           <span className="text-sm text-[#858585]">Cargando imagen…</span>
         ) : (
           <div style={{
-            transform: `scale(${zoom})`,
+            transform: `scale(${zoom}) translate(${pan.x / zoom}px, ${pan.y / zoom}px)`,
             transformOrigin: 'center center',
-            transition: 'transform 0.15s ease'
+            transition: isDragging ? 'none' : 'transform 0.15s ease',
+            userSelect: 'none',
           }}>
             {effectiveMode === 'slider' && leftUrl && rightUrl && (
               <ReactCompareSlider
