@@ -33,7 +33,7 @@ function createWindow(): void {
     minWidth: 1200,
     minHeight: 700,
     show: false,
-    title: 'MergeMate (Liviano y de uso personal)',
+    title: 'MergeMate (Uso personal)',
     backgroundColor: '#1e1e1e',
     autoHideMenuBar: true,
     webPreferences: {
