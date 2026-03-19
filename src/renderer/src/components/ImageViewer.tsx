@@ -84,17 +84,14 @@ export function ImageViewer({ file }: ImageViewerProps): React.JSX.Element {
         <span className="truncate text-sm text-[#cccccc]">{file.relativePath}</span>
 
         <div className="ml-auto flex items-center gap-1">
-          {bothExist && (Object.keys(MODE_LABELS) as ViewMode[]).map((m) => (
+          {bothExist && !isIdentical && (Object.keys(MODE_LABELS) as ViewMode[]).map((m) => (
             <button
               key={m}
-              onClick={() => !isIdentical && setMode(m)}
-              disabled={isIdentical}
+              onClick={() => setMode(m)}
               className={`rounded px-3 py-1.5 text-xs transition-colors ${
-                isIdentical
-                  ? 'bg-[#3e3e42] text-[#555] cursor-not-allowed'
-                  : mode === m
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-[#3e3e42] text-[#cccccc] hover:bg-[#505050]'
+                mode === m
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-[#3e3e42] text-[#cccccc] hover:bg-[#505050]'
               }`}
             >
               {MODE_LABELS[m]}
