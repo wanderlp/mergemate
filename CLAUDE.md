@@ -37,6 +37,15 @@ La app es un proyecto estándar de electron-vite con tres targets de compilació
 
 Toda la comunicación con Claude, comentarios en el código y respuestas deben ser en **español**. Esto incluye explicaciones, sugerencias, mensajes de error y cualquier interacción durante el desarrollo.
 
+## Animaciones
+
+El proyecto usa **Framer Motion** para animaciones UI. Al revisar o modificar componentes del renderer, si se identifica un lugar donde una animación mejoraría la experiencia (entrada/salida de elementos, transiciones de estado, feedback visual), **sugerir proactivamente la animación al programador** antes de implementarla, explicando:
+1. Qué elemento se animaría y en qué momento
+2. Cómo funcionaría (tipo de animación, duración aproximada)
+3. Cómo se implementaría con Framer Motion (`motion.div`, `AnimatePresence`, `variants`, etc.)
+
+No implementar la animación sin que el programador confirme primero.
+
 ## Restricciones importantes
 
 - `"type": "module"` NO debe estar en `package.json` — electron-vite genera CJS para main/preload, y agregarlo rompe Electron en tiempo de ejecución (causa ventana en negro).
