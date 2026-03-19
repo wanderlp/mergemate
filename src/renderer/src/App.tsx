@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react'
+import { AnimatePresence } from 'framer-motion'
 import { Toolbar } from './components/Toolbar'
 import { FileTree } from './components/FileTree'
 import { DiffViewer } from './components/DiffViewer'
@@ -305,7 +306,9 @@ export default function App(): React.JSX.Element {
         {/* Tab: Comparación */}
         {showComparisonTab && (
           <div className={activeTabId === 'comparison' ? 'flex flex-1 flex-col overflow-hidden' : 'hidden'}>
-            {scanning && progress && <ProgressBar progress={progress} />}
+            <AnimatePresence>
+              {scanning && progress && <ProgressBar progress={progress} />}
+            </AnimatePresence>
             <FileTree
               entries={scanResult?.files ?? []}
               onFileOpen={handleFileOpen}
