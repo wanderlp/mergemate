@@ -1,6 +1,35 @@
 import React, { useState, useEffect } from 'react'
 import { Minus, X } from 'lucide-react'
-import { MergeMateLogo } from './MergeMateLogo'
+
+function AppIcon({ size = 24 }: { size?: number }): React.JSX.Element {
+  return (
+    <svg width={size} height={size} viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <linearGradient id="titlebar-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#1a8cd8"/>
+          <stop offset="100%" stopColor="#005a9e"/>
+        </linearGradient>
+      </defs>
+      <rect width="512" height="512" rx="100" fill="url(#titlebar-bg)"/>
+      <path d="M 60,148 L 188,148 L 228,188 L 228,364 L 60,364 Z" fill="white" opacity="0.95"/>
+      <path d="M 188,148 L 228,148 L 228,188 Z" fill="#c8dff0"/>
+      <line x1="188" y1="148" x2="228" y2="188" stroke="#a0c4e0" strokeWidth="1.5"/>
+      <rect x="84"  y="216" width="104" height="14" rx="7" fill="#ef4444"/>
+      <rect x="84"  y="248" width="76"  height="14" rx="7" fill="#c8d8ea"/>
+      <rect x="84"  y="280" width="92"  height="14" rx="7" fill="#ef4444"/>
+      <path d="M 284,148 L 412,148 L 452,188 L 452,364 L 284,364 Z" fill="white" opacity="0.95"/>
+      <path d="M 412,148 L 452,148 L 452,188 Z" fill="#c8dff0"/>
+      <line x1="412" y1="148" x2="452" y2="188" stroke="#a0c4e0" strokeWidth="1.5"/>
+      <rect x="308" y="216" width="104" height="14" rx="7" fill="#22c55e"/>
+      <rect x="308" y="248" width="76"  height="14" rx="7" fill="#c8d8ea"/>
+      <rect x="308" y="280" width="92"  height="14" rx="7" fill="#22c55e"/>
+      <line x1="238" y1="232" x2="278" y2="232" stroke="white" strokeWidth="13" strokeLinecap="round"/>
+      <path d="M 263,214 L 294,232 L 263,250 Z" fill="white"/>
+      <line x1="274" y1="280" x2="234" y2="280" stroke="white" strokeWidth="13" strokeLinecap="round"/>
+      <path d="M 249,262 L 218,280 L 249,298 Z" fill="white"/>
+    </svg>
+  )
+}
 
 // Icono maximizar: cuadrado simple
 function MaximizeIcon(): React.JSX.Element {
@@ -41,7 +70,7 @@ export function TitleBar(): React.JSX.Element {
     >
       {/* Icono y nombre */}
       <div className="flex items-center gap-2.5 px-3">
-        <MergeMateLogo size={34} />
+        <AppIcon size={24} />
         <span className="text-sm font-semibold tracking-wide text-[#cccccc]">MergeMate</span>
       </div>
 
