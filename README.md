@@ -2,7 +2,7 @@
 
 **MergeMate — Comparador de Carpetas**
 
-Aplicación de escritorio para comparar carpetas de código fuente lado a lado. Clasifica cada archivo visualmente por color y permite hacer doble clic en cualquier archivo para abrir un visor de diferencias línea por línea con capacidades de fusión.
+Herramienta de escritorio para comparar carpetas de código fuente. Visualiza diferencias entre dos directorios en un árbol unificado con estado por color, abre archivos en tabs estilo VS Code con iconos por tipo de archivo, incluye un visor de diferencias línea por línea con Monaco Editor y un comparador de imágenes con zoom, slider y navegación.
 
 ---
 
