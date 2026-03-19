@@ -37,6 +37,19 @@ La app es un proyecto estándar de electron-vite con tres targets de compilació
 
 Toda la comunicación con Claude, comentarios en el código y respuestas deben ser en **español**. Esto incluye explicaciones, sugerencias, mensajes de error y cualquier interacción durante el desarrollo.
 
+## Accesibilidad
+
+Todo código nuevo en el renderer debe cumplir con estas reglas antes de darse por terminado:
+
+- **Roles ARIA**: elementos interactivos que no sean `<button>` o `<a>` deben tener `role` apropiado (`tab`, `tablist`, `status`, `img`, `alert`, etc.)
+- **Teclado**: cualquier elemento clickeable debe ser operable con `Enter`/`Space`. Listas de items navegables deben soportar teclas de flecha.
+- **`aria-label`**: botones con solo icono y áreas interactivas sin texto visible deben tener `aria-label` descriptivo.
+- **`aria-hidden`**: emojis decorativos, iconos y elementos puramente visuales deben tener `aria-hidden="true"`.
+- **`aria-live`**: estados dinámicos (carga, errores, notificaciones) deben usar `role="status"` o `aria-live="polite"`.
+- **Contraste**: no usar colores de texto con ratio menor a 4.5:1 sobre el fondo. Evitar `#555` o más oscuro sobre fondos `#1e1e1e`.
+- **`prefers-reduced-motion`**: cualquier animación con Framer Motion debe usar `useReducedMotion()` y desactivarse si el usuario lo prefiere.
+- **Paneles ocultos**: usar `aria-hidden="true"` en contenido ocultado con `display:none` que contenga elementos interactivos.
+
 ## Consistencia visual
 
 Todo código nuevo en el renderer debe respetar el sistema visual existente:
