@@ -14,7 +14,8 @@
     "dist:win": "npm run build && electron-builder --win",
     "dist:mac": "npm run build && electron-builder --mac",
     "dist:linux": "npm run build && electron-builder --linux",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "gen-icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
     "@electron-toolkit/tsconfig": "^2.0.0",
@@ -44,6 +45,7 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
     "@types/diff-match-patch": "^1.0.36",
     "@types/node": "^20.12.7",
     "@types/react": "^18.3.1",
@@ -53,6 +55,7 @@
     "electron": "^30.0.1",
     "electron-builder": "^24.13.3",
     "electron-vite": "^2.1.0",
+    "png2icons": "^2.0.1",
     "postcss": "^8.4.38",
     "tailwindcss": "^3.4.3",
     "typescript": "^5.4.5",
@@ -69,15 +72,18 @@
     ],
     "win": {
       "target": "nsis",
-      "artifactName": "MergeMate-Setup.exe"
+      "artifactName": "MergeMate-Setup.exe",
+      "icon": "resources/icon.ico"
     },
     "mac": {
       "target": "dmg",
-      "artifactName": "MergeMate.dmg"
+      "artifactName": "MergeMate.dmg",
+      "icon": "resources/icon.icns"
     },
     "linux": {
       "target": "AppImage",
-      "artifactName": "MergeMate.AppImage"
+      "artifactName": "MergeMate.AppImage",
+      "icon": "resources/icon.png"
     },
     "nsis": {
       "oneClick": false,

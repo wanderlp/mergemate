@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { TooltipProvider } from './components/ui/tooltip'
 import { COMPARISON_TAB_ID } from './constants'
+import { MergeMateLogo } from './components/MergeMateLogo'
 import { Toolbar } from './components/Toolbar'
 import { FileTree } from './components/FileTree'
 import { DiffViewer } from './components/DiffViewer'
@@ -285,11 +286,11 @@ export default function App(): React.JSX.Element {
       <div className="relative flex flex-1 flex-col overflow-hidden">
         {/* Sin tabs: pantalla de bienvenida */}
         {noTabs && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-4 text-[#858585]" role="main" aria-label="Pantalla de bienvenida">
-            <div className="text-7xl" aria-hidden="true">📂↔️📂</div>
-            <div className="text-3xl font-bold text-[#cccccc]">MergeMate</div>
+          <div className="flex flex-1 flex-col items-center justify-center gap-5 text-[#858585]" role="main" aria-label="Pantalla de bienvenida">
+            <MergeMateLogo size={160} />
+            <div className="text-3xl font-bold tracking-wide text-[#cccccc]">MergeMate</div>
             <div className="text-sm">Abre dos carpetas para comenzar a comparar</div>
-            <div className="mt-2 flex gap-4 text-sm text-[#aaaaaa]" aria-label="Atajos de teclado disponibles">
+            <div className="mt-1 flex gap-4 text-sm text-[#aaaaaa]" aria-label="Atajos de teclado disponibles">
               <span>Ctrl+L — Abrir izquierda</span>
               <span>Ctrl+R — Abrir derecha</span>
               <span>Ctrl+F5 — Actualizar</span>

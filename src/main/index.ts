@@ -33,6 +33,7 @@ function createWindow(): void {
     minWidth: 1200,
     minHeight: 700,
     show: false,
+    icon: join(__dirname, '../../resources/icon.ico'),
     title: 'MergeMate (Uso personal)',
     backgroundColor: '#1e1e1e',
     autoHideMenuBar: true,
