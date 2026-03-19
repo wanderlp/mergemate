@@ -1,5 +1,10 @@
 import React from 'react'
 import { Icon } from '@iconify/react'
+import imgPngIcon  from '@iconify/icons-mdi/file-png-box'
+import imgJpgIcon  from '@iconify/icons-mdi/file-jpg-box'
+import imgJpegIcon from '@iconify/icons-mdi/file-jpeg-box'
+import imgGifIcon  from '@iconify/icons-mdi/file-gif-box'
+import imgGenIcon  from '@iconify/icons-mdi/file-image'
 import tsIcon       from '@iconify/icons-devicon/typescript'
 import jsIcon       from '@iconify/icons-devicon/javascript'
 import csIcon       from '@iconify/icons-devicon/csharp'
@@ -79,6 +84,13 @@ const EXT_ICON_MAP: Record<string, IconData> = {
   ps1: ps1Icon, psm1: ps1Icon,
   wasm: wasmIcon,
   dockerfile: dockerIcon,
+  // Imágenes — MDI
+  png: imgPngIcon,
+  jpg: imgJpgIcon,
+  jpeg: imgJpegIcon,
+  gif: imgGifIcon,
+  webp: imgGenIcon, bmp: imgGenIcon, ico: imgGenIcon,
+  tiff: imgGenIcon, tif: imgGenIcon, avif: imgGenIcon, svg: imgGenIcon,
 }
 
 const EXT_COLORS: Record<string, string> = {
@@ -86,9 +98,6 @@ const EXT_COLORS: Record<string, string> = {
   csv: '#237a2e', sql: '#e38c00', graphql: '#e10098', gql: '#e10098',
   rst: '#cccccc', txt: '#aaaaaa',
   bat: '#c1f12e', cmd: '#c1f12e',
-  png: '#a855f7', jpg: '#a855f7', jpeg: '#a855f7', gif: '#a855f7',
-  webp: '#a855f7', bmp: '#a855f7', svg: '#ff9900', ico: '#a855f7',
-  tiff: '#a855f7', tif: '#a855f7', avif: '#a855f7',
   pdf: '#e53935',
   zip: '#b8860b', gz: '#b8860b', tar: '#b8860b', rar: '#b8860b',
   '7z': '#b8860b', bz2: '#b8860b', xz: '#b8860b',

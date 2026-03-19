@@ -20,6 +20,8 @@
     "@electron-toolkit/tsconfig": "^2.0.0",
     "@electron-toolkit/utils": "^4.0.0",
     "@iconify/icons-devicon": "^1.2.17",
+    "@iconify/icons-mdi": "^1.2.48",
+    "@iconify/icons-vscode-icons": "^1.2.29",
     "@iconify/react": "^6.0.2",
     "@monaco-editor/react": "^4.6.0",
     "diff-match-patch": "^1.0.5",
