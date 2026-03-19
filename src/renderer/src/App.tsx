@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { TooltipProvider } from './components/ui/tooltip'
+import { COMPARISON_TAB_ID } from './constants'
 import { Toolbar } from './components/Toolbar'
 import { FileTree } from './components/FileTree'
 import { DiffViewer } from './components/DiffViewer'
@@ -74,7 +75,7 @@ export default function App(): React.JSX.Element {
   useEffect(() => {
     if (scanResult) {
       setShowComparisonTab(true)
-      setActiveTabId('comparison')
+      setActiveTabId(COMPARISON_TAB_ID)
     }
   }, [scanResult])
 
@@ -91,8 +92,8 @@ export default function App(): React.JSX.Element {
       } else if (ctrl && e.key === 'F5') {
         e.preventDefault()
         scan()
-      } else if (e.key === 'Escape' && activeTabId !== 'comparison' && showComparisonTab) {
-        setActiveTabId('comparison')
+      } else if (e.key === 'Escape' && activeTabId !== COMPARISON_TAB_ID && showComparisonTab) {
+        setActiveTabId(COMPARISON_TAB_ID)
       }
     }
     window.addEventListener('keydown', handler)
@@ -145,9 +146,9 @@ export default function App(): React.JSX.Element {
   }, [openTabs])
 
   const handleCloseTab = useCallback((id: string) => {
-    if (id === 'comparison') {
+    if (id === COMPARISON_TAB_ID) {
       setShowComparisonTab(false)
-      if (activeTabId === 'comparison') {
+      if (activeTabId === COMPARISON_TAB_ID) {
         const firstFile = Array.from(openTabs.keys())[0]
         setActiveTabId(firstFile ?? '')
       }
@@ -160,7 +161,7 @@ export default function App(): React.JSX.Element {
     })
     if (activeTabId === id) {
       if (showComparisonTab) {
-        setActiveTabId('comparison')
+        setActiveTabId(COMPARISON_TAB_ID)
       } else {
         const remaining = Array.from(openTabs.keys()).filter((k) => k !== id)
         setActiveTabId(remaining[0] ?? '')
@@ -175,57 +176,48 @@ export default function App(): React.JSX.Element {
     setActiveTabId('')
   }, [clear])
 
-  const saveLeft = useCallback(async (content: string) => {
+  const saveSide = useCallback(async (
+    pathKey: 'leftPath' | 'rightPath',
+    contentKey: 'leftContent' | 'rightContent',
+    content: string
+  ) => {
     const tab = openTabs.get(activeTabId)
-    if (!tab?.file.leftPath) return
-    await window.electronAPI.writeFile(tab.file.leftPath, content)
+    const filePath = tab?.file[pathKey]
+    if (!filePath) return
+    await window.electronAPI.writeFile(filePath, content)
     setOpenTabs((prev) => {
       const t = prev.get(activeTabId)!
-      return new Map(prev).set(activeTabId, { ...t, leftContent: content })
+      return new Map(prev).set(activeTabId, { ...t, [contentKey]: content })
     })
   }, [openTabs, activeTabId])
 
-  const saveRight = useCallback(async (content: string) => {
-    const tab = openTabs.get(activeTabId)
-    if (!tab?.file.rightPath) return
-    await window.electronAPI.writeFile(tab.file.rightPath, content)
-    setOpenTabs((prev) => {
-      const t = prev.get(activeTabId)!
-      return new Map(prev).set(activeTabId, { ...t, rightContent: content })
-    })
-  }, [openTabs, activeTabId])
+  const saveLeft  = useCallback((content: string) => saveSide('leftPath',  'leftContent',  content), [saveSide])
+  const saveRight = useCallback((content: string) => saveSide('rightPath', 'rightContent', content), [saveSide])
 
-  const copyToRight = useCallback(async (content: string): Promise<boolean> => {
+  const copySide = useCallback(async (
+    src: 'leftPath' | 'rightPath',
+    dest: 'leftPath' | 'rightPath',
+    contentKey: 'leftContent' | 'rightContent',
+    destLabel: string,
+    content: string
+  ): Promise<boolean> => {
     const tab = openTabs.get(activeTabId)
-    if (!tab?.file.leftPath || !tab?.file.rightPath) return false
+    if (!tab?.file[src] || !tab?.file[dest]) return false
     const confirmed = window.confirm(
-      `¿Sobreescribir "${tab.file.name}" en la carpeta derecha?\nSe creará una copia de seguridad .bak automáticamente.`
+      `¿Sobreescribir "${tab.file.name}" en la carpeta ${destLabel}?\nSe creará una copia de seguridad .bak automáticamente.`
     )
     if (!confirmed) return false
-    await window.electronAPI.copyFileWithBak(tab.file.leftPath, tab.file.rightPath)
+    await window.electronAPI.copyFileWithBak(tab.file[src]!, tab.file[dest]!)
     setOpenTabs((prev) => {
       const t = prev.get(activeTabId)!
-      return new Map(prev).set(activeTabId, { ...t, rightContent: content })
+      return new Map(prev).set(activeTabId, { ...t, [contentKey]: content })
     })
     scan()
     return true
   }, [openTabs, activeTabId, scan])
 
-  const copyToLeft = useCallback(async (content: string): Promise<boolean> => {
-    const tab = openTabs.get(activeTabId)
-    if (!tab?.file.leftPath || !tab?.file.rightPath) return false
-    const confirmed = window.confirm(
-      `¿Sobreescribir "${tab.file.name}" en la carpeta izquierda?\nSe creará una copia de seguridad .bak automáticamente.`
-    )
-    if (!confirmed) return false
-    await window.electronAPI.copyFileWithBak(tab.file.rightPath, tab.file.leftPath)
-    setOpenTabs((prev) => {
-      const t = prev.get(activeTabId)!
-      return new Map(prev).set(activeTabId, { ...t, leftContent: content })
-    })
-    scan()
-    return true
-  }, [openTabs, activeTabId, scan])
+  const copyToRight = useCallback((content: string) => copySide('leftPath',  'rightPath', 'rightContent', 'derecha',    content), [copySide])
+  const copyToLeft  = useCallback((content: string) => copySide('rightPath', 'leftPath',  'leftContent',  'izquierda', content), [copySide])
 
   const handleImageDimsLoaded = useCallback((id: string, left: ImageDims | null, right: ImageDims | null) => {
     setOpenTabs((prev) => {
@@ -237,7 +229,7 @@ export default function App(): React.JSX.Element {
 
   // Construir lista de tabs visible
   const tabItems: TabItem[] = [
-    ...(showComparisonTab ? [{ id: 'comparison', label: 'Comparación', extension: '', loading: false }] : []),
+    ...(showComparisonTab ? [{ id: COMPARISON_TAB_ID, label: 'Comparación', extension: '', loading: false }] : []),
     ...Array.from(openTabs.values()).map((t) => ({
       id: t.file.relativePath,
       label: t.file.name,
@@ -250,7 +242,7 @@ export default function App(): React.JSX.Element {
 
   // StatusInfo según el tab activo
   const statusInfo: StatusInfo = (() => {
-    if (activeTabId === 'comparison' || activeTabId === '') {
+    if (activeTabId === COMPARISON_TAB_ID || activeTabId === '') {
       return scanResult ? { kind: 'comparison', stats: scanResult.stats } : { kind: 'empty' }
     }
     const tab = openTabs.get(activeTabId)
@@ -308,8 +300,8 @@ export default function App(): React.JSX.Element {
         {/* Tab: Comparación */}
         {showComparisonTab && (
           <div
-            className={activeTabId === 'comparison' ? 'flex flex-1 flex-col overflow-hidden' : 'hidden'}
-            aria-hidden={activeTabId !== 'comparison' ? true : undefined}
+            className={activeTabId === COMPARISON_TAB_ID ? 'flex flex-1 flex-col overflow-hidden' : 'hidden'}
+            aria-hidden={activeTabId !== COMPARISON_TAB_ID ? true : undefined}
           >
             <AnimatePresence>
               {scanning && progress && <ProgressBar progress={progress} />}

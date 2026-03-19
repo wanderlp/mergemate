@@ -13,6 +13,14 @@ interface ToolbarProps {
   scanning: boolean
 }
 
+function FolderPath({ path }: { path: string }): React.JSX.Element {
+  return (
+    <div className="flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa]">
+      {path || 'Ninguna carpeta seleccionada'}
+    </div>
+  )
+}
+
 export function Toolbar({
   leftFolder,
   rightFolder,
@@ -34,9 +42,7 @@ export function Toolbar({
         Abrir carpeta izquierda
       </Button>
 
-      <div className="flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa]">
-        {leftFolder || 'Ninguna carpeta seleccionada'}
-      </div>
+      <FolderPath path={leftFolder} />
 
       <Button
         onClick={onOpenRight}
@@ -48,9 +54,7 @@ export function Toolbar({
         Abrir carpeta derecha
       </Button>
 
-      <div className="flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa]">
-        {rightFolder || 'Ninguna carpeta seleccionada'}
-      </div>
+      <FolderPath path={rightFolder} />
 
       <Separator orientation="vertical" className="mx-1" />
 

@@ -2,6 +2,7 @@ import React, { useRef } from 'react'
 import { ChevronRight, ChevronDown, Folder, FolderOpen } from 'lucide-react'
 import { FileTypeIcon } from './FileTypeIcon'
 import type { FileEntry, FileStatus } from '../types'
+import { formatSize } from '../utils/format'
 
 interface FileRowProps {
   entry: FileEntry
@@ -33,13 +34,6 @@ const STATUS_LABELS: Record<FileStatus, string> = {
 
 const DOUBLE_CLICK_MS = 300
 
-function formatSize(bytes: number | null): string {
-  if (bytes === null) return '—'
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-  return `${(bytes / (1024 * 1024 * 1024)).toFixed(1)} GB`
-}
 
 export function FileRow({
   entry,

@@ -3,8 +3,8 @@ import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import Store from 'electron-store'
 import * as fs from 'fs'
-import * as crypto from 'crypto'
 import { scanFolders } from './scanner'
+import { hashFile } from './classifier'
 
 interface WindowState {
   x: number | undefined
@@ -126,8 +126,7 @@ function createWindow(): void {
 
   // IPC: get file hash
   ipcMain.handle('get-file-hash', async (_event, filePath: string) => {
-    const buf = fs.readFileSync(filePath)
-    return crypto.createHash('sha256').update(buf).digest('hex')
+    return hashFile(filePath)
   })
 
   // IPC: get last folders

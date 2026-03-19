@@ -15,7 +15,7 @@ export function classifyFiles(
 ): FileStatus {
   if (!leftPath && rightPath) return 'right-only'
   if (leftPath && !rightPath) return 'left-only'
-  if (!leftPath || !rightPath) return 'left-only' // fallback
+  if (!leftPath || !rightPath) return 'left-only'
 
   // Step 1: hash comparison
   const leftHash = hashFile(leftPath)

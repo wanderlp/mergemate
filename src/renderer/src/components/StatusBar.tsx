@@ -1,6 +1,7 @@
 import React from 'react'
 import type { ScanStats } from '../types'
 import type { DiffStats } from '../utils/diffStats'
+import { formatSize } from '../utils/format'
 
 export interface ImageDims {
   width: number
@@ -17,12 +18,6 @@ interface StatusBarProps {
   info: StatusInfo
 }
 
-function formatSize(bytes: number | null): string {
-  if (bytes === null) return '—'
-  if (bytes < 1024) return `${bytes} B`
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
-}
 
 function Dot({ color }: { color: string }): React.JSX.Element {
   return <span className="inline-block h-2.5 w-2.5 rounded-full flex-shrink-0" style={{ backgroundColor: color }} aria-hidden="true" />

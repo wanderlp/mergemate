@@ -2,6 +2,7 @@ import React from 'react'
 import { X, FolderOpen } from 'lucide-react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { FileTypeIcon } from './FileTypeIcon'
+import { COMPARISON_TAB_ID } from '../constants'
 
 export interface TabItem {
   id: string
@@ -50,7 +51,7 @@ export function TabBar({ tabs, activeTabId, onSelectTab, onCloseTab }: TabBarPro
       <AnimatePresence mode="popLayout" initial={false}>
         {tabs.map((tab, index) => {
           const isActive = tab.id === activeTabId
-          const icon = tab.id === 'comparison'
+          const icon = tab.id === COMPARISON_TAB_ID
             ? <FolderOpen size={13} className="flex-shrink-0" aria-hidden="true" />
             : tab.loading
               ? <span className="flex-shrink-0 text-xs" aria-hidden="true">⏳</span>

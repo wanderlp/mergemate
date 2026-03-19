@@ -235,7 +235,7 @@ export function scanFolders(
   collectPaths(rightFolder, '', rightMap)
 
   const allPaths = new Set([...leftMap.keys(), ...rightMap.keys()])
-  const total = allPaths.size
+  const total = Array.from(allPaths).filter((p) => !p.endsWith('/')).length
   let processed = 0
 
   const { entries, stats } = buildTree(allPaths, leftMap, rightMap, (file) => {

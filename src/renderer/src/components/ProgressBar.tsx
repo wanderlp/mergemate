@@ -30,7 +30,7 @@ export function ProgressBar({ progress }: ProgressBarProps): React.JSX.Element {
         transition={{ duration, ease: 'easeOut' }}
       >
         <div className="mb-3 text-base font-medium text-[#cccccc]">Escaneando carpetas…</div>
-        <Progress value={progress.percent} className="mb-2" aria-label="Progreso del escaneo" />
+        <Progress value={progress.percent} className="mb-2" />
         <div className="truncate text-sm text-[#aaaaaa]">{progress.currentFile || 'Iniciando…'}</div>
         <div className="mt-1 text-right text-sm text-[#aaaaaa]">{progress.percent}%</div>
       </motion.div>
