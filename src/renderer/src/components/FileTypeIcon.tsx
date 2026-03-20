@@ -43,6 +43,9 @@ import matlabIcon   from '@iconify/icons-devicon/matlab'
 import wasmIcon     from '@iconify/icons-devicon/wasm'
 import dockerIcon   from '@iconify/icons-devicon/docker'
 import gitIcon      from '@iconify/icons-devicon/git'
+import dotnetIcon   from '@iconify/icons-devicon/dotnetcore'
+import apiIcon      from '@iconify/icons-mdi/api'
+import layersIcon   from '@iconify/icons-mdi/layers-triple'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IconData = any
@@ -92,6 +95,9 @@ const EXT_ICON_MAP: Record<string, IconData> = {
   ps1: ps1Icon, psm1: ps1Icon,
   wasm: wasmIcon,
   dockerfile: dockerIcon,
+  csproj: csIcon,
+  sln: layersIcon,
+  http: apiIcon,
   // Imágenes — MDI
   png: imgPngIcon,
   jpg: imgJpgIcon,
