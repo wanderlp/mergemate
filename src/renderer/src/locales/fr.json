@@ -27,7 +27,12 @@
     "changeRightTooltip": "Changer le dossier droit (Ctrl+R)",
     "compare": "Comparer",
     "compareTooltip": "Comparer les dossiers (Ctrl+F5)",
-    "noFolder": "Aucun dossier sélectionné"
+    "noFolder": "Aucun dossier sélectionné",
+    "folderNotFoundTitle": "Dossier introuvable",
+    "folderNotFoundMessage_one": "Le dossier suivant n'existe pas :",
+    "folderNotFoundMessage_other": "Les dossiers suivants n'existent pas :",
+    "folderNotFoundContinue": "Continuer quand même",
+    "folderNotFoundCancel": "Annuler"
   },
   "startup": {
     "subtitle": "Comparer et fusionner des dossiers",

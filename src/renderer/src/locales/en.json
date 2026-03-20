@@ -27,7 +27,12 @@
     "changeRightTooltip": "Change right folder (Ctrl+R)",
     "compare": "Compare",
     "compareTooltip": "Compare folders (Ctrl+F5)",
-    "noFolder": "No folder selected"
+    "noFolder": "No folder selected",
+    "folderNotFoundTitle": "Folder not found",
+    "folderNotFoundMessage_one": "The following folder does not exist:",
+    "folderNotFoundMessage_other": "The following folders do not exist:",
+    "folderNotFoundContinue": "Continue anyway",
+    "folderNotFoundCancel": "Cancel"
   },
   "startup": {
     "subtitle": "Compare and merge folders",

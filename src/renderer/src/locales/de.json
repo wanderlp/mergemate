@@ -27,7 +27,12 @@
     "changeRightTooltip": "Rechten Ordner ändern (Ctrl+R)",
     "compare": "Vergleichen",
     "compareTooltip": "Ordner vergleichen (Ctrl+F5)",
-    "noFolder": "Kein Ordner ausgewählt"
+    "noFolder": "Kein Ordner ausgewählt",
+    "folderNotFoundTitle": "Ordner nicht gefunden",
+    "folderNotFoundMessage_one": "Der folgende Ordner existiert nicht:",
+    "folderNotFoundMessage_other": "Die folgenden Ordner existieren nicht:",
+    "folderNotFoundContinue": "Trotzdem fortfahren",
+    "folderNotFoundCancel": "Abbrechen"
   },
   "startup": {
     "subtitle": "Ordner vergleichen und zusammenführen",

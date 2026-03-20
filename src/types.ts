@@ -49,6 +49,7 @@ export interface ElectronAPI {
   getFileHash: (filePath: string) => Promise<string>
   readFileBase64: (filePath: string) => Promise<string>
   onScanProgress: (callback: (progress: ScanProgress) => void) => () => void
+  folderExists: (path: string) => Promise<boolean>
   // Startup window
   getRecentComparisons: () => Promise<RecentComparison[]>
   openMainWindow: (left?: string, right?: string) => Promise<void>

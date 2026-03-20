@@ -72,6 +72,8 @@ const api: ElectronAPI = {
 
   confirmClose: () => ipcRenderer.invoke('window-confirm-close'),
 
+  folderExists: (path) => ipcRenderer.invoke('folder-exists', path),
+
   openExternal: (url) => ipcRenderer.invoke('open-external', url)
 }
 

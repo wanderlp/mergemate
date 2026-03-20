@@ -27,7 +27,12 @@
     "changeRightTooltip": "Cambiar carpeta derecha (Ctrl+R)",
     "compare": "Comparar",
     "compareTooltip": "Comparar carpetas (Ctrl+F5)",
-    "noFolder": "Ninguna carpeta seleccionada"
+    "noFolder": "Ninguna carpeta seleccionada",
+    "folderNotFoundTitle": "Carpeta no encontrada",
+    "folderNotFoundMessage_one": "La siguiente carpeta no existe:",
+    "folderNotFoundMessage_other": "Las siguientes carpetas no existen:",
+    "folderNotFoundContinue": "Continuar de todos modos",
+    "folderNotFoundCancel": "Cancelar"
   },
   "startup": {
     "subtitle": "Compara y fusiona carpetas",

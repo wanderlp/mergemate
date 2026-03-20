@@ -219,6 +219,10 @@ function registerIpcHandlers(): void {
     hashFile(filePath)
   )
 
+  ipcMain.handle('folder-exists', (_event, folderPath: string) =>
+    fs.existsSync(folderPath) && fs.statSync(folderPath).isDirectory()
+  )
+
   ipcMain.handle('open-external', (_event, url: string) => {
     shell.openExternal(url)
   })

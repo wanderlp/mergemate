@@ -27,7 +27,12 @@
     "changeRightTooltip": "Alterar pasta direita (Ctrl+R)",
     "compare": "Comparar",
     "compareTooltip": "Comparar pastas (Ctrl+F5)",
-    "noFolder": "Nenhuma pasta selecionada"
+    "noFolder": "Nenhuma pasta selecionada",
+    "folderNotFoundTitle": "Pasta não encontrada",
+    "folderNotFoundMessage_one": "A seguinte pasta não existe:",
+    "folderNotFoundMessage_other": "As seguintes pastas não existem:",
+    "folderNotFoundContinue": "Continuar mesmo assim",
+    "folderNotFoundCancel": "Cancelar"
   },
   "startup": {
     "subtitle": "Compare e mescle pastas",
