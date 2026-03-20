@@ -55,6 +55,7 @@ export interface ElectronAPI {
   // Main window
   getPendingFolders: () => Promise<{ left: string; right: string } | null>
   saveRecentComparison: (left: string, right: string) => Promise<void>
+  removeRecentComparison: (left: string, right: string) => Promise<void>
   // Window controls
   minimizeWindow: () => Promise<void>
   maximizeWindow: () => Promise<void>

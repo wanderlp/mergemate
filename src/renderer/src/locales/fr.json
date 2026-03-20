@@ -34,6 +34,11 @@
     "noRecent": "Aucune comparaison récente",
     "noRecentDesc": "Les comparaisons effectuées apparaîtront ici",
     "openAriaLabel": "Ouvrir la comparaison : {{left}} et {{right}}",
+    "removeAriaLabel": "Supprimer des récents : {{left}} et {{right}}",
+    "removeConfirmTitle": "Supprimer des récents ?",
+    "removeConfirmMessage": "\"{{left}} → {{right}}\" sera supprimé de la liste des récents.",
+    "removeConfirm": "Supprimer",
+    "removeCancel": "Annuler",
     "timeAgo": {
       "justNow": "à l'instant",
       "minutes_one": "il y a 1 min",

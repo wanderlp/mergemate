@@ -47,6 +47,9 @@ const api: ElectronAPI = {
   saveRecentComparison: (left, right) =>
     ipcRenderer.invoke('save-recent-comparison', left, right),
 
+  removeRecentComparison: (left, right) =>
+    ipcRenderer.invoke('remove-recent-comparison', left, right),
+
   // Window controls
   minimizeWindow: () => ipcRenderer.invoke('window-minimize'),
   maximizeWindow: () => ipcRenderer.invoke('window-maximize'),

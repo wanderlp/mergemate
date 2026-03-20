@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { FolderOpen, FileText, GitBranch, Clock, ArrowRight } from 'lucide-react'
+import { FolderOpen, FileText, GitBranch, Clock, ArrowRight, X } from 'lucide-react'
 import { useTranslation, type TFunction } from 'react-i18next'
 import { TitleBar } from './TitleBar'
 import { MergeMateLogo } from './MergeMateLogo'
@@ -29,6 +29,7 @@ function timeAgo(ts: number, t: TFunction): string {
 export function StartupScreen(): React.JSX.Element {
   const { t } = useTranslation()
   const [recents, setRecents] = useState<RecentComparison[]>([])
+  const [pendingRemove, setPendingRemove] = useState<RecentComparison | null>(null)
 
   useEffect(() => {
     window.electronAPI.getRecentComparisons().then(setRecents)
@@ -42,8 +43,45 @@ export function StartupScreen(): React.JSX.Element {
     window.electronAPI.openMainWindow(r.left, r.right)
   }
 
+  function handleRemoveClick(e: React.MouseEvent, r: RecentComparison): void {
+    e.stopPropagation()
+    setPendingRemove(r)
+  }
+
+  async function handleRemoveConfirm(): Promise<void> {
+    if (!pendingRemove) return
+    await window.electronAPI.removeRecentComparison(pendingRemove.left, pendingRemove.right)
+    setRecents((prev) => prev.filter((x) => x.left !== pendingRemove.left || x.right !== pendingRemove.right))
+    setPendingRemove(null)
+  }
+
   return (
     <div className="flex h-screen flex-col bg-[#1e1e1e]" role="main">
+      {pendingRemove && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" role="dialog" aria-modal="true">
+          <div className="mx-4 w-full max-w-sm rounded-lg border border-[#3e3e42] bg-[#252526] p-6 shadow-2xl">
+            <h2 className="mb-2 text-base font-semibold text-[#cccccc]">{t('startup.removeConfirmTitle')}</h2>
+            <p className="mb-6 text-sm text-[#aaaaaa]">
+              {t('startup.removeConfirmMessage', { left: basename(pendingRemove.left), right: basename(pendingRemove.right) })}
+            </p>
+            <div className="flex justify-end gap-2">
+              <button
+                className="rounded px-3 py-1.5 text-sm text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
+                onClick={() => setPendingRemove(null)}
+                autoFocus
+              >
+                {t('startup.removeCancel')}
+              </button>
+              <button
+                className="rounded bg-[#c42b1c] px-3 py-1.5 text-sm text-white transition-colors hover:bg-[#d9362a]"
+                onClick={handleRemoveConfirm}
+              >
+                {t('startup.removeConfirm')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <TitleBar showMaximize={false} />
 
       <div className="flex min-h-0 flex-1">
@@ -102,14 +140,14 @@ export function StartupScreen(): React.JSX.Element {
           ) : (
             <ul className="mt-2 flex flex-col gap-0.5" role="list" aria-label={t('startup.sectionRecent')}>
               {recents.map((r, i) => (
-                <li key={i}>
+                <li key={i} className="group/item relative">
                   <button
                     className="group flex w-full items-start gap-3 rounded px-3 py-2.5 text-left transition-colors hover:bg-[#2a2d2e] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#007acc]"
                     onClick={() => handleOpenRecent(r)}
                     aria-label={t('startup.openAriaLabel', { left: basename(r.left), right: basename(r.right) })}
                   >
                     <FolderOpen size={16} className="mt-0.5 shrink-0 text-[#007acc]" aria-hidden="true" />
-                    <div className="min-w-0 flex-1">
+                    <div className="min-w-0 flex-1 pr-6">
                       <div className="flex items-center gap-2">
                         <span className="truncate text-sm font-medium text-[#cccccc]">
                           {basename(r.left)}
@@ -123,6 +161,14 @@ export function StartupScreen(): React.JSX.Element {
                       <div className="truncate text-xs text-[#858585]">{r.right}</div>
                       <div className="mt-1 text-xs text-[#555555]">{timeAgo(r.lastUsed, t)}</div>
                     </div>
+                  </button>
+                  <button
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-[#555555] opacity-0 transition-opacity hover:bg-[#3e3e42] hover:text-[#cccccc] group-hover/item:opacity-100"
+                    onClick={(e) => handleRemoveClick(e, r)}
+                    aria-label={t('startup.removeAriaLabel', { left: basename(r.left), right: basename(r.right) })}
+                    tabIndex={-1}
+                  >
+                    <X size={13} aria-hidden="true" />
                   </button>
                 </li>
               ))}

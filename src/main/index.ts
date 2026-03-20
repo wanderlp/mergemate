@@ -168,6 +168,11 @@ function registerIpcHandlers(): void {
     store.set('recentComparisons', [{ left, right, lastUsed: Date.now() }, ...filtered].slice(0, 8))
   })
 
+  ipcMain.handle('remove-recent-comparison', (_event, left: string, right: string) => {
+    const existing: RecentComparison[] = store.get('recentComparisons') ?? []
+    store.set('recentComparisons', existing.filter((r) => r.left !== left || r.right !== right))
+  })
+
   // ── File operations ───────────────────────────────────────────────────────
 
   ipcMain.handle('scan-folder', async (event, leftPath: string, rightPath: string) => {
