@@ -8,14 +8,6 @@
 
 ---
 
-## Sobre este proyecto
-
-MergeMate es un experimento en desarrollo acelerado de software: una herramienta completamente funcional construida en colaboración con **Claude** (Anthropic) para demostrar lo que es posible cuando la IA acompaña cada paso del proceso — desde la arquitectura hasta los detalles de UX. Cada funcionalidad, decisión de diseño y línea de código ha sido co-creada en esa dinámica, no generada automáticamente.
-
-El proyecto nace en **Guatemala** 🇬🇹 y está abierto a colaboraciones de todo el mundo. El idioma principal del proyecto (código, issues, PRs y discusiones) es el **español**.
-
-> 🚧 **En desarrollo activo** — el proyecto crece con nuevas funcionalidades y mejoras de forma continua. Si tienes ideas o quieres contribuir, eres bienvenido.
-
 Herramienta de escritorio para comparar y fusionar carpetas de código fuente. Visualiza diferencias entre dos directorios en un árbol unificado con estado por color, abre archivos en tabs estilo VS Code con iconos por tipo de archivo, incluye un visor de diferencias línea por línea con Monaco Editor con capacidades de fusión, y un comparador de imágenes con zoom, slider y navegación.
 
 ---
@@ -72,3 +64,11 @@ npm run dev
 - **@iconify/react + @iconify/icons-devicon** — iconos de tipo de archivo por extensión
 - **Lucide React** — íconos de interfaz
 - **i18next + react-i18next** — internacionalización (ES / EN / DE / FR / PT), detección automática del idioma del OS
+
+## Sobre este proyecto
+
+MergeMate es un experimento en desarrollo acelerado de software: una herramienta completamente funcional construida en colaboración con **Claude** (Anthropic) para demostrar lo que es posible cuando la IA acompaña cada paso del proceso — desde la arquitectura hasta los detalles de UX. Cada funcionalidad, decisión de diseño y línea de código ha sido co-creada en esa dinámica, no generada automáticamente.
+
+El proyecto nace en **Guatemala** 🇬🇹 y está abierto a colaboraciones de todo el mundo. El idioma principal del proyecto (código, issues, PRs y discusiones) es el **español**.
+
+> 🚧 **En desarrollo activo** — el proyecto crece con nuevas funcionalidades y mejoras de forma continua. Si tienes ideas o quieres contribuir, eres bienvenido.
