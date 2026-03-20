@@ -64,6 +64,7 @@ export interface ElectronAPI {
   onMaximizeChange: (callback: (maximized: boolean) => void) => () => void
   onCloseRequested: (callback: () => void) => () => void
   confirmClose: () => Promise<void>
+  openExternal: (url: string) => Promise<void>
 }
 
 declare global {

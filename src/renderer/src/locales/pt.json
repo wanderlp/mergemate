@@ -1,4 +1,13 @@
 {
+  "about": {
+    "title": "Sobre o MergeMate",
+    "version": "Versão {{version}}",
+    "description": "Ferramenta de desktop para comparar e mesclar pastas de código-fonte, construída em colaboração com Claude (Anthropic) como experimento em desenvolvimento acelerado de software.",
+    "origin": "Projeto nascido na Guatemala 🇬🇹, aberto a contribuições de todo o mundo. O idioma principal do projeto é o espanhol.",
+    "activeDev": "Em desenvolvimento ativo — o projeto cresce continuamente com novas funcionalidades e melhorias.",
+    "repo": "Ver repositório no GitHub",
+    "close": "Fechar"
+  },
   "titleBar": {
     "minimize": "Minimizar",
     "maximize": "Maximizar",

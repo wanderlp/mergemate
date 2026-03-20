@@ -1,4 +1,13 @@
 {
+  "about": {
+    "title": "Über MergeMate",
+    "version": "Version {{version}}",
+    "description": "Desktop-Tool zum Vergleichen und Zusammenführen von Quellcode-Ordnern, entwickelt in Zusammenarbeit mit Claude (Anthropic) als Experiment im beschleunigten Softwareentwicklung.",
+    "origin": "Projekt aus Guatemala 🇬🇹, offen für Beiträge aus der ganzen Welt. Die Hauptsprache des Projekts ist Spanisch.",
+    "activeDev": "Aktiv in Entwicklung — das Projekt wächst kontinuierlich mit neuen Funktionen und Verbesserungen.",
+    "repo": "Repository auf GitHub ansehen",
+    "close": "Schließen"
+  },
   "titleBar": {
     "minimize": "Minimieren",
     "maximize": "Maximieren",

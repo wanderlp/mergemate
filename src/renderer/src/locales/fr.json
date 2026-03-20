@@ -1,4 +1,13 @@
 {
+  "about": {
+    "title": "À propos de MergeMate",
+    "version": "Version {{version}}",
+    "description": "Outil de bureau pour comparer et fusionner des dossiers de code source, construit en collaboration avec Claude (Anthropic) comme expérience de développement logiciel accéléré.",
+    "origin": "Projet né au Guatemala 🇬🇹, ouvert aux contributions du monde entier. La langue principale du projet est l'espagnol.",
+    "activeDev": "En développement actif — le projet évolue continuellement avec de nouvelles fonctionnalités et améliorations.",
+    "repo": "Voir le dépôt sur GitHub",
+    "close": "Fermer"
+  },
   "titleBar": {
     "minimize": "Réduire",
     "maximize": "Agrandir",

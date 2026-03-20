@@ -219,6 +219,10 @@ function registerIpcHandlers(): void {
     hashFile(filePath)
   )
 
+  ipcMain.handle('open-external', (_event, url: string) => {
+    shell.openExternal(url)
+  })
+
   ipcMain.handle('window-confirm-close', () => {
     mainWindowClosing = true
     mainWindow?.close()

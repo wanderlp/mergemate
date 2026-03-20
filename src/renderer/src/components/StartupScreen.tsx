@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
-import { FolderOpen, FileText, GitBranch, Clock, ArrowRight, X } from 'lucide-react'
+import { FolderOpen, FileText, GitBranch, Clock, ArrowRight, X, Info } from 'lucide-react'
+import { version } from '../../../../package.json'
 import { useTranslation, type TFunction } from 'react-i18next'
 import { TitleBar } from './TitleBar'
 import { MergeMateLogo } from './MergeMateLogo'
@@ -30,6 +31,7 @@ export function StartupScreen(): React.JSX.Element {
   const { t } = useTranslation()
   const [recents, setRecents] = useState<RecentComparison[]>([])
   const [pendingRemove, setPendingRemove] = useState<RecentComparison | null>(null)
+  const [showAbout, setShowAbout] = useState(false)
 
   useEffect(() => {
     window.electronAPI.getRecentComparisons().then(setRecents)
@@ -57,6 +59,43 @@ export function StartupScreen(): React.JSX.Element {
 
   return (
     <div className="flex h-screen flex-col bg-[#1e1e1e]" role="main">
+      {showAbout && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" role="dialog" aria-modal="true" aria-labelledby="about-title">
+          <div className="mx-4 w-full max-w-md rounded-lg border border-[#3e3e42] bg-[#252526] p-6 shadow-2xl">
+            <div className="mb-4 flex items-center gap-3">
+              <Info size={20} className="shrink-0 text-[#007acc]" aria-hidden="true" />
+              <div>
+                <h2 id="about-title" className="text-base font-semibold text-[#cccccc]">{t('about.title')}</h2>
+                <p className="text-xs text-[#858585]">{t('about.version', { version })}</p>
+              </div>
+            </div>
+            <div className="space-y-4 text-sm leading-relaxed text-[#aaaaaa]">
+              <p className="text-justify">{t('about.description')}</p>
+              <p className="text-justify">{t('about.origin')}</p>
+              <div className="flex items-start gap-2.5 rounded border border-[#3e3e42] bg-[#1e1e1e] px-3 py-2.5">
+                <span className="text-2xl leading-tight" aria-hidden="true">🚧</span>
+                <p className="text-justify text-xs leading-relaxed text-[#858585]">{t('about.activeDev')}</p>
+              </div>
+            </div>
+            <div className="mt-5 flex items-center justify-between">
+              <button
+                className="text-xs text-[#007acc] hover:underline"
+                onClick={() => window.electronAPI.openExternal('https://github.com/wanderlp/mergemate')}
+              >
+                {t('about.repo')}
+              </button>
+              <button
+                className="rounded px-3 py-1.5 text-sm text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
+                onClick={() => setShowAbout(false)}
+                autoFocus
+              >
+                {t('about.close')}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {pendingRemove && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" role="dialog" aria-modal="true">
           <div className="mx-4 w-full max-w-sm rounded-lg border border-[#3e3e42] bg-[#252526] p-6 shadow-2xl">
@@ -122,6 +161,16 @@ export function StartupScreen(): React.JSX.Element {
             description={t('startup.historyDesc')}
             disabled
           />
+
+          <div className="mt-auto flex justify-center pt-8">
+            <button
+              className="flex items-center gap-1.5 text-xs text-[#555555] transition-colors hover:text-[#858585]"
+              onClick={() => setShowAbout(true)}
+            >
+              <Info size={13} aria-hidden="true" />
+              {t('about.title')} · v{version}
+            </button>
+          </div>
         </div>
 
         {/* Separador vertical */}

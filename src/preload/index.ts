@@ -70,7 +70,9 @@ const api: ElectronAPI = {
     return () => ipcRenderer.removeListener('window-close-requested', listener)
   },
 
-  confirmClose: () => ipcRenderer.invoke('window-confirm-close')
+  confirmClose: () => ipcRenderer.invoke('window-confirm-close'),
+
+  openExternal: (url) => ipcRenderer.invoke('open-external', url)
 }
 
 contextBridge.exposeInMainWorld('electronAPI', api)
