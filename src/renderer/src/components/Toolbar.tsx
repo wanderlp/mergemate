@@ -1,5 +1,5 @@
 import React from 'react'
-import { FolderOpen, GitCompareArrows, Eraser } from 'lucide-react'
+import { FolderOpen, GitCompareArrows } from 'lucide-react'
 import { Button } from './ui/button'
 import { Separator } from './ui/separator'
 
@@ -9,7 +9,6 @@ interface ToolbarProps {
   onOpenLeft: () => void
   onOpenRight: () => void
   onRefresh: () => void
-  onClear: () => void
   scanning: boolean
 }
 
@@ -27,7 +26,6 @@ export function Toolbar({
   onOpenLeft,
   onOpenRight,
   onRefresh,
-  onClear,
   scanning
 }: ToolbarProps): React.JSX.Element {
   return (
@@ -68,15 +66,7 @@ export function Toolbar({
         Comparar
       </Button>
 
-      <Button
-        onClick={onClear}
-        disabled={scanning || (!leftFolder && !rightFolder)}
-        title="Limpiar y empezar de nuevo"
-        aria-label="Limpiar selección"
-      >
-        <Eraser size={16} aria-hidden="true" />
-        Limpiar
-      </Button>
+
     </div>
   )
 }

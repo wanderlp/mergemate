@@ -275,7 +275,6 @@ export default function App(): React.JSX.Element {
         onOpenLeft={openLeft}
         onOpenRight={openRight}
         onRefresh={scan}
-        onClear={handleClear}
         scanning={scanning}
       />
 
