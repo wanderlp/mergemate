@@ -1,0 +1,127 @@
+{
+  "titleBar": {
+    "minimize": "Minimizar",
+    "maximize": "Maximizar",
+    "restore": "Restaurar",
+    "close": "Fechar",
+    "ariaLabel": "Barra de título",
+    "switchLanguage": "Selecionar idioma"
+  },
+  "toolbar": {
+    "openLeft": "Abrir pasta esquerda",
+    "openLeftTooltip": "Abrir pasta esquerda (Ctrl+L)",
+    "openRight": "Abrir pasta direita",
+    "openRightTooltip": "Abrir pasta direita (Ctrl+R)",
+    "compare": "Comparar",
+    "compareTooltip": "Comparar pastas (Ctrl+F5)",
+    "noFolder": "Nenhuma pasta selecionada"
+  },
+  "startup": {
+    "subtitle": "Comparador de pastas",
+    "sectionStart": "Começar",
+    "compareFolders": "Comparar 2 pastas",
+    "compareFoldersDesc": "Compara o conteúdo de duas pastas",
+    "comingSoon": "Em breve",
+    "compareFiles": "Comparar 2 arquivos",
+    "compareFilesDesc": "Diff lado a lado de arquivos individuais",
+    "history": "Histórico de alterações",
+    "historyDesc": "Navegue pelo histórico de um repositório Git",
+    "sectionRecent": "Recentes",
+    "noRecent": "Nenhuma comparação recente",
+    "noRecentDesc": "As comparações realizadas aparecerão aqui",
+    "openAriaLabel": "Abrir comparação: {{left}} e {{right}}",
+    "timeAgo": {
+      "justNow": "agora mesmo",
+      "minutes_one": "há 1 min",
+      "minutes_other": "há {{count}} min",
+      "hours_one": "há 1 h",
+      "hours_other": "há {{count}} h",
+      "yesterday": "ontem",
+      "days_one": "há 1 dia",
+      "days_other": "há {{count}} dias"
+    }
+  },
+  "welcome": {
+    "ariaLabel": "Tela de boas-vindas",
+    "description": "Abra duas pastas para começar a comparar",
+    "shortcutLeft": "Ctrl+L — Abrir esquerda",
+    "shortcutRight": "Ctrl+R — Abrir direita",
+    "shortcutRefresh": "Ctrl+F5 — Atualizar"
+  },
+  "closeDialog": {
+    "title": "Fechar a comparação?",
+    "message": "As alterações não salvas serão perdidas e você voltará à tela inicial.",
+    "cancel": "Cancelar",
+    "confirm": "Fechar mesmo assim"
+  },
+  "diff": {
+    "loading": "Carregando arquivo…",
+    "unsupportedTitle": "Formato não disponível",
+    "unsupportedMessage": "O arquivo .{{ext}} é binário e não pode ser comparado como texto.",
+    "tabComparison": "Comparação",
+    "prev": "Anterior",
+    "next": "Próximo",
+    "copyToLeft": "← Copiar para esquerda",
+    "copyToRight": "Copiar para direita →",
+    "saveLeft": "Salvar esquerda",
+    "saveRight": "Salvar direita",
+    "prevTooltip": "Diferença anterior (Alt+↑)",
+    "nextTooltip": "Próxima diferença (Alt+↓)",
+    "copyToLeftTooltip": "Copiar direita → esquerda",
+    "copyToRightTooltip": "Copiar esquerda → direita",
+    "saveLeftTooltip": "Salvar arquivo esquerdo (Ctrl+S)",
+    "saveRightTooltip": "Salvar arquivo direito (Ctrl+S)",
+    "prevAriaLabel": "Ir para diferença anterior",
+    "nextAriaLabel": "Ir para próxima diferença",
+    "copyToLeftAriaLabel": "Copiar conteúdo para pasta esquerda",
+    "copyToRightAriaLabel": "Copiar conteúdo para pasta direita",
+    "saveLeftAriaLabel": "Salvar arquivo esquerdo",
+    "saveRightAriaLabel": "Salvar arquivo direito"
+  },
+  "progress": {
+    "ariaLabel": "Escaneando pastas",
+    "title": "Escaneando pastas…",
+    "starting": "Iniciando…"
+  },
+  "status": {
+    "identical": "{{count}} idênticos",
+    "different": "{{count}} diferentes",
+    "commentsOnly": "{{count}} só comentários",
+    "leftOnly": "{{count}} só esquerda",
+    "rightOnly": "{{count}} só direita",
+    "totalFiles": "{{count}} arquivos",
+    "identicalLines": "{{count}} idênticas",
+    "differentLines": "{{count}} diferentes",
+    "commentsOnlyLines": "{{count}} comentários",
+    "totalLines": "{{count}} linhas",
+    "leftImage": "Esq: {{w}} × {{h}} px",
+    "leftImageNone": "Esq: —",
+    "rightImage": "Dir: {{w}} × {{h}} px",
+    "rightImageNone": "Dir: —",
+    "sameDimensions": "Mesmas dimensões",
+    "differentDimensions": "Dimensões diferentes"
+  },
+  "image": {
+    "sidebyside": "Lado a lado",
+    "slider": "Slider",
+    "left": "Só esquerda",
+    "right": "Só direita",
+    "identical": "Imagens idênticas",
+    "zoomOut": "Afastar",
+    "zoomIn": "Aproximar",
+    "zoomReset": "Redefinir zoom",
+    "loading": "Carregando imagem…",
+    "leftLabel": "Esquerda",
+    "rightLabel": "Direita",
+    "compareAriaLabel": "Comparação de imagem: {{path}}. Use a roda do mouse para zoom e arraste para navegar.",
+    "panelAriaLabel": "{{label}}. Use a roda do mouse para zoom e arraste para navegar."
+  },
+  "tabBar": {
+    "ariaLabel": "Arquivos abertos",
+    "closeTab": "Fechar {{label}}"
+  },
+  "copy": {
+    "confirmLeft": "Sobrescrever \"{{name}}\" na pasta esquerda?\nUma cópia de segurança .bak será criada automaticamente.",
+    "confirmRight": "Sobrescrever \"{{name}}\" na pasta direita?\nUma cópia de segurança .bak será criada automaticamente."
+  }
+}

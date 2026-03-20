@@ -1,0 +1,127 @@
+{
+  "titleBar": {
+    "minimize": "Réduire",
+    "maximize": "Agrandir",
+    "restore": "Restaurer",
+    "close": "Fermer",
+    "ariaLabel": "Barre de titre",
+    "switchLanguage": "Choisir la langue"
+  },
+  "toolbar": {
+    "openLeft": "Ouvrir le dossier gauche",
+    "openLeftTooltip": "Ouvrir le dossier gauche (Ctrl+L)",
+    "openRight": "Ouvrir le dossier droit",
+    "openRightTooltip": "Ouvrir le dossier droit (Ctrl+R)",
+    "compare": "Comparer",
+    "compareTooltip": "Comparer les dossiers (Ctrl+F5)",
+    "noFolder": "Aucun dossier sélectionné"
+  },
+  "startup": {
+    "subtitle": "Comparateur de dossiers",
+    "sectionStart": "Démarrer",
+    "compareFolders": "Comparer 2 dossiers",
+    "compareFoldersDesc": "Compare le contenu de deux dossiers",
+    "comingSoon": "Bientôt disponible",
+    "compareFiles": "Comparer 2 fichiers",
+    "compareFilesDesc": "Diff côte à côte de fichiers individuels",
+    "history": "Historique des modifications",
+    "historyDesc": "Naviguer dans l'historique d'un dépôt Git",
+    "sectionRecent": "Récents",
+    "noRecent": "Aucune comparaison récente",
+    "noRecentDesc": "Les comparaisons effectuées apparaîtront ici",
+    "openAriaLabel": "Ouvrir la comparaison : {{left}} et {{right}}",
+    "timeAgo": {
+      "justNow": "à l'instant",
+      "minutes_one": "il y a 1 min",
+      "minutes_other": "il y a {{count}} min",
+      "hours_one": "il y a 1 h",
+      "hours_other": "il y a {{count}} h",
+      "yesterday": "hier",
+      "days_one": "il y a 1 jour",
+      "days_other": "il y a {{count}} jours"
+    }
+  },
+  "welcome": {
+    "ariaLabel": "Écran de bienvenue",
+    "description": "Ouvrez deux dossiers pour commencer à comparer",
+    "shortcutLeft": "Ctrl+L — Ouvrir gauche",
+    "shortcutRight": "Ctrl+R — Ouvrir droit",
+    "shortcutRefresh": "Ctrl+F5 — Actualiser"
+  },
+  "closeDialog": {
+    "title": "Fermer la comparaison ?",
+    "message": "Les modifications non enregistrées seront perdues et vous reviendrez à l'écran d'accueil.",
+    "cancel": "Annuler",
+    "confirm": "Fermer quand même"
+  },
+  "diff": {
+    "loading": "Chargement du fichier…",
+    "unsupportedTitle": "Format non disponible",
+    "unsupportedMessage": "Le fichier .{{ext}} est binaire et ne peut pas être comparé comme texte.",
+    "tabComparison": "Comparaison",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "copyToLeft": "← Copier à gauche",
+    "copyToRight": "Copier à droite →",
+    "saveLeft": "Enregistrer gauche",
+    "saveRight": "Enregistrer droit",
+    "prevTooltip": "Différence précédente (Alt+↑)",
+    "nextTooltip": "Différence suivante (Alt+↓)",
+    "copyToLeftTooltip": "Copier droite → gauche",
+    "copyToRightTooltip": "Copier gauche → droite",
+    "saveLeftTooltip": "Enregistrer le fichier gauche (Ctrl+S)",
+    "saveRightTooltip": "Enregistrer le fichier droit (Ctrl+S)",
+    "prevAriaLabel": "Aller à la différence précédente",
+    "nextAriaLabel": "Aller à la différence suivante",
+    "copyToLeftAriaLabel": "Copier le contenu dans le dossier gauche",
+    "copyToRightAriaLabel": "Copier le contenu dans le dossier droit",
+    "saveLeftAriaLabel": "Enregistrer le fichier gauche",
+    "saveRightAriaLabel": "Enregistrer le fichier droit"
+  },
+  "progress": {
+    "ariaLabel": "Analyse des dossiers",
+    "title": "Analyse des dossiers…",
+    "starting": "Démarrage…"
+  },
+  "status": {
+    "identical": "{{count}} identiques",
+    "different": "{{count}} différents",
+    "commentsOnly": "{{count}} commentaires seuls",
+    "leftOnly": "{{count}} gauche seul.",
+    "rightOnly": "{{count}} droit seul.",
+    "totalFiles": "{{count}} fichiers",
+    "identicalLines": "{{count}} identiques",
+    "differentLines": "{{count}} différentes",
+    "commentsOnlyLines": "{{count}} commentaires",
+    "totalLines": "{{count}} lignes",
+    "leftImage": "Gche : {{w}} × {{h}} px",
+    "leftImageNone": "Gche : —",
+    "rightImage": "Dte : {{w}} × {{h}} px",
+    "rightImageNone": "Dte : —",
+    "sameDimensions": "Mêmes dimensions",
+    "differentDimensions": "Dimensions différentes"
+  },
+  "image": {
+    "sidebyside": "Côte à côte",
+    "slider": "Curseur",
+    "left": "Gauche seul.",
+    "right": "Droit seul.",
+    "identical": "Images identiques",
+    "zoomOut": "Dézoomer",
+    "zoomIn": "Zoomer",
+    "zoomReset": "Réinitialiser le zoom",
+    "loading": "Chargement de l'image…",
+    "leftLabel": "Gauche",
+    "rightLabel": "Droit",
+    "compareAriaLabel": "Comparaison d'image : {{path}}. Utilisez la molette pour zoomer et faites glisser pour naviguer.",
+    "panelAriaLabel": "{{label}}. Utilisez la molette pour zoomer et faites glisser pour naviguer."
+  },
+  "tabBar": {
+    "ariaLabel": "Fichiers ouverts",
+    "closeTab": "Fermer {{label}}"
+  },
+  "copy": {
+    "confirmLeft": "Écraser « {{name}} » dans le dossier gauche ?\nUne sauvegarde .bak sera créée automatiquement.",
+    "confirmRight": "Écraser « {{name}} » dans le dossier droit ?\nUne sauvegarde .bak sera créée automatiquement."
+  }
+}

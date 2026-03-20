@@ -61,4 +61,4 @@ npm run dev
 - **react-compare-slider** — visor comparativo de imágenes con slider
 - **@iconify/react + @iconify/icons-devicon** — iconos de tipo de archivo por extensión
 - **Lucide React** — íconos de interfaz
-- **i18next + react-i18next** — internacionalización (ES / EN), detección automática del idioma del OS
+- **i18next + react-i18next** — internacionalización (ES / EN / DE / FR / PT), detección automática del idioma del OS

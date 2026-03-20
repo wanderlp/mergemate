@@ -89,12 +89,12 @@ El proyecto usa **shadcn/ui** como sistema de componentes base. Todo código nue
 
 ## Internacionalización (i18n)
 
-El proyecto usa **i18next + react-i18next** para soportar múltiples idiomas. Idiomas disponibles: **Español (ES)** y **Inglés (EN)**. El idioma se detecta automáticamente del OS y se persiste en `localStorage` con la clave `mergemate-language`.
+El proyecto usa **i18next + react-i18next** para soportar múltiples idiomas. Idiomas disponibles: **Español (ES)**, **Inglés (EN)**, **Alemán (DE)**, **Francés (FR)** y **Portugués (PT)**. El idioma se detecta automáticamente del OS y se persiste en `localStorage` con la clave `mergemate-language`.
 
 Reglas al agregar texto nuevo en el renderer:
 
 - **Nunca hardcodear strings visibles** — todo texto visible por el usuario debe ir en los archivos de traducción.
-- **Archivos de traducción**: `src/renderer/src/locales/es.json` y `src/renderer/src/locales/en.json`. Agregar la clave en ambos archivos siempre.
+- **Archivos de traducción**: `src/renderer/src/locales/{es,en,de,fr,pt}.json`. Agregar la clave en **todos** los archivos siempre.
 - **Usar el hook**: `const { t } = useTranslation()` en el componente y referenciar con `t('seccion.clave')`.
 - **Interpolación**: usar `t('clave', { variable: valor })` y en el JSON `"{{variable}}"`.
 - **Plurales**: usar sufijos `_one` / `_other` en el JSON y pasar `{ count: n }` al llamar a `t()`.

@@ -1,6 +1,14 @@
 import React, { useId, useState, useEffect } from 'react'
-import { Minus, X, Languages } from 'lucide-react'
+import { Minus, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+
+const LANGUAGES = [
+  { code: 'es', label: 'ES — Español' },
+  { code: 'en', label: 'EN — English' },
+  { code: 'de', label: 'DE — Deutsch' },
+  { code: 'fr', label: 'FR — Français' },
+  { code: 'pt', label: 'PT — Português' },
+]
 
 export function AppIcon({ size = 24 }: { size?: number }): React.JSX.Element {
   const uid = useId().replace(/:/g, '')
@@ -67,8 +75,6 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
     return window.electronAPI.onMaximizeChange(setIsMaximized)
   }, [])
 
-  const isEs = i18n.language.startsWith('es')
-
   return (
     <div
       role="banner"
@@ -83,16 +89,21 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
 
       <div className="ml-auto flex h-full items-center" style={NO_DRAG}>
         {/* Selector de idioma */}
-        <button
-          className="flex h-full items-center gap-1.5 px-3 text-xs text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
-          onClick={() => i18n.changeLanguage(isEs ? 'en' : 'es')}
+        <select
+          value={i18n.language}
+          onChange={(e) => i18n.changeLanguage(e.target.value)}
           aria-label={t('titleBar.switchLanguage')}
           title={t('titleBar.switchLanguage')}
           tabIndex={-1}
+          className="h-full cursor-pointer bg-transparent px-2 text-sm text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc] focus:outline-none"
+          style={{ border: 'none' }}
         >
-          <Languages size={12} aria-hidden="true" />
-          {isEs ? 'EN' : 'ES'}
-        </button>
+          {LANGUAGES.map((l) => (
+            <option key={l.code} value={l.code} style={{ backgroundColor: '#2d2d2d', color: '#cccccc' }}>
+              {l.label}
+            </option>
+          ))}
+        </select>
 
         <button
           className="flex h-full w-[46px] items-center justify-center text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"

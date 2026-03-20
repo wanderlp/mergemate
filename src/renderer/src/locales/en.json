@@ -5,7 +5,7 @@
     "restore": "Restore",
     "close": "Close",
     "ariaLabel": "Title bar",
-    "switchLanguage": "Cambiar a español"
+    "switchLanguage": "Select language"
   },
   "toolbar": {
     "openLeft": "Open left folder",
