@@ -70,10 +70,10 @@ function CloseConfirmDialog({ onConfirm, onCancel }: { onConfirm: () => void; on
     >
       <div className="mx-4 w-full max-w-sm rounded-lg border border-[#3e3e42] bg-[#252526] p-6 shadow-2xl">
         <h2 id="close-dialog-title" className="mb-2 text-base font-semibold text-[#cccccc]">
-          ¿Cerrar MergeMate?
+          ¿Cerrar la comparación?
         </h2>
         <p className="mb-6 text-sm text-[#aaaaaa]">
-          Los cambios no guardados se perderán al cerrar.
+          Los cambios no guardados se perderán y volverás a la pantalla de inicio.
         </p>
         <div className="flex justify-end gap-2">
           <Button ref={cancelRef} variant="ghost" onClick={onCancel}>

@@ -121,6 +121,12 @@ function createMainWindow(): void {
     }
   })
 
+  mainWindow.on('closed', () => {
+    mainWindow = null
+    mainWindowClosing = false
+    createStartupWindow()
+  })
+
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
