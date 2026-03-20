@@ -8,6 +8,7 @@ Este archivo proporciona orientación a Claude Code (claude.ai/code) al trabajar
 npm run dev          # Iniciar la app en modo desarrollo (hot-reload)
 npm run build        # Compilar los tres procesos (main, preload, renderer)
 npm run typecheck    # Verificar TypeScript sin emitir archivos
+npm run gen-icons    # Regenerar iconos de la app desde resources/icon.svg
 npm run dist:win     # Generar instalador de Windows (MergeMate-Setup.exe)
 npm run dist:mac     # Generar DMG de macOS
 npm run dist:linux   # Generar AppImage de Linux
@@ -23,7 +24,7 @@ La app es un proyecto estándar de electron-vite con tres targets de compilació
 
 **Preload** (`src/preload/index.ts`) — puente delgado. Expone `window.electronAPI` mediante `contextBridge`. Toda llamada IPC desde el renderer pasa por aquí. La forma está definida en `src/types.ts`.
 
-**Renderer** (`src/renderer/src/`) — React 18 + Tailwind, tema oscuro estilo VS Code. Dos pantallas controladas en `App.tsx`: la vista de comparación de carpetas (FileTree) y la vista de diferencias (DiffViewer). El estado vive en dos hooks: `useFolderScan` (ciclo de vida del escaneo, progreso, persistencia de carpetas vía electron-store) y `useFileDiff` (carga de archivos, guardar, copiar con backup). El renderer nunca importa APIs de Node.js directamente.
+**Renderer** (`src/renderer/src/`) — React 18 + Tailwind, tema oscuro estilo VS Code. El routing entre pantallas se hace por hash de URL (`#startup` / `#main`) en `main.tsx`. La pantalla de inicio (`StartupScreen`) muestra acciones y comparaciones recientes. La pantalla principal (`App.tsx`) controla: la vista de comparación de carpetas (FileTree) y la vista de diferencias (DiffViewer). El estado vive en el hook `useFolderScan` (ciclo de vida del escaneo, progreso, auto-scan desde recientes). El renderer nunca importa APIs de Node.js directamente.
 
 **Tipos compartidos** (`src/types.ts`) — importado tanto por main como por el renderer. `tsconfig.node.json` y `tsconfig.web.json` incluyen este archivo explícitamente.
 
@@ -89,6 +90,6 @@ El proyecto usa **shadcn/ui** como sistema de componentes base. Todo código nue
 ## Restricciones importantes
 
 - `"type": "module"` NO debe estar en `package.json` — electron-vite genera CJS para main/preload, y agregarlo rompe Electron en tiempo de ejecución (causa ventana en negro).
-- electron-store se usa para persistir `lastLeftFolder` / `lastRightFolder`. El tipo del esquema es `StoreSchema` en `src/main/index.ts`.
+- electron-store se usa para persistir `recentComparisons` (array de hasta 8 pares `{ left, right, lastUsed }`) y `windowState`. El tipo del esquema es `StoreSchema` en `src/main/index.ts`.
 - El renderer se comunica exclusivamente mediante `window.electronAPI` (contextBridge). Agregar nuevas llamadas IPC requiere cambios en tres lugares: `src/main/index.ts` (manejador), `src/preload/index.ts` (puente), `src/types.ts` (interfaz ElectronAPI).
 - Los directorios ignorados durante el escaneo están hardcodeados en `scanner.ts`: `node_modules`, `.git`, `__pycache__`, `dist`, `build`, `.next`, `out`, `target`, `.gradle`, `.idea`, `.vscode`, y archivos `*.bak`.
