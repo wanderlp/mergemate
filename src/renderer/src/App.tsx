@@ -98,6 +98,8 @@ export default function App(): React.JSX.Element {
     progress,
     leftFolder,
     rightFolder,
+    setLeftFolder,
+    setRightFolder,
     scan,
     openLeft,
     openRight,
@@ -320,6 +322,8 @@ export default function App(): React.JSX.Element {
             rightFolder={rightFolder}
             onOpenLeft={openLeft}
             onOpenRight={openRight}
+            onChangeLeft={setLeftFolder}
+            onChangeRight={setRightFolder}
             onRefresh={scan}
             scanning={scanning}
           />

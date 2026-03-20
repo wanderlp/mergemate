@@ -8,10 +8,14 @@
     "switchLanguage": "Select language"
   },
   "toolbar": {
-    "openLeft": "Open left folder",
-    "openLeftTooltip": "Open left folder (Ctrl+L)",
-    "openRight": "Open right folder",
-    "openRightTooltip": "Open right folder (Ctrl+R)",
+    "openLeft": "Select left folder",
+    "openLeftTooltip": "Select left folder (Ctrl+L)",
+    "changeLeft": "Change left folder",
+    "changeLeftTooltip": "Change left folder (Ctrl+L)",
+    "openRight": "Select right folder",
+    "openRightTooltip": "Select right folder (Ctrl+R)",
+    "changeRight": "Change right folder",
+    "changeRightTooltip": "Change right folder (Ctrl+R)",
     "compare": "Compare",
     "compareTooltip": "Compare folders (Ctrl+F5)",
     "noFolder": "No folder selected"

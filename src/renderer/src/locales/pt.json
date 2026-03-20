@@ -8,10 +8,14 @@
     "switchLanguage": "Selecionar idioma"
   },
   "toolbar": {
-    "openLeft": "Abrir pasta esquerda",
-    "openLeftTooltip": "Abrir pasta esquerda (Ctrl+L)",
-    "openRight": "Abrir pasta direita",
-    "openRightTooltip": "Abrir pasta direita (Ctrl+R)",
+    "openLeft": "Selecionar pasta esquerda",
+    "openLeftTooltip": "Selecionar pasta esquerda (Ctrl+L)",
+    "changeLeft": "Alterar pasta esquerda",
+    "changeLeftTooltip": "Alterar pasta esquerda (Ctrl+L)",
+    "openRight": "Selecionar pasta direita",
+    "openRightTooltip": "Selecionar pasta direita (Ctrl+R)",
+    "changeRight": "Alterar pasta direita",
+    "changeRightTooltip": "Alterar pasta direita (Ctrl+R)",
     "compare": "Comparar",
     "compareTooltip": "Comparar pastas (Ctrl+F5)",
     "noFolder": "Nenhuma pasta selecionada"

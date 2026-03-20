@@ -8,10 +8,14 @@
     "switchLanguage": "Sprache wählen"
   },
   "toolbar": {
-    "openLeft": "Linken Ordner öffnen",
-    "openLeftTooltip": "Linken Ordner öffnen (Ctrl+L)",
-    "openRight": "Rechten Ordner öffnen",
-    "openRightTooltip": "Rechten Ordner öffnen (Ctrl+R)",
+    "openLeft": "Linken Ordner auswählen",
+    "openLeftTooltip": "Linken Ordner auswählen (Ctrl+L)",
+    "changeLeft": "Linken Ordner ändern",
+    "changeLeftTooltip": "Linken Ordner ändern (Ctrl+L)",
+    "openRight": "Rechten Ordner auswählen",
+    "openRightTooltip": "Rechten Ordner auswählen (Ctrl+R)",
+    "changeRight": "Rechten Ordner ändern",
+    "changeRightTooltip": "Rechten Ordner ändern (Ctrl+R)",
     "compare": "Vergleichen",
     "compareTooltip": "Ordner vergleichen (Ctrl+F5)",
     "noFolder": "Kein Ordner ausgewählt"

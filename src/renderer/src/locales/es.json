@@ -8,10 +8,14 @@
     "switchLanguage": "Seleccionar idioma"
   },
   "toolbar": {
-    "openLeft": "Abrir carpeta izquierda",
-    "openLeftTooltip": "Abrir carpeta izquierda (Ctrl+L)",
-    "openRight": "Abrir carpeta derecha",
-    "openRightTooltip": "Abrir carpeta derecha (Ctrl+R)",
+    "openLeft": "Seleccionar carpeta izquierda",
+    "openLeftTooltip": "Seleccionar carpeta izquierda (Ctrl+L)",
+    "changeLeft": "Cambiar carpeta izquierda",
+    "changeLeftTooltip": "Cambiar carpeta izquierda (Ctrl+L)",
+    "openRight": "Seleccionar carpeta derecha",
+    "openRightTooltip": "Seleccionar carpeta derecha (Ctrl+R)",
+    "changeRight": "Cambiar carpeta derecha",
+    "changeRightTooltip": "Cambiar carpeta derecha (Ctrl+R)",
     "compare": "Comparar",
     "compareTooltip": "Comparar carpetas (Ctrl+F5)",
     "noFolder": "Ninguna carpeta seleccionada"

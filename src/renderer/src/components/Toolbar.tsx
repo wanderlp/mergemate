@@ -9,17 +9,10 @@ interface ToolbarProps {
   rightFolder: string
   onOpenLeft: () => void
   onOpenRight: () => void
+  onChangeLeft: (path: string) => void
+  onChangeRight: (path: string) => void
   onRefresh: () => void
   scanning: boolean
-}
-
-function FolderPath({ path }: { path: string }): React.JSX.Element {
-  const { t } = useTranslation()
-  return (
-    <div className="flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa]">
-      {path || t('toolbar.noFolder')}
-    </div>
-  )
 }
 
 export function Toolbar({
@@ -27,36 +20,60 @@ export function Toolbar({
   rightFolder,
   onOpenLeft,
   onOpenRight,
+  onChangeLeft,
+  onChangeRight,
   onRefresh,
   scanning
 }: ToolbarProps): React.JSX.Element {
   const { t } = useTranslation()
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    if (e.key === 'Enter' && leftFolder && rightFolder) onRefresh()
+  }
 
   return (
     <div className="flex items-center gap-2 border-b border-[#3e3e42] bg-[#252526] px-3 py-2">
       <Button
         onClick={onOpenLeft}
         disabled={scanning}
-        title={t('toolbar.openLeftTooltip')}
-        aria-label={t('toolbar.openLeft')}
+        title={leftFolder ? t('toolbar.changeLeftTooltip') : t('toolbar.openLeftTooltip')}
+        aria-label={leftFolder ? t('toolbar.changeLeft') : t('toolbar.openLeft')}
       >
         <FolderOpen size={16} aria-hidden="true" />
-        {t('toolbar.openLeft')}
+        {leftFolder ? t('toolbar.changeLeft') : t('toolbar.openLeft')}
       </Button>
 
-      <FolderPath path={leftFolder} />
+      <input
+        className="flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa] placeholder-[#555] focus:outline-none focus:ring-1 focus:ring-[#007acc]"
+        value={leftFolder}
+        onChange={(e) => onChangeLeft(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={t('toolbar.noFolder')}
+        aria-label={leftFolder ? t('toolbar.changeLeft') : t('toolbar.openLeft')}
+        disabled={scanning}
+        spellCheck={false}
+      />
 
       <Button
         onClick={onOpenRight}
         disabled={scanning}
-        title={t('toolbar.openRightTooltip')}
-        aria-label={t('toolbar.openRight')}
+        title={rightFolder ? t('toolbar.changeRightTooltip') : t('toolbar.openRightTooltip')}
+        aria-label={rightFolder ? t('toolbar.changeRight') : t('toolbar.openRight')}
       >
         <FolderOpen size={16} aria-hidden="true" />
-        {t('toolbar.openRight')}
+        {rightFolder ? t('toolbar.changeRight') : t('toolbar.openRight')}
       </Button>
 
-      <FolderPath path={rightFolder} />
+      <input
+        className="flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa] placeholder-[#555] focus:outline-none focus:ring-1 focus:ring-[#007acc]"
+        value={rightFolder}
+        onChange={(e) => onChangeRight(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={t('toolbar.noFolder')}
+        aria-label={rightFolder ? t('toolbar.changeRight') : t('toolbar.openRight')}
+        disabled={scanning}
+        spellCheck={false}
+      />
 
       <Separator orientation="vertical" className="mx-1" />
 

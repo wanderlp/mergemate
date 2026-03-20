@@ -8,10 +8,14 @@
     "switchLanguage": "Choisir la langue"
   },
   "toolbar": {
-    "openLeft": "Ouvrir le dossier gauche",
-    "openLeftTooltip": "Ouvrir le dossier gauche (Ctrl+L)",
-    "openRight": "Ouvrir le dossier droit",
-    "openRightTooltip": "Ouvrir le dossier droit (Ctrl+R)",
+    "openLeft": "Sélectionner le dossier gauche",
+    "openLeftTooltip": "Sélectionner le dossier gauche (Ctrl+L)",
+    "changeLeft": "Changer le dossier gauche",
+    "changeLeftTooltip": "Changer le dossier gauche (Ctrl+L)",
+    "openRight": "Sélectionner le dossier droit",
+    "openRightTooltip": "Sélectionner le dossier droit (Ctrl+R)",
+    "changeRight": "Changer le dossier droit",
+    "changeRightTooltip": "Changer le dossier droit (Ctrl+R)",
     "compare": "Comparer",
     "compareTooltip": "Comparer les dossiers (Ctrl+F5)",
     "noFolder": "Aucun dossier sélectionné"
