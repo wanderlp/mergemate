@@ -45,7 +45,7 @@ import dockerIcon   from '@iconify/icons-devicon/docker'
 import gitIcon      from '@iconify/icons-devicon/git'
 import dotnetIcon   from '@iconify/icons-devicon/dotnetcore'
 import apiIcon      from '@iconify/icons-mdi/api'
-import layersIcon   from '@iconify/icons-mdi/layers-triple'
+import viewGridIcon from '@iconify/icons-mdi/view-grid'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IconData = any
@@ -96,7 +96,7 @@ const EXT_ICON_MAP: Record<string, IconData> = {
   wasm: wasmIcon,
   dockerfile: dockerIcon,
   csproj: csIcon,
-  sln: layersIcon,
+  sln: viewGridIcon,
   http: apiIcon,
   // Imágenes — MDI
   png: imgPngIcon,
@@ -105,6 +105,10 @@ const EXT_ICON_MAP: Record<string, IconData> = {
   gif: imgGifIcon,
   webp: imgGenIcon, bmp: imgGenIcon, ico: imgGenIcon,
   tiff: imgGenIcon, tif: imgGenIcon, avif: imgGenIcon, svg: imgGenIcon,
+}
+
+const EXT_ICON_COLOR_OVERRIDES: Record<string, string> = {
+  sln: '#7B5EA7',
 }
 
 const EXT_COLORS: Record<string, string> = {
@@ -130,7 +134,8 @@ export function FileTypeIcon({ extension, name, size = 18 }: { extension: string
   const icon = (name ? FILENAME_ICON_MAP[name.toLowerCase()] : undefined) ?? EXT_ICON_MAP[ext]
 
   if (icon) {
-    return <Icon icon={icon} width={size} height={size} style={{ flexShrink: 0 }} />
+    const colorOverride = EXT_ICON_COLOR_OVERRIDES[ext]
+    return <Icon icon={icon} width={size} height={size} style={{ flexShrink: 0, ...(colorOverride ? { color: colorOverride } : {}) }} />
   }
 
   const color = EXT_COLORS[ext] ?? '#858585'
