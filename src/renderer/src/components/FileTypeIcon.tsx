@@ -42,9 +42,17 @@ import perlIcon     from '@iconify/icons-devicon/perl'
 import matlabIcon   from '@iconify/icons-devicon/matlab'
 import wasmIcon     from '@iconify/icons-devicon/wasm'
 import dockerIcon   from '@iconify/icons-devicon/docker'
+import gitIcon      from '@iconify/icons-devicon/git'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type IconData = any
+
+const FILENAME_ICON_MAP: Record<string, IconData> = {
+  '.gitignore': gitIcon,
+  '.gitattributes': gitIcon,
+  '.gitmodules': gitIcon,
+  'dockerfile': dockerIcon,
+}
 
 const EXT_ICON_MAP: Record<string, IconData> = {
   ts: tsIcon, tsx: tsIcon, mts: tsIcon, cts: tsIcon,
@@ -111,9 +119,9 @@ function hexToRgb(hex: string): string {
   return `${r}, ${g}, ${b}`
 }
 
-export function FileTypeIcon({ extension, size = 18 }: { extension: string; size?: number }): React.JSX.Element {
+export function FileTypeIcon({ extension, name, size = 18 }: { extension: string; name?: string; size?: number }): React.JSX.Element {
   const ext = extension.toLowerCase()
-  const icon = EXT_ICON_MAP[ext]
+  const icon = (name ? FILENAME_ICON_MAP[name.toLowerCase()] : undefined) ?? EXT_ICON_MAP[ext]
 
   if (icon) {
     return <Icon icon={icon} width={size} height={size} style={{ flexShrink: 0 }} />

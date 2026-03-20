@@ -121,7 +121,7 @@ export function FileRow({
             </>
           ) : (
             <>
-              <FileTypeIcon extension={entry.extension} />
+              <FileTypeIcon extension={entry.extension} name={entry.name} />
               <span className="truncate" style={{ color }}>{entry.name}</span>
             </>
           )
@@ -157,7 +157,7 @@ export function FileRow({
           ) : (
             <>
               <span className="truncate" style={{ color }}>{entry.name}</span>
-              <FileTypeIcon extension={entry.extension} />
+              <FileTypeIcon extension={entry.extension} name={entry.name} />
             </>
           )
         ) : (

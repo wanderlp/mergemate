@@ -58,7 +58,7 @@ export function TabBar({ tabs, activeTabId, onSelectTab, onCloseTab }: TabBarPro
             ? <FolderOpen size={13} className="flex-shrink-0" aria-hidden="true" />
             : tab.loading
               ? <span className="flex-shrink-0 text-xs" aria-hidden="true">⏳</span>
-              : <FileTypeIcon extension={tab.extension} size={14} />
+              : <FileTypeIcon extension={tab.extension} name={tab.label} size={14} />
 
           const isCloseable = tab.closeable !== false
 
