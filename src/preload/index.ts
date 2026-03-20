@@ -20,6 +20,9 @@ const api: ElectronAPI = {
   getFileHash: (filePath) =>
     ipcRenderer.invoke('get-file-hash', filePath),
 
+  readFileBase64: (filePath) =>
+    ipcRenderer.invoke('read-file-base64', filePath),
+
   onScanProgress: (callback: (progress: ScanProgress) => void) => {
     const listener = (_event: Electron.IpcRendererEvent, progress: ScanProgress): void => {
       callback(progress)
@@ -30,15 +33,21 @@ const api: ElectronAPI = {
     }
   },
 
-  readFileBase64: (filePath) =>
-    ipcRenderer.invoke('read-file-base64', filePath),
+  // Startup window
+  getRecentComparisons: () =>
+    ipcRenderer.invoke('startup-get-recent'),
 
-  getLastFolders: () =>
-    ipcRenderer.invoke('get-last-folders'),
+  openMainWindow: (left?, right?) =>
+    ipcRenderer.invoke('startup-open-main', left, right),
 
-  saveLastFolders: (left, right) =>
-    ipcRenderer.invoke('save-last-folders', left, right),
+  // Main window
+  getPendingFolders: () =>
+    ipcRenderer.invoke('get-pending-folders'),
 
+  saveRecentComparison: (left, right) =>
+    ipcRenderer.invoke('save-recent-comparison', left, right),
+
+  // Window controls
   minimizeWindow: () => ipcRenderer.invoke('window-minimize'),
   maximizeWindow: () => ipcRenderer.invoke('window-maximize'),
   closeWindow:    () => ipcRenderer.invoke('window-close'),

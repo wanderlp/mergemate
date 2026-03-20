@@ -5,6 +5,7 @@ import Store from 'electron-store'
 import * as fs from 'fs'
 import { scanFolders } from './scanner'
 import { hashFile } from './classifier'
+import type { RecentComparison } from '../types'
 
 interface WindowState {
   x: number | undefined
@@ -15,17 +16,64 @@ interface WindowState {
 }
 
 interface StoreSchema {
-  lastLeftFolder: string | null
-  lastRightFolder: string | null
+  recentComparisons: RecentComparison[]
   windowState: WindowState | null
 }
 
 const store = new Store<StoreSchema>()
 
-function createWindow(): void {
+let startupWindow: BrowserWindow | null = null
+let mainWindow: BrowserWindow | null = null
+let pendingFolders: { left: string; right: string } | null = null
+
+function setupMaximizeEvents(win: BrowserWindow): void {
+  win.on('maximize',   () => win.webContents.send('window-maximize-change', true))
+  win.on('unmaximize', () => win.webContents.send('window-maximize-change', false))
+}
+
+function createStartupWindow(): void {
+  startupWindow = new BrowserWindow({
+    width: 900,
+    height: 600,
+    resizable: false,
+    maximizable: false,
+    center: true,
+    show: false,
+    frame: false,
+    icon: join(__dirname, '../../resources/icon.ico'),
+    title: 'MergeMate',
+    backgroundColor: '#1e1e1e',
+    autoHideMenuBar: true,
+    webPreferences: {
+      preload: join(__dirname, '../preload/index.js'),
+      sandbox: false,
+      contextIsolation: true,
+      nodeIntegration: false
+    }
+  })
+
+  startupWindow.on('ready-to-show', () => startupWindow?.show())
+
+  // Si el usuario cierra la startup sin haber abierto main → salir
+  startupWindow.on('close', () => {
+    if (!mainWindow || mainWindow.isDestroyed()) {
+      app.quit()
+    }
+  })
+
+  setupMaximizeEvents(startupWindow)
+
+  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    startupWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + '#startup')
+  } else {
+    startupWindow.loadFile(join(__dirname, '../renderer/index.html'), { hash: 'startup' })
+  }
+}
+
+function createMainWindow(): void {
   const savedState = store.get('windowState') ?? null
 
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     x: savedState?.x,
     y: savedState?.y,
     width: savedState?.width ?? 1400,
@@ -47,16 +95,14 @@ function createWindow(): void {
   })
 
   mainWindow.on('ready-to-show', () => {
-    // Primera vez (sin estado guardado) → maximizar siempre
-    // Con estado guardado → restaurar tal como lo dejó el usuario
     if (!savedState || savedState.maximized) {
-      mainWindow.maximize()
+      mainWindow?.maximize()
     }
-    mainWindow.show()
+    mainWindow?.show()
   })
 
-  // Guardar estado al cerrar
   mainWindow.on('close', () => {
+    if (!mainWindow) return
     const isMaximized = mainWindow.isMaximized()
     const bounds = mainWindow.getNormalBounds()
     store.set('windowState', {
@@ -68,26 +114,55 @@ function createWindow(): void {
     })
   })
 
-  mainWindow.on('maximize',   () => mainWindow.webContents.send('window-maximize-change', true))
-  mainWindow.on('unmaximize', () => mainWindow.webContents.send('window-maximize-change', false))
-
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
   })
 
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'])
-  } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
-  }
+  setupMaximizeEvents(mainWindow)
 
-  // IPC: scan folders
-  ipcMain.handle('scan-folder', async (_event, leftPath: string, rightPath: string) => {
+  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + '#main')
+  } else {
+    mainWindow.loadFile(join(__dirname, '../renderer/index.html'), { hash: 'main' })
+  }
+}
+
+function registerIpcHandlers(): void {
+  // ── Startup ───────────────────────────────────────────────────────────────
+
+  ipcMain.handle('startup-get-recent', () =>
+    store.get('recentComparisons') ?? []
+  )
+
+  ipcMain.handle('startup-open-main', (_event, left?: string, right?: string) => {
+    if (left && right) pendingFolders = { left, right }
+    createMainWindow()
+    startupWindow?.close()
+  })
+
+  // ── Main window ───────────────────────────────────────────────────────────
+
+  ipcMain.handle('get-pending-folders', () => {
+    const f = pendingFolders
+    pendingFolders = null
+    return f
+  })
+
+  ipcMain.handle('save-recent-comparison', (_event, left: string, right: string) => {
+    const existing: RecentComparison[] = store.get('recentComparisons') ?? []
+    const filtered = existing.filter((r) => r.left !== left || r.right !== right)
+    store.set('recentComparisons', [{ left, right, lastUsed: Date.now() }, ...filtered].slice(0, 8))
+  })
+
+  // ── File operations ───────────────────────────────────────────────────────
+
+  ipcMain.handle('scan-folder', async (event, leftPath: string, rightPath: string) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
     return new Promise((resolve, reject) => {
       try {
         const result = scanFolders(leftPath, rightPath, (percent, currentFile) => {
-          mainWindow.webContents.send('scan-progress', { percent, currentFile })
+          win?.webContents.send('scan-progress', { percent, currentFile })
         })
         resolve(result)
       } catch (err) {
@@ -96,63 +171,54 @@ function createWindow(): void {
     })
   })
 
-  // IPC: read file
-  ipcMain.handle('read-file', async (_event, filePath: string) => {
-    return fs.readFileSync(filePath, 'utf-8')
-  })
+  ipcMain.handle('read-file', async (_event, filePath: string) =>
+    fs.readFileSync(filePath, 'utf-8')
+  )
 
-  // IPC: read file as base64 (para imágenes)
-  ipcMain.handle('read-file-base64', async (_event, filePath: string) => {
-    const buf = fs.readFileSync(filePath)
-    return buf.toString('base64')
-  })
+  ipcMain.handle('read-file-base64', async (_event, filePath: string) =>
+    fs.readFileSync(filePath).toString('base64')
+  )
 
-  // IPC: write file
   ipcMain.handle('write-file', async (_event, filePath: string, content: string) => {
     fs.writeFileSync(filePath, content, 'utf-8')
   })
 
-  // IPC: copy file with .bak backup
   ipcMain.handle('copy-file-with-bak', async (_event, src: string, dest: string) => {
-    if (fs.existsSync(dest)) {
-      fs.copyFileSync(dest, dest + '.bak')
-    }
+    if (fs.existsSync(dest)) fs.copyFileSync(dest, dest + '.bak')
     fs.copyFileSync(src, dest)
   })
 
-  // IPC: show folder dialog
-  ipcMain.handle('show-folder-dialog', async () => {
-    const result = await dialog.showOpenDialog(mainWindow, {
+  ipcMain.handle('show-folder-dialog', async (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+    const result = await dialog.showOpenDialog(win ?? mainWindow!, {
       properties: ['openDirectory']
     })
     if (result.canceled || result.filePaths.length === 0) return null
     return result.filePaths[0]
   })
 
-  // IPC: get file hash
-  ipcMain.handle('get-file-hash', async (_event, filePath: string) => {
-    return hashFile(filePath)
+  ipcMain.handle('get-file-hash', async (_event, filePath: string) =>
+    hashFile(filePath)
+  )
+
+  // ── Window controls (funciona para cualquier ventana via event.sender) ────
+
+  ipcMain.handle('window-minimize', (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.minimize()
   })
 
-  // IPC: window controls
-  ipcMain.handle('window-minimize',    () => mainWindow.minimize())
-  ipcMain.handle('window-maximize',    () => mainWindow.isMaximized() ? mainWindow.unmaximize() : mainWindow.maximize())
-  ipcMain.handle('window-close',       () => mainWindow.close())
-  ipcMain.handle('window-is-maximized',() => mainWindow.isMaximized())
-
-  // IPC: get last folders
-  ipcMain.handle('get-last-folders', async () => {
-    return {
-      left: store.get('lastLeftFolder') ?? null,
-      right: store.get('lastRightFolder') ?? null
-    }
+  ipcMain.handle('window-maximize', (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+    if (win) win.isMaximized() ? win.unmaximize() : win.maximize()
   })
 
-  // IPC: save last folders
-  ipcMain.handle('save-last-folders', async (_event, left: string, right: string) => {
-    store.set('lastLeftFolder', left)
-    store.set('lastRightFolder', right)
+  ipcMain.handle('window-close', (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.close()
   })
+
+  ipcMain.handle('window-is-maximized', (event) =>
+    BrowserWindow.fromWebContents(event.sender)?.isMaximized() ?? false
+  )
 }
 
 app.whenReady().then(() => {
@@ -162,10 +228,11 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  createWindow()
+  registerIpcHandlers()
+  createStartupWindow()
 
-  app.on('activate', function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow()
+  app.on('activate', () => {
+    if (BrowserWindow.getAllWindows().length === 0) createStartupWindow()
   })
 })
 

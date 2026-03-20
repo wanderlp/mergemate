@@ -1,5 +1,11 @@
 // Shared TypeScript interfaces between main and renderer
 
+export interface RecentComparison {
+  left: string
+  right: string
+  lastUsed: number
+}
+
 export type FileStatus = 'identical' | 'different' | 'comments-only' | 'left-only' | 'right-only'
 
 export interface FileEntry {
@@ -43,8 +49,12 @@ export interface ElectronAPI {
   getFileHash: (filePath: string) => Promise<string>
   readFileBase64: (filePath: string) => Promise<string>
   onScanProgress: (callback: (progress: ScanProgress) => void) => () => void
-  getLastFolders: () => Promise<{ left: string | null; right: string | null }>
-  saveLastFolders: (left: string, right: string) => Promise<void>
+  // Startup window
+  getRecentComparisons: () => Promise<RecentComparison[]>
+  openMainWindow: (left?: string, right?: string) => Promise<void>
+  // Main window
+  getPendingFolders: () => Promise<{ left: string; right: string } | null>
+  saveRecentComparison: (left: string, right: string) => Promise<void>
   // Window controls
   minimizeWindow: () => Promise<void>
   maximizeWindow: () => Promise<void>

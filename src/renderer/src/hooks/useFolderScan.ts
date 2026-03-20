@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import type { ScanResult, ScanProgress } from '../types'
 
 interface UseFolderScanReturn {
@@ -21,15 +21,18 @@ export function useFolderScan(): UseFolderScanReturn {
   const [progress, setProgress] = useState<ScanProgress | null>(null)
   const [leftFolder, setLeftFolder] = useState('')
   const [rightFolder, setRightFolder] = useState('')
+  const autoScanRef = useRef(false)
 
-  // Restore last folders on mount
   useEffect(() => {
-    window.electronAPI.getLastFolders().then(({ left, right }) => {
-      if (left) setLeftFolder(left)
-      if (right) setRightFolder(right)
+    // Leer carpetas pendientes (seleccionadas desde la startup screen)
+    window.electronAPI.getPendingFolders().then((pending) => {
+      if (pending?.left)  setLeftFolder(pending.left)
+      if (pending?.right) setRightFolder(pending.right)
+      if (pending?.left && pending?.right) {
+        autoScanRef.current = true
+      }
     })
 
-    // Listen for scan progress
     const unsubscribe = window.electronAPI.onScanProgress((p) => {
       setProgress(p)
     })
@@ -41,7 +44,7 @@ export function useFolderScan(): UseFolderScanReturn {
     setScanning(true)
     setProgress({ percent: 0, currentFile: '' })
     try {
-      await window.electronAPI.saveLastFolders(leftFolder, rightFolder)
+      await window.electronAPI.saveRecentComparison(leftFolder, rightFolder)
       const result = await window.electronAPI.scanFolder(leftFolder, rightFolder)
       setScanResult(result)
     } finally {
@@ -49,6 +52,14 @@ export function useFolderScan(): UseFolderScanReturn {
       setProgress(null)
     }
   }, [leftFolder, rightFolder])
+
+  // Auto-scan cuando se cargan carpetas desde recientes
+  useEffect(() => {
+    if (autoScanRef.current && leftFolder && rightFolder) {
+      autoScanRef.current = false
+      scan()
+    }
+  }, [leftFolder, rightFolder, scan])
 
   const openLeft = useCallback(async () => {
     const folder = await window.electronAPI.showFolderDialog()
@@ -65,7 +76,6 @@ export function useFolderScan(): UseFolderScanReturn {
     setRightFolder('')
     setScanResult(null)
     setProgress(null)
-    window.electronAPI.saveLastFolders('', '')
   }, [])
 
   return {

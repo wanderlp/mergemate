@@ -1,16 +1,18 @@
-import React, { useState, useEffect } from 'react'
+import React, { useId, useState, useEffect } from 'react'
 import { Minus, X } from 'lucide-react'
 
-function AppIcon({ size = 24 }: { size?: number }): React.JSX.Element {
+export function AppIcon({ size = 24 }: { size?: number }): React.JSX.Element {
+  const uid = useId().replace(/:/g, '')
+  const gradId = `${uid}-bg`
   return (
     <svg width={size} height={size} viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
       <defs>
-        <linearGradient id="titlebar-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#1a8cd8"/>
           <stop offset="100%" stopColor="#005a9e"/>
         </linearGradient>
       </defs>
-      <rect width="512" height="512" rx="100" fill="url(#titlebar-bg)"/>
+      <rect width="512" height="512" rx="100" fill={`url(#${gradId})`}/>
       <path d="M 60,148 L 188,148 L 228,188 L 228,364 L 60,364 Z" fill="white" opacity="0.95"/>
       <path d="M 188,148 L 228,148 L 228,188 Z" fill="#c8dff0"/>
       <line x1="188" y1="148" x2="228" y2="188" stroke="#a0c4e0" strokeWidth="1.5"/>
@@ -31,7 +33,6 @@ function AppIcon({ size = 24 }: { size?: number }): React.JSX.Element {
   )
 }
 
-// Icono maximizar: cuadrado simple
 function MaximizeIcon(): React.JSX.Element {
   return (
     <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
@@ -40,7 +41,6 @@ function MaximizeIcon(): React.JSX.Element {
   )
 }
 
-// Icono restaurar: dos rectángulos superpuestos (estilo Windows)
 function RestoreIcon(): React.JSX.Element {
   return (
     <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true">
@@ -53,7 +53,11 @@ function RestoreIcon(): React.JSX.Element {
 const DRAG    = { WebkitAppRegion: 'drag'    } as React.CSSProperties
 const NO_DRAG = { WebkitAppRegion: 'no-drag' } as React.CSSProperties
 
-export function TitleBar(): React.JSX.Element {
+interface TitleBarProps {
+  showMaximize?: boolean
+}
+
+export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Element {
   const [isMaximized, setIsMaximized] = useState(false)
 
   useEffect(() => {
@@ -68,13 +72,11 @@ export function TitleBar(): React.JSX.Element {
       className="flex shrink-0 select-none items-center border-b border-[#3e3e42] bg-[#252526]"
       style={{ height: 40, ...DRAG }}
     >
-      {/* Icono y nombre */}
       <div className="flex items-center gap-2.5 px-3">
         <AppIcon size={24} />
         <span className="text-sm font-semibold tracking-wide text-[#cccccc]">MergeMate</span>
       </div>
 
-      {/* Botones de ventana */}
       <div className="ml-auto flex h-full" style={NO_DRAG}>
         <button
           className="flex h-full w-[46px] items-center justify-center text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
@@ -85,14 +87,16 @@ export function TitleBar(): React.JSX.Element {
           <Minus size={13} aria-hidden="true" />
         </button>
 
-        <button
-          className="flex h-full w-[46px] items-center justify-center text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
-          onClick={() => window.electronAPI.maximizeWindow()}
-          aria-label={isMaximized ? 'Restaurar' : 'Maximizar'}
-          tabIndex={-1}
-        >
-          {isMaximized ? <RestoreIcon /> : <MaximizeIcon />}
-        </button>
+        {showMaximize && (
+          <button
+            className="flex h-full w-[46px] items-center justify-center text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
+            onClick={() => window.electronAPI.maximizeWindow()}
+            aria-label={isMaximized ? 'Restaurar' : 'Maximizar'}
+            tabIndex={-1}
+          >
+            {isMaximized ? <RestoreIcon /> : <MaximizeIcon />}
+          </button>
+        )}
 
         <button
           className="flex h-full w-[46px] items-center justify-center text-[#aaaaaa] transition-colors hover:bg-[#e81123] hover:text-white"
