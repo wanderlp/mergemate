@@ -1,8 +1,17 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
-import type { ScanResult, ScanProgress } from '../types'
+import type { ScanResult, ScanProgress, FileEntry, FileStatus } from '../types'
+
+function patchEntryInTree(files: FileEntry[], relativePath: string, status: FileStatus): FileEntry[] {
+  return files.map((f) => {
+    if (f.relativePath === relativePath) return { ...f, status }
+    if (f.isDirectory && f.children) return { ...f, children: patchEntryInTree(f.children, relativePath, status) }
+    return f
+  })
+}
 
 interface UseFolderScanReturn {
   scanResult: ScanResult | null
+  scanCount: number
   scanning: boolean
   progress: ScanProgress | null
   leftFolder: string
@@ -13,10 +22,12 @@ interface UseFolderScanReturn {
   openLeft: () => Promise<void>
   openRight: () => Promise<void>
   clear: () => void
+  patchFileStatus: (relativePath: string, status: FileStatus) => void
 }
 
 export function useFolderScan(): UseFolderScanReturn {
   const [scanResult, setScanResult] = useState<ScanResult | null>(null)
+  const [scanCount, setScanCount] = useState(0)
   const [scanning, setScanning] = useState(false)
   const [progress, setProgress] = useState<ScanProgress | null>(null)
   const [leftFolder, setLeftFolder] = useState('')
@@ -47,6 +58,7 @@ export function useFolderScan(): UseFolderScanReturn {
       await window.electronAPI.saveRecentComparison(leftFolder, rightFolder)
       const result = await window.electronAPI.scanFolder(leftFolder, rightFolder)
       setScanResult(result)
+      setScanCount((c) => c + 1)
     } finally {
       setScanning(false)
       setProgress(null)
@@ -78,8 +90,16 @@ export function useFolderScan(): UseFolderScanReturn {
     setProgress(null)
   }, [])
 
+  const patchFileStatus = useCallback((relativePath: string, status: FileStatus) => {
+    setScanResult((prev) => {
+      if (!prev) return prev
+      return { ...prev, files: patchEntryInTree(prev.files, relativePath, status) }
+    })
+  }, [])
+
   return {
     scanResult,
+    scanCount,
     scanning,
     progress,
     leftFolder,
@@ -89,6 +109,7 @@ export function useFolderScan(): UseFolderScanReturn {
     scan,
     openLeft,
     openRight,
-    clear
+    clear,
+    patchFileStatus
   }
 }

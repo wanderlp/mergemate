@@ -94,6 +94,7 @@ export default function App(): React.JSX.Element {
   const { t } = useTranslation()
   const {
     scanResult,
+    scanCount,
     scanning,
     progress,
     leftFolder,
@@ -103,21 +104,24 @@ export default function App(): React.JSX.Element {
     scan,
     openLeft,
     openRight,
-    clear
+    clear,
+    patchFileStatus
   } = useFolderScan()
 
   const [openTabs, setOpenTabs] = useState<Map<string, DiffTabData>>(new Map())
   const [activeTabId, setActiveTabId] = useState<string>('')
   const [showComparisonTab, setShowComparisonTab] = useState(false)
   const [showCloseDialog, setShowCloseDialog] = useState(false)
+  const [scanVersion, setScanVersion] = useState(0)
 
-  // Cuando termina el escaneo, mostrar y activar el tab de Comparación
+  // Cuando termina un escaneo completo, mostrar y activar el tab de Comparación
+  // scanCount solo cambia en scan() real, no en patchFileStatus
   useEffect(() => {
-    if (scanResult) {
-      setShowComparisonTab(true)
-      setActiveTabId(COMPARISON_TAB_ID)
-    }
-  }, [scanResult])
+    if (scanCount === 0) return
+    setShowComparisonTab(true)
+    setActiveTabId(COMPARISON_TAB_ID)
+    setScanVersion((v) => v + 1)
+  }, [scanCount])
 
   // Diálogo de confirmación al cerrar
   useEffect(() => {
@@ -223,7 +227,12 @@ export default function App(): React.JSX.Element {
       const t = prev.get(activeTabId)!
       return new Map(prev).set(activeTabId, { ...t, [contentKey]: content })
     })
-  }, [openTabs, activeTabId])
+    // Actualizar el estado de la fila en el árbol sin re-escanear todo
+    if (tab) {
+      const newStatus = await window.electronAPI.classifyFiles(tab.file.leftPath, tab.file.rightPath, tab.file.extension)
+      patchFileStatus(tab.file.relativePath, newStatus)
+    }
+  }, [openTabs, activeTabId, patchFileStatus])
 
   const saveLeft  = useCallback((content: string) => saveSide('leftPath',  'leftContent',  content), [saveSide])
   const saveRight = useCallback((content: string) => saveSide('rightPath', 'rightContent', content), [saveSide])
@@ -355,6 +364,7 @@ export default function App(): React.JSX.Element {
             <FileTree
               entries={scanResult?.files ?? []}
               openTabIds={new Set(openTabs.keys())}
+              scanVersion={scanVersion}
               onFileOpen={handleFileOpen}
               onHover={() => {}}
             />

@@ -174,19 +174,11 @@ export function FileRow({
       {/* Status badge */}
       <div className="w-6 flex-shrink-0 text-center">
         {leftExists && rightExists && (
-          isOpen ? (
-            <span
-              className="inline-block h-3 w-3 rounded-full ring-2 ring-[#007acc]"
-              style={{ backgroundColor: '#007acc' }}
-              aria-hidden="true"
-            />
-          ) : (
-            <span
-              className="inline-block h-3 w-3 rounded-full"
-              style={{ backgroundColor: color }}
-              aria-hidden="true"
-            />
-          )
+          <span
+            className="inline-block h-3 w-3 rounded-full"
+            style={{ backgroundColor: color }}
+            aria-hidden="true"
+          />
         )}
       </div>
     </div>

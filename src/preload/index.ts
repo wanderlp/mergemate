@@ -73,6 +73,7 @@ const api: ElectronAPI = {
   confirmClose: () => ipcRenderer.invoke('window-confirm-close'),
 
   folderExists: (path) => ipcRenderer.invoke('folder-exists', path),
+  classifyFiles: (leftPath, rightPath, ext) => ipcRenderer.invoke('classify-files', leftPath, rightPath, ext),
 
   openExternal: (url) => ipcRenderer.invoke('open-external', url)
 }

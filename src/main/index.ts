@@ -4,7 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import Store from 'electron-store'
 import * as fs from 'fs'
 import { scanFolders } from './scanner'
-import { hashFile } from './classifier'
+import { hashFile, classifyFiles } from './classifier'
 import type { RecentComparison } from '../types'
 
 interface WindowState {
@@ -217,6 +217,10 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle('get-file-hash', async (_event, filePath: string) =>
     hashFile(filePath)
+  )
+
+  ipcMain.handle('classify-files', (_event, leftPath: string | null, rightPath: string | null, ext: string) =>
+    classifyFiles(leftPath, rightPath, ext)
   )
 
   ipcMain.handle('folder-exists', (_event, folderPath: string) =>

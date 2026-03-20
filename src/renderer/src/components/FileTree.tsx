@@ -6,6 +6,7 @@ import type { FileEntry } from '../types'
 interface FileTreeProps {
   entries: FileEntry[]
   openTabIds: Set<string>
+  scanVersion: number
   onFileOpen: (file: FileEntry) => void
   onHover: (path: string) => void
 }
@@ -47,6 +48,7 @@ function makeRowVariants(reduced: boolean) {
 export function FileTree({
   entries,
   openTabIds,
+  scanVersion,
   onFileOpen,
   onHover
 }: FileTreeProps): React.JSX.Element {
@@ -56,12 +58,12 @@ export function FileTree({
   const containerRef = useRef<HTMLDivElement>(null)
   const keyboardNav = useRef(false)
 
-  // Clave que cambia con cada nuevo escaneo para re-disparar las animaciones
+  // scanKey cambia solo en re-escaneos completos (no en actualizaciones puntuales de fila)
   const scanKey = useRef(0)
-  const prevEntries = useRef(entries)
-  if (prevEntries.current !== entries) {
-    if (entries.length > 0) scanKey.current++
-    prevEntries.current = entries
+  const prevScanVersion = useRef(scanVersion)
+  if (prevScanVersion.current !== scanVersion) {
+    scanKey.current++
+    prevScanVersion.current = scanVersion
     setExpandedDirs(new Set())
   }
 
