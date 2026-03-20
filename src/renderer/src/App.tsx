@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { TooltipProvider } from './components/ui/tooltip'
 import { COMPARISON_TAB_ID } from './constants'
@@ -15,6 +15,7 @@ import { TabBar } from './components/TabBar'
 import type { TabItem } from './components/TabBar'
 import { useFolderScan } from './hooks/useFolderScan'
 import { computeDiffStats } from './utils/diffStats'
+import { Button } from './components/ui/button'
 import type { FileEntry } from './types'
 
 const IMAGE_EXTENSIONS = new Set([
@@ -56,6 +57,37 @@ interface DiffTabData {
   imageDims?: { left: ImageDims | null; right: ImageDims | null }
 }
 
+function CloseConfirmDialog({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }): React.JSX.Element {
+  const cancelRef = useRef<HTMLButtonElement>(null)
+  useEffect(() => { cancelRef.current?.focus() }, [])
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="close-dialog-title"
+    >
+      <div className="mx-4 w-full max-w-sm rounded-lg border border-[#3e3e42] bg-[#252526] p-6 shadow-2xl">
+        <h2 id="close-dialog-title" className="mb-2 text-base font-semibold text-[#cccccc]">
+          ¿Cerrar MergeMate?
+        </h2>
+        <p className="mb-6 text-sm text-[#aaaaaa]">
+          Los cambios no guardados se perderán al cerrar.
+        </p>
+        <div className="flex justify-end gap-2">
+          <Button ref={cancelRef} variant="ghost" onClick={onCancel}>
+            Cancelar
+          </Button>
+          <Button variant="primary" onClick={onConfirm}>
+            Cerrar de todos modos
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function App(): React.JSX.Element {
   const {
     scanResult,
@@ -72,6 +104,7 @@ export default function App(): React.JSX.Element {
   const [openTabs, setOpenTabs] = useState<Map<string, DiffTabData>>(new Map())
   const [activeTabId, setActiveTabId] = useState<string>('')
   const [showComparisonTab, setShowComparisonTab] = useState(false)
+  const [showCloseDialog, setShowCloseDialog] = useState(false)
 
   // Cuando termina el escaneo, mostrar y activar el tab de Comparación
   useEffect(() => {
@@ -80,6 +113,11 @@ export default function App(): React.JSX.Element {
       setActiveTabId(COMPARISON_TAB_ID)
     }
   }, [scanResult])
+
+  // Diálogo de confirmación al cerrar
+  useEffect(() => {
+    return window.electronAPI.onCloseRequested(() => setShowCloseDialog(true))
+  }, [])
 
   // Keyboard shortcuts globales
   useEffect(() => {
@@ -267,6 +305,12 @@ export default function App(): React.JSX.Element {
   return (
     <TooltipProvider delayDuration={400}>
     <div className="flex h-screen flex-col bg-[#1e1e1e]">
+      {showCloseDialog && (
+        <CloseConfirmDialog
+          onConfirm={() => window.electronAPI.confirmClose()}
+          onCancel={() => setShowCloseDialog(false)}
+        />
+      )}
       <TitleBar />
 
       <Toolbar

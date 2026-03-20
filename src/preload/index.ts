@@ -59,7 +59,15 @@ const api: ElectronAPI = {
     }
     ipcRenderer.on('window-maximize-change', listener)
     return () => ipcRenderer.removeListener('window-maximize-change', listener)
-  }
+  },
+
+  onCloseRequested: (callback) => {
+    const listener = (): void => callback()
+    ipcRenderer.on('window-close-requested', listener)
+    return () => ipcRenderer.removeListener('window-close-requested', listener)
+  },
+
+  confirmClose: () => ipcRenderer.invoke('window-confirm-close')
 }
 
 contextBridge.exposeInMainWorld('electronAPI', api)

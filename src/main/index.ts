@@ -25,6 +25,7 @@ const store = new Store<StoreSchema>()
 let startupWindow: BrowserWindow | null = null
 let mainWindow: BrowserWindow | null = null
 let pendingFolders: { left: string; right: string } | null = null
+let mainWindowClosing = false
 
 function setupMaximizeEvents(win: BrowserWindow): void {
   win.on('maximize',   () => win.webContents.send('window-maximize-change', true))
@@ -101,8 +102,9 @@ function createMainWindow(): void {
     mainWindow?.show()
   })
 
-  mainWindow.on('close', () => {
+  mainWindow.on('close', (event) => {
     if (!mainWindow) return
+    // Guardar estado siempre (antes de cualquier decisión)
     const isMaximized = mainWindow.isMaximized()
     const bounds = mainWindow.getNormalBounds()
     store.set('windowState', {
@@ -112,6 +114,11 @@ function createMainWindow(): void {
       height: bounds.height,
       maximized: isMaximized
     })
+    // Pedir confirmación al renderer (solo la primera vez)
+    if (!mainWindowClosing) {
+      event.preventDefault()
+      mainWindow.webContents.send('window-close-requested')
+    }
   })
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
@@ -200,6 +207,11 @@ function registerIpcHandlers(): void {
   ipcMain.handle('get-file-hash', async (_event, filePath: string) =>
     hashFile(filePath)
   )
+
+  ipcMain.handle('window-confirm-close', () => {
+    mainWindowClosing = true
+    mainWindow?.close()
+  })
 
   // ── Window controls (funciona para cualquier ventana via event.sender) ────
 
