@@ -12,6 +12,7 @@ interface FileRowProps {
   onDoubleClick: () => void
   onHover: (path: string) => void
   isFocused?: boolean
+  isOpen?: boolean
   onFocusPath?: (path: string) => void
   refCallback?: (el: HTMLDivElement | null) => void
 }
@@ -43,6 +44,7 @@ export function FileRow({
   onDoubleClick,
   onHover,
   isFocused,
+  isOpen,
   onFocusPath,
   refCallback
 }: FileRowProps): React.JSX.Element {
@@ -80,6 +82,10 @@ export function FileRow({
       else onDoubleClick()
     }
   }
+
+  const fileNameStyle: React.CSSProperties = isOpen
+    ? { color: '#ffffff', fontWeight: 600 }
+    : { color }
 
   return (
     <div
@@ -122,7 +128,7 @@ export function FileRow({
           ) : (
             <>
               <FileTypeIcon extension={entry.extension} name={entry.name} />
-              <span className="truncate" style={{ color }}>{entry.name}</span>
+              <span className="truncate" style={fileNameStyle}>{entry.name}</span>
             </>
           )
         ) : (
@@ -156,7 +162,7 @@ export function FileRow({
             </>
           ) : (
             <>
-              <span className="truncate" style={{ color }}>{entry.name}</span>
+              <span className="truncate" style={fileNameStyle}>{entry.name}</span>
               <FileTypeIcon extension={entry.extension} name={entry.name} />
             </>
           )
@@ -168,11 +174,19 @@ export function FileRow({
       {/* Status badge */}
       <div className="w-6 flex-shrink-0 text-center">
         {leftExists && rightExists && (
-          <span
-            className="inline-block h-3 w-3 rounded-full"
-            style={{ backgroundColor: color }}
-            aria-hidden="true"
-          />
+          isOpen ? (
+            <span
+              className="inline-block h-3 w-3 rounded-full ring-2 ring-[#007acc]"
+              style={{ backgroundColor: '#007acc' }}
+              aria-hidden="true"
+            />
+          ) : (
+            <span
+              className="inline-block h-3 w-3 rounded-full"
+              style={{ backgroundColor: color }}
+              aria-hidden="true"
+            />
+          )
         )}
       </div>
     </div>

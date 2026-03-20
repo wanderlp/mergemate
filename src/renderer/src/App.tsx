@@ -354,6 +354,7 @@ export default function App(): React.JSX.Element {
             </AnimatePresence>
             <FileTree
               entries={scanResult?.files ?? []}
+              openTabIds={new Set(openTabs.keys())}
               onFileOpen={handleFileOpen}
               onHover={() => {}}
             />

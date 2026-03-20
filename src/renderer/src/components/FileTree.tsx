@@ -5,6 +5,7 @@ import type { FileEntry } from '../types'
 
 interface FileTreeProps {
   entries: FileEntry[]
+  openTabIds: Set<string>
   onFileOpen: (file: FileEntry) => void
   onHover: (path: string) => void
 }
@@ -45,6 +46,7 @@ function makeRowVariants(reduced: boolean) {
 
 export function FileTree({
   entries,
+  openTabIds,
   onFileOpen,
   onHover
 }: FileTreeProps): React.JSX.Element {
@@ -189,6 +191,7 @@ export function FileTree({
                 onDoubleClick={() => !entry.isDirectory && onFileOpen(entry)}
                 onHover={onHover}
                 isFocused={focusedPath === entry.relativePath}
+                isOpen={openTabIds.has(entry.relativePath)}
                 onFocusPath={setFocusedPath}
                 refCallback={(el) => {
                   if (el) rowRefsMap.current.set(entry.relativePath, el)
