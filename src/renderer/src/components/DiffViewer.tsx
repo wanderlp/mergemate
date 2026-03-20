@@ -196,6 +196,7 @@ export function DiffViewer({
             fontSize: 15,
             lineNumbers: 'on',
             scrollbar: { vertical: 'auto', horizontal: 'auto' },
+            stickyScroll: { enabled: false },
             diffAlgorithm: 'advanced',
             originalEditable: true,
           }}
