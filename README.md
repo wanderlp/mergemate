@@ -41,11 +41,12 @@ npm run dev
 
 ## Funcionalidades
 
-- Tabs estilo VS Code con icono por tipo de archivo
-- Árbol unificado con estado por color (idéntico, diferente, solo comentarios, solo izquierda, solo derecha)
 - Visor de diferencias línea por línea con Monaco Editor y capacidades de fusión
-- Visor de imágenes con modos lado a lado, slider, solo izquierda y solo derecha
-- Navegación por teclado en el árbol de archivos
+- Árbol unificado con estado por color (idéntico, diferente, solo comentarios, solo izquierda, solo derecha)
+- Visor de imágenes con modos lado a lado, slider, zoom y navegación
+- Tabs estilo VS Code con icono por tipo de archivo
+- Pantalla de inicio con acciones y comparaciones recientes
+- Interfaz en 5 idiomas: español, inglés, alemán, francés y portugués
 
 [Ver el detalle completo de funcionalidades →](FEATURES.md)
 
