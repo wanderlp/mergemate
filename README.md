@@ -65,7 +65,7 @@ npm run dev
 - **Lucide React** — íconos de interfaz
 - **i18next + react-i18next** — internacionalización (ES / EN / DE / FR / PT), detección automática del idioma del OS
 
-## Sobre este proyecto
+## Más sobre este proyecto
 
 MergeMate es un experimento en desarrollo acelerado de software: una herramienta completamente funcional construida en colaboración con **Claude** (Anthropic) para demostrar lo que es posible cuando la IA acompaña cada paso del proceso — desde la arquitectura hasta los detalles de UX. Cada funcionalidad, decisión de diseño y línea de código ha sido co-creada en esa dinámica, no generada automáticamente.
 
