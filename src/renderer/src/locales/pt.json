@@ -17,7 +17,7 @@
     "noFolder": "Nenhuma pasta selecionada"
   },
   "startup": {
-    "subtitle": "Comparador de pastas",
+    "subtitle": "Compare e mescle pastas",
     "sectionStart": "Começar",
     "compareFolders": "Comparar 2 pastas",
     "compareFoldersDesc": "Compara o conteúdo de duas pastas",

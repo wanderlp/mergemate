@@ -17,7 +17,7 @@
     "noFolder": "Ninguna carpeta seleccionada"
   },
   "startup": {
-    "subtitle": "Comparador de carpetas",
+    "subtitle": "Compara y fusiona carpetas",
     "sectionStart": "Comenzar",
     "compareFolders": "Comparar 2 carpetas",
     "compareFoldersDesc": "Compara el contenido de dos carpetas",

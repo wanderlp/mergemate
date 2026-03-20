@@ -1,6 +1,27 @@
 # MergeMate — Funcionalidades
 
+## Pantalla de inicio
+
+- Diseño estilo Visual Studio con panel izquierdo de acciones y panel derecho de recientes
+- Acciones disponibles: **Comparar 2 carpetas** (activa) y placeholders para funciones futuras (Comparar 2 archivos, Historial de cambios)
+- Lista de hasta 8 comparaciones recientes con rutas y tiempo relativo ("hace 5 min", "ayer", etc.)
+- Clic en una comparación reciente abre el comparador directamente y lanza el escaneo automático
+- Ventana independiente (900 × 600, no redimensionable) separada de la ventana de comparación
+
+---
+
+## Barra de título personalizada
+
+- Reemplaza la barra nativa de Windows con una barra frameless integrada al tema oscuro
+- Muestra el icono de la app y el nombre **MergeMate**
+- Botones de control de ventana: minimizar, maximizar/restaurar y cerrar (con hover rojo en cerrar)
+- Selector de idioma integrado: cambia entre los 5 idiomas disponibles instantáneamente
+- Área de arrastre para mover la ventana (`-webkit-app-region: drag`)
+
+---
+
 ## Sistema de tabs estilo VS Code
+
 - Cada archivo abierto aparece en su propio tab con el icono del tipo de archivo
 - Cierre con clic en la X, con el botón central del ratón o con `Escape` para volver a la vista de comparación
 - El tab de **Comparación** siempre está disponible mientras haya carpetas abiertas
@@ -9,6 +30,7 @@
 ---
 
 ## Vista de comparación de carpetas
+
 - Abre dos carpetas y visualiza todos los archivos en un árbol unificado
 - Estado de cada archivo codificado por color:
   - 🟢 **Verde** — idénticos byte a byte (mismo hash SHA256)
@@ -23,6 +45,7 @@
 - Barra de estado con conteo por categoría
 
 ### Navegación por teclado en el árbol
+
 | Tecla | Acción |
 |-------|--------|
 | `↑` / `↓` | Moverse entre filas |
@@ -31,11 +54,13 @@
 | `Enter` | Abrir archivo / expandir-colapsar carpeta |
 
 ### Directorios ignorados
+
 `node_modules`, `.git`, `__pycache__`, `dist`, `build`, `.next`, `out`, `target`, `.gradle`, `.idea`, `.vscode`, `*.bak`
 
 ---
 
 ## Visor de diferencias (archivos de texto)
+
 - Monaco Editor en modo lado a lado (tema vs-dark)
 - Detección automática de lenguaje por extensión de archivo
 - Navegación entre bloques de diferencia con botones Anterior/Siguiente
@@ -45,7 +70,9 @@
 ---
 
 ## Visor de imágenes
+
 Doble clic en cualquier imagen abre un visor dedicado con cuatro modos:
+
 - **Lado a lado** — ambas versiones en paneles paralelos (modo por defecto)
 - **Slider** — arrastra para revelar izquierda/derecha sobre la misma imagen (ideal para detectar cambios visuales sutiles)
 - **Solo izquierda / Solo derecha** — vista individual
@@ -55,6 +82,23 @@ Doble clic en cualquier imagen abre un visor dedicado con cuatro modos:
 - La barra de estado muestra dimensiones en píxeles y tamaño de archivo de cada versión
 
 Formatos soportados: `png`, `jpg`, `jpeg`, `gif`, `bmp`, `ico`, `tiff`, `tif`, `webp`, `avif`, `svg`
+
+---
+
+## Diálogo de confirmación al cerrar
+
+- Al intentar cerrar la ventana de comparación se muestra un diálogo de confirmación
+- Advierte que los cambios no guardados se perderán
+- Al confirmar, cierra el comparador y regresa automáticamente a la pantalla de inicio
+
+---
+
+## Soporte multiidioma
+
+- 5 idiomas disponibles: **Español**, **Inglés**, **Alemán**, **Francés** y **Portugués**
+- Detección automática del idioma del sistema operativo al iniciar
+- Selector en la barra de título para cambiar de idioma instantáneamente sin reiniciar
+- Preferencia persistida en `localStorage`
 
 ---
 

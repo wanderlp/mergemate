@@ -17,7 +17,7 @@
     "noFolder": "Aucun dossier sélectionné"
   },
   "startup": {
-    "subtitle": "Comparateur de dossiers",
+    "subtitle": "Comparer et fusionner des dossiers",
     "sectionStart": "Démarrer",
     "compareFolders": "Comparer 2 dossiers",
     "compareFoldersDesc": "Compare le contenu de deux dossiers",

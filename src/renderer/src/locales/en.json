@@ -17,7 +17,7 @@
     "noFolder": "No folder selected"
   },
   "startup": {
-    "subtitle": "Folder comparator",
+    "subtitle": "Compare and merge folders",
     "sectionStart": "Start",
     "compareFolders": "Compare 2 folders",
     "compareFoldersDesc": "Compare files between two folders",

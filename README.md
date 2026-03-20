@@ -4,9 +4,9 @@
   <img src="resources/icon.svg" width="120" alt="MergeMate logo"/>
 </p>
 
-**MergeMate — Comparador de Carpetas**
+**MergeMate — Compara y fusiona carpetas**
 
-Herramienta de escritorio para comparar carpetas de código fuente. Visualiza diferencias entre dos directorios en un árbol unificado con estado por color, abre archivos en tabs estilo VS Code con iconos por tipo de archivo, incluye un visor de diferencias línea por línea con Monaco Editor y un comparador de imágenes con zoom, slider y navegación.
+Herramienta de escritorio para comparar y fusionar carpetas de código fuente. Visualiza diferencias entre dos directorios en un árbol unificado con estado por color, abre archivos en tabs estilo VS Code con iconos por tipo de archivo, incluye un visor de diferencias línea por línea con Monaco Editor con capacidades de fusión, y un comparador de imágenes con zoom, slider y navegación.
 
 ---
 

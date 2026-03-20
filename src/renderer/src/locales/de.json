@@ -17,7 +17,7 @@
     "noFolder": "Kein Ordner ausgewählt"
   },
   "startup": {
-    "subtitle": "Ordnervergleich",
+    "subtitle": "Ordner vergleichen und zusammenführen",
     "sectionStart": "Starten",
     "compareFolders": "2 Ordner vergleichen",
     "compareFoldersDesc": "Inhalt zweier Ordner vergleichen",
