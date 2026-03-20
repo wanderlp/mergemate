@@ -1,4 +1,5 @@
 import React, { useState, useCallback, useEffect, useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import { AnimatePresence } from 'framer-motion'
 import { TooltipProvider } from './components/ui/tooltip'
 import { COMPARISON_TAB_ID } from './constants'
@@ -58,6 +59,7 @@ interface DiffTabData {
 }
 
 function CloseConfirmDialog({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }): React.JSX.Element {
+  const { t } = useTranslation()
   const cancelRef = useRef<HTMLButtonElement>(null)
   useEffect(() => { cancelRef.current?.focus() }, [])
 
@@ -70,17 +72,17 @@ function CloseConfirmDialog({ onConfirm, onCancel }: { onConfirm: () => void; on
     >
       <div className="mx-4 w-full max-w-sm rounded-lg border border-[#3e3e42] bg-[#252526] p-6 shadow-2xl">
         <h2 id="close-dialog-title" className="mb-2 text-base font-semibold text-[#cccccc]">
-          ¿Cerrar la comparación?
+          {t('closeDialog.title')}
         </h2>
         <p className="mb-6 text-sm text-[#aaaaaa]">
-          Los cambios no guardados se perderán y volverás a la pantalla de inicio.
+          {t('closeDialog.message')}
         </p>
         <div className="flex justify-end gap-2">
           <Button ref={cancelRef} variant="ghost" onClick={onCancel}>
-            Cancelar
+            {t('closeDialog.cancel')}
           </Button>
           <Button variant="primary" onClick={onConfirm}>
-            Cerrar de todos modos
+            {t('closeDialog.confirm')}
           </Button>
         </div>
       </div>
@@ -89,6 +91,7 @@ function CloseConfirmDialog({ onConfirm, onCancel }: { onConfirm: () => void; on
 }
 
 export default function App(): React.JSX.Element {
+  const { t } = useTranslation()
   const {
     scanResult,
     scanning,
@@ -244,7 +247,7 @@ export default function App(): React.JSX.Element {
     const tab = openTabs.get(activeTabId)
     if (!tab?.file[src] || !tab?.file[dest]) return false
     const confirmed = window.confirm(
-      `¿Sobreescribir "${tab.file.name}" en la carpeta ${destLabel}?\nSe creará una copia de seguridad .bak automáticamente.`
+      t(destLabel === 'derecha' ? 'copy.confirmRight' : 'copy.confirmLeft', { name: tab.file.name })
     )
     if (!confirmed) return false
     await window.electronAPI.copyFileWithBak(tab.file[src]!, tab.file[dest]!)
@@ -254,7 +257,7 @@ export default function App(): React.JSX.Element {
     })
     scan()
     return true
-  }, [openTabs, activeTabId, scan])
+  }, [openTabs, activeTabId, scan, t])
 
   const copyToRight = useCallback((content: string) => copySide('leftPath',  'rightPath', 'rightContent', 'derecha',    content), [copySide])
   const copyToLeft  = useCallback((content: string) => copySide('rightPath', 'leftPath',  'leftContent',  'izquierda', content), [copySide])
@@ -269,7 +272,7 @@ export default function App(): React.JSX.Element {
 
   // Construir lista de tabs visible
   const tabItems: TabItem[] = [
-    ...(showComparisonTab ? [{ id: COMPARISON_TAB_ID, label: 'Comparación', extension: '', loading: false }] : []),
+    ...(showComparisonTab ? [{ id: COMPARISON_TAB_ID, label: t('diff.tabComparison'), extension: '', loading: false }] : []),
     ...Array.from(openTabs.values()).map((t) => ({
       id: t.file.relativePath,
       label: t.file.name,
@@ -332,14 +335,14 @@ export default function App(): React.JSX.Element {
       <div className="relative flex flex-1 flex-col overflow-hidden">
         {/* Sin tabs: pantalla de bienvenida */}
         {noTabs && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-5 text-[#858585]" role="main" aria-label="Pantalla de bienvenida">
+          <div className="flex flex-1 flex-col items-center justify-center gap-5 text-[#858585]" role="main" aria-label={t('welcome.ariaLabel')}>
             <MergeMateLogo size={160} />
             <div className="text-3xl font-bold tracking-wide text-[#cccccc]">MergeMate</div>
-            <div className="text-sm">Abre dos carpetas para comenzar a comparar</div>
-            <div className="mt-1 flex gap-4 text-sm text-[#aaaaaa]" aria-label="Atajos de teclado disponibles">
-              <span>Ctrl+L — Abrir izquierda</span>
-              <span>Ctrl+R — Abrir derecha</span>
-              <span>Ctrl+F5 — Actualizar</span>
+            <div className="text-sm">{t('welcome.description')}</div>
+            <div className="mt-1 flex gap-4 text-sm text-[#aaaaaa]" aria-label={t('welcome.ariaLabel')}>
+              <span>{t('welcome.shortcutLeft')}</span>
+              <span>{t('welcome.shortcutRight')}</span>
+              <span>{t('welcome.shortcutRefresh')}</span>
             </div>
           </div>
         )}
@@ -370,7 +373,7 @@ export default function App(): React.JSX.Element {
           >
             {tab.loading ? (
               <div className="flex flex-1 items-center justify-center text-[#858585]" role="status" aria-live="polite">
-                Cargando archivo…
+                {t('diff.loading')}
               </div>
             ) : tab.isImage ? (
               <ImageViewer
@@ -380,9 +383,9 @@ export default function App(): React.JSX.Element {
             ) : tab.unsupported ? (
               <div className="flex flex-1 flex-col items-center justify-center gap-3 text-[#858585]" role="alert">
                 <div className="text-5xl" aria-hidden="true">🚫</div>
-                <div className="text-lg font-semibold text-[#cccccc]">Formato no disponible</div>
+                <div className="text-lg font-semibold text-[#cccccc]">{t('diff.unsupportedTitle')}</div>
                 <div className="text-sm">
-                  El archivo <span className="text-[#aaaaaa]">.{tab.file.extension}</span> es binario y no puede compararse como texto.
+                  {t('diff.unsupportedMessage', { ext: tab.file.extension })}
                 </div>
               </div>
             ) : (

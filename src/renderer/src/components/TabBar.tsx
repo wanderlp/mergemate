@@ -1,6 +1,7 @@
 import React from 'react'
 import { X, FolderOpen } from 'lucide-react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { FileTypeIcon } from './FileTypeIcon'
 import { COMPARISON_TAB_ID } from '../constants'
 
@@ -19,6 +20,7 @@ interface TabBarProps {
 }
 
 export function TabBar({ tabs, activeTabId, onSelectTab, onCloseTab }: TabBarProps): React.JSX.Element {
+  const { t } = useTranslation()
   const shouldReduceMotion = useReducedMotion()
 
   if (tabs.length === 0) return <></>
@@ -44,7 +46,7 @@ export function TabBar({ tabs, activeTabId, onSelectTab, onCloseTab }: TabBarPro
   return (
     <div
       role="tablist"
-      aria-label="Archivos abiertos"
+      aria-label={t('tabBar.ariaLabel')}
       className="flex overflow-x-auto border-b border-[#3e3e42] bg-[#2d2d2d]"
       style={{ minHeight: 35, maxHeight: 35 }}
     >
@@ -88,8 +90,8 @@ export function TabBar({ tabs, activeTabId, onSelectTab, onCloseTab }: TabBarPro
                 className="ml-1 flex-shrink-0 rounded p-0.5 opacity-0 transition-opacity hover:bg-[#5a5a5a] group-hover:opacity-100"
                 style={{ opacity: isActive ? 1 : undefined }}
                 onClick={(e) => { e.stopPropagation(); onCloseTab(tab.id) }}
-                title={`Cerrar ${tab.label}`}
-                aria-label={`Cerrar ${tab.label}`}
+                title={t('tabBar.closeTab', { label: tab.label })}
+                aria-label={t('tabBar.closeTab', { label: tab.label })}
                 tabIndex={-1}
               >
                 <X size={12} />

@@ -1,0 +1,127 @@
+{
+  "titleBar": {
+    "minimize": "Minimizar",
+    "maximize": "Maximizar",
+    "restore": "Restaurar",
+    "close": "Cerrar",
+    "ariaLabel": "Barra de título",
+    "switchLanguage": "Switch to English"
+  },
+  "toolbar": {
+    "openLeft": "Abrir carpeta izquierda",
+    "openLeftTooltip": "Abrir carpeta izquierda (Ctrl+L)",
+    "openRight": "Abrir carpeta derecha",
+    "openRightTooltip": "Abrir carpeta derecha (Ctrl+R)",
+    "compare": "Comparar",
+    "compareTooltip": "Comparar carpetas (Ctrl+F5)",
+    "noFolder": "Ninguna carpeta seleccionada"
+  },
+  "startup": {
+    "subtitle": "Comparador de carpetas",
+    "sectionStart": "Comenzar",
+    "compareFolders": "Comparar 2 carpetas",
+    "compareFoldersDesc": "Compara el contenido de dos carpetas",
+    "comingSoon": "Próximamente",
+    "compareFiles": "Comparar 2 archivos",
+    "compareFilesDesc": "Diff lado a lado de archivos individuales",
+    "history": "Historial de cambios",
+    "historyDesc": "Navega el historial de un repositorio Git",
+    "sectionRecent": "Recientes",
+    "noRecent": "No hay comparaciones recientes",
+    "noRecentDesc": "Las comparaciones que realices aparecerán aquí",
+    "openAriaLabel": "Abrir comparación: {{left}} y {{right}}",
+    "timeAgo": {
+      "justNow": "hace un momento",
+      "minutes_one": "hace 1 min",
+      "minutes_other": "hace {{count}} min",
+      "hours_one": "hace 1 h",
+      "hours_other": "hace {{count}} h",
+      "yesterday": "ayer",
+      "days_one": "hace 1 día",
+      "days_other": "hace {{count}} días"
+    }
+  },
+  "welcome": {
+    "ariaLabel": "Pantalla de bienvenida",
+    "description": "Abre dos carpetas para comenzar a comparar",
+    "shortcutLeft": "Ctrl+L — Abrir izquierda",
+    "shortcutRight": "Ctrl+R — Abrir derecha",
+    "shortcutRefresh": "Ctrl+F5 — Actualizar"
+  },
+  "closeDialog": {
+    "title": "¿Cerrar la comparación?",
+    "message": "Los cambios no guardados se perderán y volverás a la pantalla de inicio.",
+    "cancel": "Cancelar",
+    "confirm": "Cerrar de todos modos"
+  },
+  "diff": {
+    "loading": "Cargando archivo…",
+    "unsupportedTitle": "Formato no disponible",
+    "unsupportedMessage": "El archivo .{{ext}} es binario y no puede compararse como texto.",
+    "tabComparison": "Comparación",
+    "prev": "Anterior",
+    "next": "Siguiente",
+    "copyToLeft": "← Copiar a izquierda",
+    "copyToRight": "Copiar a derecha →",
+    "saveLeft": "Guardar izquierda",
+    "saveRight": "Guardar derecha",
+    "prevTooltip": "Diferencia anterior (Alt+↑)",
+    "nextTooltip": "Siguiente diferencia (Alt+↓)",
+    "copyToLeftTooltip": "Copiar derecha → izquierda",
+    "copyToRightTooltip": "Copiar izquierda → derecha",
+    "saveLeftTooltip": "Guardar archivo izquierdo (Ctrl+S)",
+    "saveRightTooltip": "Guardar archivo derecho (Ctrl+S)",
+    "prevAriaLabel": "Ir a diferencia anterior",
+    "nextAriaLabel": "Ir a siguiente diferencia",
+    "copyToLeftAriaLabel": "Copiar contenido a carpeta izquierda",
+    "copyToRightAriaLabel": "Copiar contenido a carpeta derecha",
+    "saveLeftAriaLabel": "Guardar archivo izquierdo",
+    "saveRightAriaLabel": "Guardar archivo derecho"
+  },
+  "progress": {
+    "ariaLabel": "Escaneando carpetas",
+    "title": "Escaneando carpetas…",
+    "starting": "Iniciando…"
+  },
+  "status": {
+    "identical": "{{count}} idénticos",
+    "different": "{{count}} diferentes",
+    "commentsOnly": "{{count}} solo comentarios",
+    "leftOnly": "{{count}} solo izquierda",
+    "rightOnly": "{{count}} solo derecha",
+    "totalFiles": "{{count}} archivos",
+    "identicalLines": "{{count}} idénticas",
+    "differentLines": "{{count}} diferentes",
+    "commentsOnlyLines": "{{count}} comentarios",
+    "totalLines": "{{count}} líneas",
+    "leftImage": "Izq: {{w}} × {{h}} px",
+    "leftImageNone": "Izq: —",
+    "rightImage": "Der: {{w}} × {{h}} px",
+    "rightImageNone": "Der: —",
+    "sameDimensions": "Mismas dimensiones",
+    "differentDimensions": "Dimensiones distintas"
+  },
+  "image": {
+    "sidebyside": "Lado a lado",
+    "slider": "Slider",
+    "left": "Solo izquierda",
+    "right": "Solo derecha",
+    "identical": "Imágenes idénticas",
+    "zoomOut": "Alejar",
+    "zoomIn": "Acercar",
+    "zoomReset": "Restablecer zoom",
+    "loading": "Cargando imagen…",
+    "leftLabel": "Izquierda",
+    "rightLabel": "Derecha",
+    "compareAriaLabel": "Comparación de imagen: {{path}}. Usa la rueda del ratón para hacer zoom y arrastra para navegar.",
+    "panelAriaLabel": "{{label}}. Usa la rueda del ratón para hacer zoom y arrastra para navegar."
+  },
+  "tabBar": {
+    "ariaLabel": "Archivos abiertos",
+    "closeTab": "Cerrar {{label}}"
+  },
+  "copy": {
+    "confirmLeft": "¿Sobreescribir \"{{name}}\" en la carpeta izquierda?\nSe creará una copia de seguridad .bak automáticamente.",
+    "confirmRight": "¿Sobreescribir \"{{name}}\" en la carpeta derecha?\nSe creará una copia de seguridad .bak automáticamente."
+  }
+}

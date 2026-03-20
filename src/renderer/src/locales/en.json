@@ -1,0 +1,127 @@
+{
+  "titleBar": {
+    "minimize": "Minimize",
+    "maximize": "Maximize",
+    "restore": "Restore",
+    "close": "Close",
+    "ariaLabel": "Title bar",
+    "switchLanguage": "Cambiar a español"
+  },
+  "toolbar": {
+    "openLeft": "Open left folder",
+    "openLeftTooltip": "Open left folder (Ctrl+L)",
+    "openRight": "Open right folder",
+    "openRightTooltip": "Open right folder (Ctrl+R)",
+    "compare": "Compare",
+    "compareTooltip": "Compare folders (Ctrl+F5)",
+    "noFolder": "No folder selected"
+  },
+  "startup": {
+    "subtitle": "Folder comparator",
+    "sectionStart": "Start",
+    "compareFolders": "Compare 2 folders",
+    "compareFoldersDesc": "Compare files between two folders",
+    "comingSoon": "Coming soon",
+    "compareFiles": "Compare 2 files",
+    "compareFilesDesc": "Side-by-side diff of individual files",
+    "history": "Change history",
+    "historyDesc": "Browse a Git repository history",
+    "sectionRecent": "Recent",
+    "noRecent": "No recent comparisons",
+    "noRecentDesc": "Comparisons you make will appear here",
+    "openAriaLabel": "Open comparison: {{left}} and {{right}}",
+    "timeAgo": {
+      "justNow": "just now",
+      "minutes_one": "1 min ago",
+      "minutes_other": "{{count}} min ago",
+      "hours_one": "1 hour ago",
+      "hours_other": "{{count}} hours ago",
+      "yesterday": "yesterday",
+      "days_one": "1 day ago",
+      "days_other": "{{count}} days ago"
+    }
+  },
+  "welcome": {
+    "ariaLabel": "Welcome screen",
+    "description": "Open two folders to start comparing",
+    "shortcutLeft": "Ctrl+L — Open left",
+    "shortcutRight": "Ctrl+R — Open right",
+    "shortcutRefresh": "Ctrl+F5 — Refresh"
+  },
+  "closeDialog": {
+    "title": "Close comparison?",
+    "message": "Unsaved changes will be lost and you'll return to the start screen.",
+    "cancel": "Cancel",
+    "confirm": "Close anyway"
+  },
+  "diff": {
+    "loading": "Loading file…",
+    "unsupportedTitle": "Format not supported",
+    "unsupportedMessage": "The .{{ext}} file is binary and cannot be compared as text.",
+    "tabComparison": "Comparison",
+    "prev": "Previous",
+    "next": "Next",
+    "copyToLeft": "← Copy to left",
+    "copyToRight": "Copy to right →",
+    "saveLeft": "Save left",
+    "saveRight": "Save right",
+    "prevTooltip": "Previous diff (Alt+↑)",
+    "nextTooltip": "Next diff (Alt+↓)",
+    "copyToLeftTooltip": "Copy right → left",
+    "copyToRightTooltip": "Copy left → right",
+    "saveLeftTooltip": "Save left file (Ctrl+S)",
+    "saveRightTooltip": "Save right file (Ctrl+S)",
+    "prevAriaLabel": "Go to previous diff",
+    "nextAriaLabel": "Go to next diff",
+    "copyToLeftAriaLabel": "Copy content to left folder",
+    "copyToRightAriaLabel": "Copy content to right folder",
+    "saveLeftAriaLabel": "Save left file",
+    "saveRightAriaLabel": "Save right file"
+  },
+  "progress": {
+    "ariaLabel": "Scanning folders",
+    "title": "Scanning folders…",
+    "starting": "Starting…"
+  },
+  "status": {
+    "identical": "{{count}} identical",
+    "different": "{{count}} different",
+    "commentsOnly": "{{count}} comments only",
+    "leftOnly": "{{count}} left only",
+    "rightOnly": "{{count}} right only",
+    "totalFiles": "{{count}} files",
+    "identicalLines": "{{count}} identical",
+    "differentLines": "{{count}} different",
+    "commentsOnlyLines": "{{count}} comments",
+    "totalLines": "{{count}} lines",
+    "leftImage": "Left: {{w}} × {{h}} px",
+    "leftImageNone": "Left: —",
+    "rightImage": "Right: {{w}} × {{h}} px",
+    "rightImageNone": "Right: —",
+    "sameDimensions": "Same dimensions",
+    "differentDimensions": "Different dimensions"
+  },
+  "image": {
+    "sidebyside": "Side by side",
+    "slider": "Slider",
+    "left": "Left only",
+    "right": "Right only",
+    "identical": "Identical images",
+    "zoomOut": "Zoom out",
+    "zoomIn": "Zoom in",
+    "zoomReset": "Reset zoom",
+    "loading": "Loading image…",
+    "leftLabel": "Left",
+    "rightLabel": "Right",
+    "compareAriaLabel": "Image comparison: {{path}}. Use mouse wheel to zoom and drag to navigate.",
+    "panelAriaLabel": "{{label}}. Use mouse wheel to zoom and drag to navigate."
+  },
+  "tabBar": {
+    "ariaLabel": "Open files",
+    "closeTab": "Close {{label}}"
+  },
+  "copy": {
+    "confirmLeft": "Overwrite \"{{name}}\" in the left folder?\nA .bak backup will be created automatically.",
+    "confirmRight": "Overwrite \"{{name}}\" in the right folder?\nA .bak backup will be created automatically."
+  }
+}

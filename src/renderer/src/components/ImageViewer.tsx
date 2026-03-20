@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider'
 import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import type { FileEntry } from '../types'
 import type { ImageDims } from './StatusBar'
 import { Button } from './ui/button'
@@ -11,7 +12,6 @@ interface ImageViewerProps {
   onDimsLoaded?: (left: ImageDims | null, right: ImageDims | null) => void
 }
 
-// Mime type por extensión para la data URL
 const MIME: Record<string, string> = {
   png: 'image/png',
   jpg: 'image/jpeg', jpeg: 'image/jpeg',
@@ -31,13 +31,6 @@ function toDataUrl(base64: string, ext: string): string {
 
 type ViewMode = 'slider' | 'sidebyside' | 'left' | 'right'
 
-const MODE_LABELS: Record<ViewMode, string> = {
-  sidebyside: 'Lado a lado',
-  slider:     'Slider',
-  left:       'Solo izquierda',
-  right:      'Solo derecha',
-}
-
 function getImageDims(url: string): Promise<ImageDims> {
   return new Promise((resolve, reject) => {
     const img = new Image()
@@ -48,6 +41,7 @@ function getImageDims(url: string): Promise<ImageDims> {
 }
 
 export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX.Element {
+  const { t } = useTranslation()
   const [mode, setMode] = useState<ViewMode>('sidebyside')
   const [zoom, setZoom] = useState(1)
   const [leftUrl,  setLeftUrl]  = useState<string | null>(null)
@@ -96,14 +90,12 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
   const effectiveMode: ViewMode =
     !bothExist || isIdentical ? (onlyLeft || isIdentical ? 'left' : 'right') : mode
 
-  // Pan state
   const [pan, setPan] = useState({ x: 0, y: 0 })
   const dragging = useRef(false)
   const dragStart = useRef({ x: 0, y: 0 })
   const panStart = useRef({ x: 0, y: 0 })
   const [isDragging, setIsDragging] = useState(false)
 
-  // Resetear pan al cambiar zoom a 1 o cambiar imagen
   useEffect(() => { if (zoom === 1) setPan({ x: 0, y: 0 }) }, [zoom])
   useEffect(() => { setPan({ x: 0, y: 0 }) }, [file.leftPath, file.rightPath])
 
@@ -139,56 +131,55 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
   function handleZoomOut(): void { setZoom((z) => Math.max(z - 0.25, 0.25)) }
   function handleReset():   void { setZoom(1); setPan({ x: 0, y: 0 }) }
 
+  const modes: ViewMode[] = ['sidebyside', 'slider', 'left', 'right']
+
   return (
     <div className="flex h-full flex-col bg-[#1e1e1e]">
-      {/* Toolbar */}
       <div className="flex items-center gap-2 border-b border-[#3e3e42] bg-[#252526] px-3 py-2">
         <span className="truncate text-sm text-[#cccccc]">{file.relativePath}</span>
 
         <div className="ml-auto flex items-center gap-1">
-          {bothExist && !isIdentical && (Object.keys(MODE_LABELS) as ViewMode[]).map((m) => (
+          {bothExist && !isIdentical && modes.map((m) => (
             <Button
               key={m}
               size="sm"
               variant={mode === m ? 'primary' : 'default'}
               onClick={() => setMode(m)}
             >
-              {MODE_LABELS[m]}
+              {t(`image.${m}`)}
             </Button>
           ))}
           {isIdentical && (
             <span className="rounded bg-green-900/40 px-2 py-1 text-xs text-green-400">
-              Imágenes idénticas
+              {t('image.identical')}
             </span>
           )}
 
           <Separator orientation="vertical" className="mx-1" />
 
-          <Button size="icon" onClick={handleZoomOut} disabled={zoom <= 0.25} title="Alejar" aria-label="Alejar">
+          <Button size="icon" onClick={handleZoomOut} disabled={zoom <= 0.25} title={t('image.zoomOut')} aria-label={t('image.zoomOut')}>
             <ZoomOut size={14} aria-hidden="true" />
           </Button>
           <span className="w-12 text-center text-xs text-[#aaaaaa]">
             {Math.round(zoom * 100)}%
           </span>
-          <Button size="icon" onClick={handleZoomIn} disabled={zoom >= 4} title="Acercar" aria-label="Acercar">
+          <Button size="icon" onClick={handleZoomIn} disabled={zoom >= 4} title={t('image.zoomIn')} aria-label={t('image.zoomIn')}>
             <ZoomIn size={14} aria-hidden="true" />
           </Button>
-          <Button size="icon" onClick={handleReset} title="Restablecer zoom" aria-label="Restablecer zoom">
+          <Button size="icon" onClick={handleReset} title={t('image.zoomReset')} aria-label={t('image.zoomReset')}>
             <RotateCcw size={14} aria-hidden="true" />
           </Button>
         </div>
       </div>
 
-      {/* Contenido */}
       {loading ? (
         <div className="flex flex-1 items-center justify-center bg-[#181818]">
-          <span className="text-sm text-[#858585]">Cargando imagen…</span>
+          <span className="text-sm text-[#858585]">{t('image.loading')}</span>
         </div>
       ) : effectiveMode === 'slider' && leftUrl && rightUrl ? (
-        /* Slider: un solo panel con zoom/pan */
         <div
           role="img"
-          aria-label={`Comparación de imagen: ${file.relativePath}. Usa la rueda del ratón para hacer zoom y arrastra para navegar.`}
+          aria-label={t('image.compareAriaLabel', { path: file.relativePath })}
           className="relative flex flex-1 items-center justify-center overflow-hidden bg-[#181818] p-12"
           style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
           onMouseDown={handleMouseDown}
@@ -207,18 +198,17 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
           }}>
             <ReactCompareSlider
               style={{ width: '100%', height: '100%', borderRadius: 4, overflow: 'hidden' }}
-              itemOne={<ReactCompareSliderImage src={leftUrl} alt="Izquierda" style={{ objectFit: 'contain' }} />}
-              itemTwo={<ReactCompareSliderImage src={rightUrl} alt="Derecha"   style={{ objectFit: 'contain' }} />}
+              itemOne={<ReactCompareSliderImage src={leftUrl}  alt={t('image.leftLabel')}  style={{ objectFit: 'contain' }} />}
+              itemTwo={<ReactCompareSliderImage src={rightUrl} alt={t('image.rightLabel')} style={{ objectFit: 'contain' }} />}
             />
           </div>
         </div>
       ) : (
-        /* Paneles separados: label fijo + imagen zoomeable */
         <div className="flex flex-1 overflow-hidden bg-[#181818]">
           {(effectiveMode === 'sidebyside' || effectiveMode === 'left') && leftUrl && (
             <ImagePanel
               url={leftUrl}
-              label={isIdentical ? '' : 'Izquierda'}
+              label={isIdentical ? '' : t('image.leftLabel')}
               zoom={zoom}
               pan={pan}
               isDragging={isDragging}
@@ -226,12 +216,13 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onWheel={handleWheel}
+              panelAriaLabel={t('image.panelAriaLabel', { label: t('image.leftLabel') })}
             />
           )}
           {(effectiveMode === 'sidebyside' || effectiveMode === 'right') && rightUrl && (
             <ImagePanel
               url={rightUrl}
-              label={isIdentical ? '' : 'Derecha'}
+              label={isIdentical ? '' : t('image.rightLabel')}
               zoom={zoom}
               pan={pan}
               isDragging={isDragging}
@@ -239,6 +230,7 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
               onMouseMove={handleMouseMove}
               onMouseUp={handleMouseUp}
               onWheel={handleWheel}
+              panelAriaLabel={t('image.panelAriaLabel', { label: t('image.rightLabel') })}
             />
           )}
         </div>
@@ -253,19 +245,19 @@ interface ImagePanelProps {
   zoom: number
   pan: { x: number; y: number }
   isDragging: boolean
+  panelAriaLabel: string
   onMouseDown: (e: React.MouseEvent) => void
   onMouseMove: (e: React.MouseEvent) => void
   onMouseUp: () => void
   onWheel: (e: React.WheelEvent) => void
 }
 
-function ImagePanel({ url, label, zoom, pan, isDragging, onMouseDown, onMouseMove, onMouseUp, onWheel }: ImagePanelProps): React.JSX.Element {
+function ImagePanel({ url, label, zoom, pan, isDragging, panelAriaLabel, onMouseDown, onMouseMove, onMouseUp, onWheel }: ImagePanelProps): React.JSX.Element {
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
-      {/* Área de imagen zoomeable */}
       <div
         role="img"
-        aria-label={`${label || 'Imagen'}. Usa la rueda del ratón para hacer zoom y arrastra para navegar.`}
+        aria-label={panelAriaLabel}
         className="relative flex flex-1 items-center justify-center overflow-hidden p-12"
         style={{ cursor: zoom > 1 ? (isDragging ? 'grabbing' : 'grab') : 'default' }}
         onMouseDown={onMouseDown}
@@ -290,7 +282,6 @@ function ImagePanel({ url, label, zoom, pan, isDragging, onMouseDown, onMouseMov
           }}
         />
       </div>
-      {/* Label fijo en la parte inferior, sin bordes */}
       {label && (
         <div className="flex-shrink-0 py-1.5 text-center text-xs font-semibold uppercase tracking-wider text-[#858585]">
           {label}

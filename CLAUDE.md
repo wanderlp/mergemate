@@ -87,6 +87,21 @@ El proyecto usa **shadcn/ui** como sistema de componentes base. Todo código nue
 - **CSS variables**: el tema está mapeado en `index.css` con variables HSL (`--background`, `--primary`, `--border`, etc.). Nuevos componentes shadcn deben seguir el mismo patrón.
 - **No crear botones nativos** cuando ya existe el componente `Button` — mantener consistencia y aprovechar el manejo centralizado de `disabled:opacity-40` y `focus-visible`.
 
+## Internacionalización (i18n)
+
+El proyecto usa **i18next + react-i18next** para soportar múltiples idiomas. Idiomas disponibles: **Español (ES)** y **Inglés (EN)**. El idioma se detecta automáticamente del OS y se persiste en `localStorage` con la clave `mergemate-language`.
+
+Reglas al agregar texto nuevo en el renderer:
+
+- **Nunca hardcodear strings visibles** — todo texto visible por el usuario debe ir en los archivos de traducción.
+- **Archivos de traducción**: `src/renderer/src/locales/es.json` y `src/renderer/src/locales/en.json`. Agregar la clave en ambos archivos siempre.
+- **Usar el hook**: `const { t } = useTranslation()` en el componente y referenciar con `t('seccion.clave')`.
+- **Interpolación**: usar `t('clave', { variable: valor })` y en el JSON `"{{variable}}"`.
+- **Plurales**: usar sufijos `_one` / `_other` en el JSON y pasar `{ count: n }` al llamar a `t()`.
+- **Estructura de claves**: organizadas por componente (`titleBar`, `toolbar`, `startup`, `diff`, `status`, `image`, `tabBar`, `progress`, `welcome`, `closeDialog`, `copy`).
+- **Inicialización**: `src/renderer/src/i18n.ts` configura i18next con recursos inline (sin carga asíncrona). Se importa en `main.tsx` antes de renderizar.
+- El selector de idioma está en `TitleBar` y cambia el idioma instantáneamente en toda la UI.
+
 ## Restricciones importantes
 
 - `"type": "module"` NO debe estar en `package.json` — electron-vite genera CJS para main/preload, y agregarlo rompe Electron en tiempo de ejecución (causa ventana en negro).

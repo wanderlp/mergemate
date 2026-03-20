@@ -1,6 +1,7 @@
 import React, { useRef, useCallback, useEffect } from 'react'
 import { DiffEditor, type DiffEditorProps } from '@monaco-editor/react'
 import { ChevronUp, ChevronDown, ArrowLeftRight, Save } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import type { FileEntry } from '../types'
 import type * as monaco from 'monaco-editor'
 import { Button } from './ui/button'
@@ -53,6 +54,7 @@ export function DiffViewer({
   onCopyToLeft,
   onCopyToRight
 }: DiffViewerProps): React.JSX.Element {
+  const { t } = useTranslation()
   const editorRef = useRef<monaco.editor.IStandaloneDiffEditor | null>(null)
   const language = detectLanguage(file.extension)
 
@@ -93,7 +95,6 @@ export function DiffViewer({
     await onCopyToLeft(content)
   }, [rightContent, onCopyToLeft])
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handler = (e: KeyboardEvent): void => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
@@ -116,7 +117,6 @@ export function DiffViewer({
 
   return (
     <div className="flex h-full flex-col bg-[#1e1e1e]">
-      {/* Toolbar */}
       <div className="flex items-center gap-2 border-b border-[#3e3e42] bg-[#252526] px-3 py-2">
         <div className="flex-1 truncate text-sm text-[#cccccc]">
           {file.relativePath}
@@ -125,19 +125,19 @@ export function DiffViewer({
         <div className="flex items-center gap-1">
           <Button
             onClick={() => navigateDiff('prev')}
-            title="Diferencia anterior (Alt+↑)"
-            aria-label="Ir a diferencia anterior"
+            title={t('diff.prevTooltip')}
+            aria-label={t('diff.prevAriaLabel')}
           >
             <ChevronUp size={16} aria-hidden="true" />
-            Anterior
+            {t('diff.prev')}
           </Button>
           <Button
             onClick={() => navigateDiff('next')}
-            title="Siguiente diferencia (Alt+↓)"
-            aria-label="Ir a siguiente diferencia"
+            title={t('diff.nextTooltip')}
+            aria-label={t('diff.nextAriaLabel')}
           >
             <ChevronDown size={16} aria-hidden="true" />
-            Siguiente
+            {t('diff.next')}
           </Button>
         </div>
 
@@ -146,18 +146,18 @@ export function DiffViewer({
         <Button
           onClick={handleCopyToLeft}
           disabled={!canCopyLeft || !canCopyRight}
-          title="Copiar derecha → izquierda"
-          aria-label="Copiar contenido a carpeta izquierda"
+          title={t('diff.copyToLeftTooltip')}
+          aria-label={t('diff.copyToLeftAriaLabel')}
         >
-          <ArrowLeftRight size={16} aria-hidden="true" />← Copiar a izquierda
+          <ArrowLeftRight size={16} aria-hidden="true" />{t('diff.copyToLeft')}
         </Button>
         <Button
           onClick={handleCopyToRight}
           disabled={!canCopyLeft || !canCopyRight}
-          title="Copiar izquierda → derecha"
-          aria-label="Copiar contenido a carpeta derecha"
+          title={t('diff.copyToRightTooltip')}
+          aria-label={t('diff.copyToRightAriaLabel')}
         >
-          Copiar a derecha →<ArrowLeftRight size={16} aria-hidden="true" />
+          {t('diff.copyToRight')}<ArrowLeftRight size={16} aria-hidden="true" />
         </Button>
 
         <Separator orientation="vertical" className="mx-1" />
@@ -165,24 +165,23 @@ export function DiffViewer({
         <Button
           onClick={handleSaveLeft}
           disabled={!canCopyLeft}
-          title="Guardar archivo izquierdo (Ctrl+S)"
-          aria-label="Guardar archivo izquierdo"
+          title={t('diff.saveLeftTooltip')}
+          aria-label={t('diff.saveLeftAriaLabel')}
         >
           <Save size={16} aria-hidden="true" />
-          Guardar izquierda
+          {t('diff.saveLeft')}
         </Button>
         <Button
           onClick={handleSaveRight}
           disabled={!canCopyRight}
-          title="Guardar archivo derecho (Ctrl+S)"
-          aria-label="Guardar archivo derecho"
+          title={t('diff.saveRightTooltip')}
+          aria-label={t('diff.saveRightAriaLabel')}
         >
           <Save size={16} aria-hidden="true" />
-          Guardar derecha
+          {t('diff.saveRight')}
         </Button>
       </div>
 
-      {/* Monaco Diff Editor */}
       <div className="flex-1 overflow-hidden">
         <DiffEditor
           original={leftContent}

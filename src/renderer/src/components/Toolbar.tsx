@@ -1,5 +1,6 @@
 import React from 'react'
 import { FolderOpen, GitCompareArrows } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Button } from './ui/button'
 import { Separator } from './ui/separator'
 
@@ -13,9 +14,10 @@ interface ToolbarProps {
 }
 
 function FolderPath({ path }: { path: string }): React.JSX.Element {
+  const { t } = useTranslation()
   return (
     <div className="flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa]">
-      {path || 'Ninguna carpeta seleccionada'}
+      {path || t('toolbar.noFolder')}
     </div>
   )
 }
@@ -28,16 +30,18 @@ export function Toolbar({
   onRefresh,
   scanning
 }: ToolbarProps): React.JSX.Element {
+  const { t } = useTranslation()
+
   return (
     <div className="flex items-center gap-2 border-b border-[#3e3e42] bg-[#252526] px-3 py-2">
       <Button
         onClick={onOpenLeft}
         disabled={scanning}
-        title="Abrir carpeta izquierda (Ctrl+L)"
-        aria-label="Abrir carpeta izquierda"
+        title={t('toolbar.openLeftTooltip')}
+        aria-label={t('toolbar.openLeft')}
       >
         <FolderOpen size={16} aria-hidden="true" />
-        Abrir carpeta izquierda
+        {t('toolbar.openLeft')}
       </Button>
 
       <FolderPath path={leftFolder} />
@@ -45,11 +49,11 @@ export function Toolbar({
       <Button
         onClick={onOpenRight}
         disabled={scanning}
-        title="Abrir carpeta derecha (Ctrl+R)"
-        aria-label="Abrir carpeta derecha"
+        title={t('toolbar.openRightTooltip')}
+        aria-label={t('toolbar.openRight')}
       >
         <FolderOpen size={16} aria-hidden="true" />
-        Abrir carpeta derecha
+        {t('toolbar.openRight')}
       </Button>
 
       <FolderPath path={rightFolder} />
@@ -59,14 +63,12 @@ export function Toolbar({
       <Button
         onClick={onRefresh}
         disabled={scanning || !leftFolder || !rightFolder}
-        title="Comparar carpetas (Ctrl+F5)"
-        aria-label="Comparar carpetas"
+        title={t('toolbar.compareTooltip')}
+        aria-label={t('toolbar.compare')}
       >
         <GitCompareArrows size={16} aria-hidden="true" />
-        Comparar
+        {t('toolbar.compare')}
       </Button>
-
-
     </div>
   )
 }

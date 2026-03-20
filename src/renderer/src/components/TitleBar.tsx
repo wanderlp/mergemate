@@ -1,5 +1,6 @@
 import React, { useId, useState, useEffect } from 'react'
-import { Minus, X } from 'lucide-react'
+import { Minus, X, Languages } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 export function AppIcon({ size = 24 }: { size?: number }): React.JSX.Element {
   const uid = useId().replace(/:/g, '')
@@ -58,6 +59,7 @@ interface TitleBarProps {
 }
 
 export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Element {
+  const { t, i18n } = useTranslation()
   const [isMaximized, setIsMaximized] = useState(false)
 
   useEffect(() => {
@@ -65,10 +67,12 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
     return window.electronAPI.onMaximizeChange(setIsMaximized)
   }, [])
 
+  const isEs = i18n.language.startsWith('es')
+
   return (
     <div
       role="banner"
-      aria-label="Barra de título"
+      aria-label={t('titleBar.ariaLabel')}
       className="flex shrink-0 select-none items-center border-b border-[#3e3e42] bg-[#252526]"
       style={{ height: 40, ...DRAG }}
     >
@@ -77,11 +81,23 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
         <span className="text-sm font-semibold tracking-wide text-[#cccccc]">MergeMate</span>
       </div>
 
-      <div className="ml-auto flex h-full" style={NO_DRAG}>
+      <div className="ml-auto flex h-full items-center" style={NO_DRAG}>
+        {/* Selector de idioma */}
+        <button
+          className="flex h-full items-center gap-1.5 px-3 text-xs text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
+          onClick={() => i18n.changeLanguage(isEs ? 'en' : 'es')}
+          aria-label={t('titleBar.switchLanguage')}
+          title={t('titleBar.switchLanguage')}
+          tabIndex={-1}
+        >
+          <Languages size={12} aria-hidden="true" />
+          {isEs ? 'EN' : 'ES'}
+        </button>
+
         <button
           className="flex h-full w-[46px] items-center justify-center text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
           onClick={() => window.electronAPI.minimizeWindow()}
-          aria-label="Minimizar"
+          aria-label={t('titleBar.minimize')}
           tabIndex={-1}
         >
           <Minus size={13} aria-hidden="true" />
@@ -91,7 +107,7 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
           <button
             className="flex h-full w-[46px] items-center justify-center text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
             onClick={() => window.electronAPI.maximizeWindow()}
-            aria-label={isMaximized ? 'Restaurar' : 'Maximizar'}
+            aria-label={isMaximized ? t('titleBar.restore') : t('titleBar.maximize')}
             tabIndex={-1}
           >
             {isMaximized ? <RestoreIcon /> : <MaximizeIcon />}
@@ -101,7 +117,7 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
         <button
           className="flex h-full w-[46px] items-center justify-center text-[#aaaaaa] transition-colors hover:bg-[#e81123] hover:text-white"
           onClick={() => window.electronAPI.closeWindow()}
-          aria-label="Cerrar"
+          aria-label={t('titleBar.close')}
           tabIndex={-1}
         >
           <X size={13} aria-hidden="true" />
