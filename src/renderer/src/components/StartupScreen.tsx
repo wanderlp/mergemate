@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { FolderOpen, FileText, GitBranch, Clock, ArrowRight } from 'lucide-react'
-import { TitleBar, AppIcon } from './TitleBar'
+import { TitleBar } from './TitleBar'
+import { MergeMateLogo } from './MergeMateLogo'
 import type { RecentComparison } from '../types'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -47,9 +48,9 @@ export function StartupScreen(): React.JSX.Element {
         {/* Panel izquierdo ─ acciones */}
         <div className="flex w-[340px] shrink-0 flex-col overflow-y-auto px-10 py-10">
           {/* Logo + nombre */}
-          <div className="mb-10 flex items-center gap-4">
-            <AppIcon size={48} />
-            <div>
+          <div className="mb-10 flex flex-col items-center gap-4">
+            <MergeMateLogo size={140} />
+            <div className="text-center">
               <div className="text-2xl font-bold tracking-wide text-[#cccccc]">MergeMate</div>
               <div className="text-xs text-[#858585]">Comparador de carpetas</div>
             </div>
