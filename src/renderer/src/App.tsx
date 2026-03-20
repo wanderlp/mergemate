@@ -189,26 +189,15 @@ export default function App(): React.JSX.Element {
   }, [openTabs])
 
   const handleCloseTab = useCallback((id: string) => {
-    if (id === COMPARISON_TAB_ID) {
-      setShowComparisonTab(false)
-      if (activeTabId === COMPARISON_TAB_ID) {
-        const firstFile = Array.from(openTabs.keys())[0]
-        setActiveTabId(firstFile ?? '')
-      }
-      return
-    }
+    if (id === COMPARISON_TAB_ID) return
     setOpenTabs((prev) => {
       const next = new Map(prev)
       next.delete(id)
       return next
     })
     if (activeTabId === id) {
-      if (showComparisonTab) {
-        setActiveTabId(COMPARISON_TAB_ID)
-      } else {
-        const remaining = Array.from(openTabs.keys()).filter((k) => k !== id)
-        setActiveTabId(remaining[0] ?? '')
-      }
+      const remaining = Array.from(openTabs.keys()).filter((k) => k !== id)
+      setActiveTabId(showComparisonTab ? COMPARISON_TAB_ID : (remaining[0] ?? ''))
     }
   }, [activeTabId, openTabs, showComparisonTab])
 
@@ -272,7 +261,7 @@ export default function App(): React.JSX.Element {
 
   // Construir lista de tabs visible
   const tabItems: TabItem[] = [
-    ...(showComparisonTab ? [{ id: COMPARISON_TAB_ID, label: t('diff.tabComparison'), extension: '', loading: false }] : []),
+    ...(showComparisonTab ? [{ id: COMPARISON_TAB_ID, label: t('diff.tabComparison'), extension: '', loading: false, closeable: false }] : []),
     ...Array.from(openTabs.values()).map((t) => ({
       id: t.file.relativePath,
       label: t.file.name,
@@ -316,15 +305,6 @@ export default function App(): React.JSX.Element {
       )}
       <TitleBar />
 
-      <Toolbar
-        leftFolder={leftFolder}
-        rightFolder={rightFolder}
-        onOpenLeft={openLeft}
-        onOpenRight={openRight}
-        onRefresh={scan}
-        scanning={scanning}
-      />
-
       <TabBar
         tabs={tabItems}
         activeTabId={activeTabId}
@@ -333,6 +313,18 @@ export default function App(): React.JSX.Element {
       />
 
       <div className="relative flex flex-1 flex-col overflow-hidden">
+        {/* Toolbar: visible en pantalla de bienvenida y en el tab de Comparación */}
+        {(noTabs || activeTabId === COMPARISON_TAB_ID) && (
+          <Toolbar
+            leftFolder={leftFolder}
+            rightFolder={rightFolder}
+            onOpenLeft={openLeft}
+            onOpenRight={openRight}
+            onRefresh={scan}
+            scanning={scanning}
+          />
+        )}
+
         {/* Sin tabs: pantalla de bienvenida */}
         {noTabs && (
           <div className="flex flex-1 flex-col items-center justify-center gap-5 text-[#858585]" role="main" aria-label={t('welcome.ariaLabel')}>

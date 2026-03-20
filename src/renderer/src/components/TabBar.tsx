@@ -10,6 +10,7 @@ export interface TabItem {
   label: string
   extension: string
   loading: boolean
+  closeable?: boolean
 }
 
 interface TabBarProps {
@@ -37,7 +38,7 @@ export function TabBar({ tabs, activeTabId, onSelectTab, onCloseTab }: TabBarPro
       onSelectTab(tabs[(index - 1 + tabs.length) % tabs.length].id)
     } else if (e.key === 'Delete' || e.key === 'Backspace') {
       e.preventDefault()
-      onCloseTab(tabId)
+      if (tabs[index].closeable !== false) onCloseTab(tabId)
     }
   }
 
@@ -58,6 +59,8 @@ export function TabBar({ tabs, activeTabId, onSelectTab, onCloseTab }: TabBarPro
             : tab.loading
               ? <span className="flex-shrink-0 text-xs" aria-hidden="true">⏳</span>
               : <FileTypeIcon extension={tab.extension} size={14} />
+
+          const isCloseable = tab.closeable !== false
 
           return (
             <motion.div
@@ -81,21 +84,23 @@ export function TabBar({ tabs, activeTabId, onSelectTab, onCloseTab }: TabBarPro
               }}
               onClick={() => onSelectTab(tab.id)}
               onKeyDown={(e) => handleKeyDown(e, tab.id, index)}
-              onAuxClick={(e) => { if (e.button === 1) { e.preventDefault(); onCloseTab(tab.id) } }}
+              onAuxClick={(e) => { if (e.button === 1 && isCloseable) { e.preventDefault(); onCloseTab(tab.id) } }}
               title={tab.id}
             >
               {icon}
               <span className="flex-1 truncate">{tab.label}</span>
-              <button
-                className="ml-1 flex-shrink-0 rounded p-0.5 opacity-0 transition-opacity hover:bg-[#5a5a5a] group-hover:opacity-100"
-                style={{ opacity: isActive ? 1 : undefined }}
-                onClick={(e) => { e.stopPropagation(); onCloseTab(tab.id) }}
-                title={t('tabBar.closeTab', { label: tab.label })}
-                aria-label={t('tabBar.closeTab', { label: tab.label })}
-                tabIndex={-1}
-              >
-                <X size={12} />
-              </button>
+              {isCloseable && (
+                <button
+                  className="ml-1 flex-shrink-0 rounded p-0.5 opacity-0 transition-opacity hover:bg-[#5a5a5a] group-hover:opacity-100"
+                  style={{ opacity: isActive ? 1 : undefined }}
+                  onClick={(e) => { e.stopPropagation(); onCloseTab(tab.id) }}
+                  title={t('tabBar.closeTab', { label: tab.label })}
+                  aria-label={t('tabBar.closeTab', { label: tab.label })}
+                  tabIndex={-1}
+                >
+                  <X size={12} />
+                </button>
+              )}
             </motion.div>
           )
         })}
