@@ -1,6 +1,7 @@
 import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { autoUpdater } from 'electron-updater'
 import Store from 'electron-store'
 import * as fs from 'fs'
 import { scanFolders } from './scanner'
@@ -297,6 +298,32 @@ function registerIpcHandlers(): void {
   )
 }
 
+function setupAutoUpdater(): void {
+  autoUpdater.autoDownload = true
+  autoUpdater.autoInstallOnAppQuit = true
+
+  autoUpdater.on('update-downloaded', () => {
+    const win = mainWindow ?? startupWindow
+    if (!win) return
+    dialog.showMessageBox(win, {
+      type: 'info',
+      title: 'Actualización lista',
+      message: 'Se descargó una nueva versión de MergeMate.',
+      detail: '¿Deseas reiniciar ahora para aplicar la actualización?',
+      buttons: ['Reiniciar ahora', 'Más tarde'],
+      defaultId: 0,
+      cancelId: 1
+    }).then(({ response }) => {
+      if (response === 0) autoUpdater.quitAndInstall()
+    })
+  })
+
+  // Errores silenciosos (sin internet, rate limit de GitHub, etc.)
+  autoUpdater.on('error', () => { /* ignorar */ })
+
+  autoUpdater.checkForUpdates()
+}
+
 app.whenReady().then(() => {
   electronApp.setAppUserModelId('com.mergemate.app')
 
@@ -306,6 +333,8 @@ app.whenReady().then(() => {
 
   registerIpcHandlers()
   createStartupWindow()
+
+  if (!is.dev) setupAutoUpdater()
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createStartupWindow()
