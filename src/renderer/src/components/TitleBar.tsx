@@ -90,7 +90,7 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
       <div className="ml-auto flex h-full items-center" style={NO_DRAG}>
         {/* Selector de idioma */}
         <select
-          value={i18n.language}
+          value={i18n.resolvedLanguage}
           onChange={(e) => i18n.changeLanguage(e.target.value)}
           aria-label={t('titleBar.switchLanguage')}
           title={t('titleBar.switchLanguage')}
