@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next'
 const LANGUAGES = [
   { code: 'es', label: 'ES — Español' },
   { code: 'en', label: 'EN — English' },
+  { code: 'pt', label: 'PT — Português' },
   { code: 'de', label: 'DE — Deutsch' },
   { code: 'fr', label: 'FR — Français' },
-  { code: 'pt', label: 'PT — Português' },
 ]
 
 export function AppIcon({ size = 24 }: { size?: number }): React.JSX.Element {
@@ -90,7 +90,7 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
       <div className="ml-auto flex h-full items-center" style={NO_DRAG}>
         {/* Selector de idioma */}
         <select
-          value={i18n.language}
+          value={i18n.resolvedLanguage}
           onChange={(e) => i18n.changeLanguage(e.target.value)}
           aria-label={t('titleBar.switchLanguage')}
           title={t('titleBar.switchLanguage')}
