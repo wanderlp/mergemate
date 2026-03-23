@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { FolderOpen, FileText, Clock, ArrowRight, X, Info, Clipboard } from 'lucide-react'
 import { version } from '../../../../package.json'
-import { useTranslation, type TFunction } from 'react-i18next'
+import { useTranslation } from 'react-i18next'
+import type { TFunction } from 'i18next'
 import { TitleBar } from './TitleBar'
 import { MergeMateLogo } from './MergeMateLogo'
-import type { RecentComparison } from '../types'
+import type { RecentComparison } from '../../../types'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
