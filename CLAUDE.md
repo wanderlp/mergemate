@@ -102,6 +102,12 @@ Reglas al agregar texto nuevo en el renderer:
 - **Inicialización**: `src/renderer/src/i18n.ts` configura i18next con recursos inline (sin carga asíncrona). Se importa en `main.tsx` antes de renderizar.
 - El selector de idioma está en `TitleBar` y cambia el idioma instantáneamente en toda la UI.
 
+## Documentación del proyecto
+
+- **README.md** — La sección `## Funcionalidades` debe mantenerse siempre entre **5 y 7 ítems**. Es un resumen para visitantes del repositorio; el detalle completo vive en `FEATURES.md`. Al agregar funcionalidades, consolidar o fusionar ítems existentes si se llega a 8 o más.
+- **FEATURES.md** — Documento exhaustivo. Cada funcionalidad relevante debe tener su propia sección con viñetas detalladas.
+- Al implementar una funcionalidad nueva, verificar si README.md y FEATURES.md requieren actualización.
+
 ## Restricciones importantes
 
 - `"type": "module"` NO debe estar en `package.json` — electron-vite genera CJS para main/preload, y agregarlo rompe Electron en tiempo de ejecución (causa ventana en negro).
