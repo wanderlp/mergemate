@@ -60,6 +60,7 @@ npm run dev
 - **Tailwind CSS** — estilos con tema oscuro
 - **shadcn/ui** — componentes de UI accesibles (Button, Separator, Progress, Tooltip) basados en Radix UI
 - **electron-store** — persistencia del historial de comparaciones recientes y estado de ventana
+- **electron-updater** — actualizaciones automáticas desde GitHub Releases
 - **react-compare-slider** — visor comparativo de imágenes con slider
 - **@iconify/react + @iconify/icons-devicon** — iconos de tipo de archivo por extensión
 - **Lucide React** — íconos de interfaz

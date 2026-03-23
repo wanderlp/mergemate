@@ -106,6 +106,16 @@ Formatos soportados: `png`, `jpg`, `jpeg`, `gif`, `bmp`, `ico`, `tiff`, `tif`, `
 
 ---
 
+## Actualizaciones automáticas
+
+- Al iniciar la app (solo en producción), verifica silenciosamente si hay una nueva versión en GitHub Releases
+- La descarga ocurre en segundo plano sin interrumpir el uso
+- Al completarse, muestra un diálogo nativo preguntando si reiniciar para aplicar la actualización
+- Si el usuario elige "Más tarde", la actualización se aplica automáticamente al cerrar la app
+- Errores de red (sin internet, rate limit) se ignoran silenciosamente
+
+---
+
 ## Diálogo de confirmación al cerrar
 
 - Al intentar cerrar la ventana de comparación se muestra un diálogo de confirmación
