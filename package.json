@@ -1,7 +1,7 @@
 {
   "name": "mergemate",
   "version": "1.0.0",
-  "description": "MergeMate — Folder Comparison Tool",
+  "description": "MergeMate — Code Comparison Tool",
   "productName": "MergeMate",
   "main": "./out/main/index.js",
   "author": {

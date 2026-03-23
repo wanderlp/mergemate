@@ -4,11 +4,11 @@
   <img src="resources/icon.svg" width="120" alt="MergeMate logo"/>
 </p>
 
-**MergeMate — Compara y fusiona carpetas**
+**MergeMate — Compara y fusiona código**
 
 ---
 
-Herramienta de escritorio para comparar y fusionar carpetas de código fuente. Visualiza diferencias entre dos directorios en un árbol unificado con estado por color, abre archivos en tabs estilo VS Code con iconos por tipo de archivo, incluye un visor de diferencias línea por línea con Monaco Editor con capacidades de fusión, y un comparador de imágenes con zoom, slider y navegación.
+Herramienta de escritorio para comparar y fusionar código. Soporta tres modos: comparación de carpetas completas con árbol unificado por color, comparación de dos archivos individuales (texto e imágenes), y editor libre para pegar código directamente. Incluye visor de diferencias línea por línea con Monaco Editor con capacidades de fusión, comparador de imágenes con zoom y slider, tabs estilo VS Code con icono por tipo de archivo, e interfaz multiidioma.
 
 ---
 
@@ -41,12 +41,11 @@ npm run dev
 
 ## Funcionalidades
 
-- Visor de diferencias línea por línea con Monaco Editor y capacidades de fusión
-- Árbol unificado con estado por color (idéntico, diferente, solo comentarios, solo izquierda, solo derecha)
-- Visor de imágenes con modos lado a lado, slider, zoom y navegación
-- Tabs estilo VS Code con icono por tipo de archivo
-- Pantalla de inicio con acciones y comparaciones recientes
-- Interfaz en 5 idiomas: español, inglés, alemán, francés y portugués
+- **Tres modos de comparación** — carpetas completas, dos archivos individuales o editor libre para pegar código directamente
+- **Visor de diferencias** — Monaco Editor lado a lado con navegación entre bloques y capacidades de fusión
+- **Visor de imágenes** — slider, zoom, lado a lado y vista individual; soporta PNG, JPG, SVG, WebP y más
+- **Historial de comparaciones recientes** — hasta 8 entradas con reapertura automática en el modo correcto
+- **Interfaz en 5 idiomas** — español, inglés, alemán, francés y portugués con detección automática del OS
 
 [Ver el detalle completo de funcionalidades →](FEATURES.md)
 

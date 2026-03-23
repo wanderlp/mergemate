@@ -3,9 +3,11 @@
 ## Pantalla de inicio
 
 - Diseño estilo Visual Studio con panel izquierdo de acciones y panel derecho de recientes
-- Acciones disponibles: **Comparar 2 carpetas** (activa) y placeholders para funciones futuras (Comparar 2 archivos, Historial de cambios)
+- Tres modos disponibles (en orden): **Comparación en blanco**, **Comparar 2 archivos**, **Comparar 2 carpetas**
 - Lista de hasta 8 comparaciones recientes con rutas y tiempo relativo ("hace 5 min", "ayer", etc.)
-- Clic en una comparación reciente abre el comparador directamente y lanza el escaneo automático
+- El modo de cada reciente se guarda; al reabrir se detecta automáticamente si son archivos o carpetas por el sistema de archivos
+- Icono diferenciado en recientes: carpeta para comparaciones de directorio, documento para comparaciones de archivo
+- Clic en una comparación reciente abre el comparador en el modo correcto automáticamente
 - Ventana independiente (900 × 600, no redimensionable) separada de la ventana de comparación
 
 ---
@@ -24,7 +26,8 @@
 
 - Cada archivo abierto aparece en su propio tab con el icono del tipo de archivo
 - Cierre con clic en la X, con el botón central del ratón o con `Escape` para volver a la vista de comparación
-- El tab de **Comparación** siempre está disponible mientras haya carpetas abiertas
+- Tabs no cerrables: **Comparación** (carpetas), **Editor libre** y **Comparar archivos** (persisten mientras la sesión esté abierta)
+- El tab **Editor libre** muestra un icono de portapapeles; el de comparación de carpetas muestra un icono de carpeta
 - Los tabs aparecen y desaparecen con animación suave
 
 ---
@@ -69,9 +72,27 @@
 
 ---
 
+## Comparación de archivos individuales
+
+- Selección de dos archivos desde el disco vía diálogos nativos del sistema operativo
+- Si el primer archivo es una imagen, el segundo diálogo filtra automáticamente solo imágenes
+- Si el primer archivo no es imagen, se valida que el segundo tampoco lo sea (con mensaje de error en la UI)
+- Dos imágenes seleccionadas abren directamente el visor de imágenes con slider
+- La comparación se guarda en recientes con su modo (`files`) para reabrirse correctamente
+
+---
+
+## Editor libre
+
+- Monaco Editor en blanco sin archivos vinculados
+- El usuario puede pegar código en cualquiera de los dos paneles y comparar en tiempo real
+- Accesible desde la pantalla de inicio como primera opción
+
+---
+
 ## Visor de imágenes
 
-Doble clic en cualquier imagen abre un visor dedicado con cuatro modos:
+Disponible al abrir una imagen desde el árbol de carpetas o al comparar dos archivos de imagen directamente. Cuatro modos:
 
 - **Lado a lado** — ambas versiones en paneles paralelos (modo por defecto)
 - **Slider** — arrastra para revelar izquierda/derecha sobre la misma imagen (ideal para detectar cambios visuales sutiles)
