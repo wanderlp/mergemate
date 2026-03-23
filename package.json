@@ -74,7 +74,8 @@
     "publish": {
       "provider": "github",
       "owner": "wanderlp",
-      "repo": "mergemate"
+      "repo": "mergemate",
+      "releaseType": "release"
     },
     "directories": {
       "output": "dist"
