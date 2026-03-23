@@ -44,6 +44,7 @@
     "compareFilesDesc": "Datei-Diff nebeneinander",
     "blankComparison": "Leerer Vergleich",
     "blankComparisonDesc": "Code auf beiden Seiten einfügen und vergleichen",
+    "fileMixedTypeError": "Bild und Textdatei können nicht gemischt werden",
     "history": "Änderungsverlauf",
     "historyDesc": "Git-Repository-Verlauf durchsuchen",
     "sectionRecent": "Zuletzt verwendet",

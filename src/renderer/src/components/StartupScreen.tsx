@@ -8,6 +8,12 @@ import type { RecentComparison } from '../types'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+const IMAGE_EXTS = new Set(['png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico', 'tiff', 'tif', 'webp', 'avif', 'svg'])
+
+function fileIsImage(filePath: string): boolean {
+  return IMAGE_EXTS.has(filePath.split('.').pop()?.toLowerCase() ?? '')
+}
+
 function basename(p: string): string {
   return p.replace(/[/\\]+$/, '').split(/[/\\]/).pop() ?? p
 }
@@ -32,6 +38,7 @@ export function StartupScreen(): React.JSX.Element {
   const [recents, setRecents] = useState<RecentComparison[]>([])
   const [pendingRemove, setPendingRemove] = useState<RecentComparison | null>(null)
   const [showAbout, setShowAbout] = useState(false)
+  const [fileError, setFileError] = useState<string | null>(null)
 
   useEffect(() => {
     window.electronAPI.getRecentComparisons().then(setRecents)
@@ -42,10 +49,16 @@ export function StartupScreen(): React.JSX.Element {
   }
 
   async function handleOpenFiles(): Promise<void> {
+    setFileError(null)
     const left = await window.electronAPI.showFileDialog()
     if (!left) return
-    const right = await window.electronAPI.showFileDialog()
+    const leftIsImage = fileIsImage(left)
+    const right = await window.electronAPI.showFileDialog(leftIsImage ? 'images-only' : undefined)
     if (!right) return
+    if (!leftIsImage && fileIsImage(right)) {
+      setFileError(t('startup.fileMixedTypeError'))
+      return
+    }
     window.electronAPI.openMainWindow(left, right, 'files')
   }
 
@@ -163,6 +176,11 @@ export function StartupScreen(): React.JSX.Element {
             description={t('startup.compareFilesDesc')}
             onClick={handleOpenFiles}
           />
+          {fileError && (
+            <p className="mb-1 px-3 text-xs text-[#f48771]" role="alert" aria-live="polite">
+              {fileError}
+            </p>
+          )}
 
           <ActionButton
             icon={<FolderOpen size={18} aria-hidden="true" />}

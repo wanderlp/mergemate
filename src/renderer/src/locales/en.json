@@ -44,6 +44,7 @@
     "compareFilesDesc": "Side-by-side diff of individual files",
     "blankComparison": "Blank comparison",
     "blankComparisonDesc": "Paste code on both sides to compare",
+    "fileMixedTypeError": "Cannot mix an image with a text file",
     "history": "Change history",
     "historyDesc": "Browse a Git repository history",
     "sectionRecent": "Recent",

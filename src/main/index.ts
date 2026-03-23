@@ -190,10 +190,14 @@ function registerIpcHandlers(): void {
     return b
   })
 
-  ipcMain.handle('show-file-dialog', async (event) => {
+  ipcMain.handle('show-file-dialog', async (event, filter?: string) => {
     const win = BrowserWindow.fromWebContents(event.sender)
+    const imageExts = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico', 'tiff', 'tif', 'webp', 'avif', 'svg']
     const result = await dialog.showOpenDialog(win ?? startupWindow!, {
-      properties: ['openFile']
+      properties: ['openFile'],
+      filters: filter === 'images-only'
+        ? [{ name: 'Imágenes', extensions: imageExts }]
+        : undefined
     })
     if (result.canceled || result.filePaths.length === 0) return null
     return result.filePaths[0]

@@ -17,8 +17,8 @@ const api: ElectronAPI = {
   showFolderDialog: () =>
     ipcRenderer.invoke('show-folder-dialog'),
 
-  showFileDialog: () =>
-    ipcRenderer.invoke('show-file-dialog'),
+  showFileDialog: (filter?) =>
+    ipcRenderer.invoke('show-file-dialog', filter),
 
   getFileHash: (filePath) =>
     ipcRenderer.invoke('get-file-hash', filePath),

@@ -44,6 +44,7 @@
     "compareFilesDesc": "Diff côte à côte de fichiers individuels",
     "blankComparison": "Comparaison vierge",
     "blankComparisonDesc": "Collez du code des deux côtés pour comparer",
+    "fileMixedTypeError": "Impossible de mélanger une image avec un fichier texte",
     "history": "Historique des modifications",
     "historyDesc": "Naviguer dans l'historique d'un dépôt Git",
     "sectionRecent": "Récents",

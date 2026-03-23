@@ -47,7 +47,7 @@ export interface ElectronAPI {
   writeFile: (filePath: string, content: string) => Promise<void>
   copyFileWithBak: (src: string, dest: string) => Promise<void>
   showFolderDialog: () => Promise<string | null>
-  showFileDialog: () => Promise<string | null>
+  showFileDialog: (filter?: 'images-only') => Promise<string | null>
   getFileHash: (filePath: string) => Promise<string>
   readFileBase64: (filePath: string) => Promise<string>
   onScanProgress: (callback: (progress: ScanProgress) => void) => () => void

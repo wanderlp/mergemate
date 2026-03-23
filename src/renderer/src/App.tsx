@@ -135,6 +135,12 @@ export default function App(): React.JSX.Element {
         leftSize: null,
         rightSize: null,
       }
+      if (isImageExtension(ext)) {
+        setOpenTabs((prev) => new Map(prev).set(tabLabel, { file, leftContent: '', rightContent: '', loading: false, unsupported: false, isImage: true, isFilesComparison: true }))
+        setActiveTabId(tabLabel)
+        await window.electronAPI.saveRecentComparison(left, right, 'files')
+        return
+      }
       setOpenTabs((prev) => new Map(prev).set(tabLabel, { file, leftContent: '', rightContent: '', loading: true, unsupported: false, isImage: false, isFilesComparison: true }))
       setActiveTabId(tabLabel)
       const [leftContent, rightContent] = await Promise.all([
