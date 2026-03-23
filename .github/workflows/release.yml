@@ -7,6 +7,7 @@ on:
 jobs:
   build:
     strategy:
+      fail-fast: false
       matrix:
         os: [windows-latest, macos-latest, ubuntu-latest]
 
@@ -25,25 +26,20 @@ jobs:
       - name: Instalar dependencias
         run: npm ci
 
-      - name: Compilar (Windows)
+      - name: Compilar y publicar (Windows)
         if: matrix.os == 'windows-latest'
         run: npm run dist:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Compilar (macOS)
+      - name: Compilar y publicar (macOS)
         if: matrix.os == 'macos-latest'
         run: npm run dist:mac
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Compilar (Linux)
+      - name: Compilar y publicar (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: npm run dist:linux
-
-      - name: Subir archivos al Release
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            dist/*.exe
-            dist/*.dmg
-            dist/*.AppImage
-            dist/*.yml
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
