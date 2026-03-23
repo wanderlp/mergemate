@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { FolderOpen, FileText, GitBranch, Clock, ArrowRight, X, Info, Clipboard } from 'lucide-react'
+import { FolderOpen, FileText, Clock, ArrowRight, X, Info, Clipboard } from 'lucide-react'
 import { version } from '../../../../package.json'
 import { useTranslation, type TFunction } from 'react-i18next'
 import { TitleBar } from './TitleBar'
@@ -189,15 +189,6 @@ export function StartupScreen(): React.JSX.Element {
             onClick={handleOpenMain}
           />
 
-          {/* Sección: Próximamente */}
-          <SectionHeader label={t('startup.comingSoon')} className="mt-8" />
-
-          <ActionButton
-            icon={<GitBranch size={18} aria-hidden="true" />}
-            label={t('startup.history')}
-            description={t('startup.historyDesc')}
-            disabled
-          />
 
           <div className="mt-auto flex justify-center pt-8">
             <button
