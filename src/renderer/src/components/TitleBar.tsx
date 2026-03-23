@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next'
 const LANGUAGES = [
   { code: 'es', label: 'ES — Español' },
   { code: 'en', label: 'EN — English' },
+  { code: 'pt', label: 'PT — Português' },
   { code: 'de', label: 'DE — Deutsch' },
   { code: 'fr', label: 'FR — Français' },
-  { code: 'pt', label: 'PT — Português' },
 ]
 
 export function AppIcon({ size = 24 }: { size?: number }): React.JSX.Element {
