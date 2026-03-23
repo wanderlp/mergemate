@@ -2,7 +2,7 @@ import React, { useState, useCallback, useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AnimatePresence } from 'framer-motion'
 import { TooltipProvider } from './components/ui/tooltip'
-import { COMPARISON_TAB_ID } from './constants'
+import { COMPARISON_TAB_ID, BLANK_TAB_ID } from './constants'
 import { MergeMateLogo } from './components/MergeMateLogo'
 import { TitleBar } from './components/TitleBar'
 import { Toolbar } from './components/Toolbar'
@@ -53,6 +53,7 @@ interface DiffTabData {
   loading: boolean
   unsupported: boolean
   isImage: boolean
+  isFilesComparison?: boolean
   // stats para la barra de estado
   diffStats?: { identical: number; different: number; commentsOnly: number; leftOnly: number; rightOnly: number; total: number }
   imageDims?: { left: ImageDims | null; right: ImageDims | null }
@@ -113,6 +114,58 @@ export default function App(): React.JSX.Element {
   const [showComparisonTab, setShowComparisonTab] = useState(false)
   const [showCloseDialog, setShowCloseDialog] = useState(false)
   const [scanVersion, setScanVersion] = useState(0)
+
+  // Modo "comparar 2 archivos": abrir tab directo con los dos archivos
+  useEffect(() => {
+    window.electronAPI.getPendingFiles().then(async (pending) => {
+      if (!pending) return
+      const { left, right } = pending
+      const ext = left.split('.').pop() ?? ''
+      const leftName = left.replace(/[/\\]+$/, '').split(/[/\\]/).pop() ?? left
+      const rightName = right.replace(/[/\\]+$/, '').split(/[/\\]/).pop() ?? right
+      const tabLabel = `${leftName} ↔ ${rightName}`
+      const file: FileEntry = {
+        relativePath: tabLabel,
+        leftPath: left,
+        rightPath: right,
+        status: 'different',
+        isDirectory: false,
+        name: tabLabel,
+        extension: ext,
+        leftSize: null,
+        rightSize: null,
+      }
+      setOpenTabs((prev) => new Map(prev).set(tabLabel, { file, leftContent: '', rightContent: '', loading: true, unsupported: false, isImage: false, isFilesComparison: true }))
+      setActiveTabId(tabLabel)
+      const [leftContent, rightContent] = await Promise.all([
+        window.electronAPI.readFile(left),
+        window.electronAPI.readFile(right),
+      ])
+      await window.electronAPI.saveRecentComparison(left, right, 'files')
+      const diffStats = computeDiffStats(leftContent, rightContent)
+      setOpenTabs((prev) => new Map(prev).set(tabLabel, { file, leftContent, rightContent, loading: false, unsupported: false, isImage: false, isFilesComparison: true, diffStats }))
+    })
+  }, [])
+
+  // Modo "comparación en blanco": abrir tab vacío en Monaco
+  useEffect(() => {
+    window.electronAPI.getPendingBlank().then((pending) => {
+      if (!pending) return
+      const file: FileEntry = {
+        relativePath: BLANK_TAB_ID,
+        leftPath: null,
+        rightPath: null,
+        status: 'different',
+        isDirectory: false,
+        name: t('diff.tabBlank'),
+        extension: '',
+        leftSize: null,
+        rightSize: null,
+      }
+      setOpenTabs((prev) => new Map(prev).set(BLANK_TAB_ID, { file, leftContent: '', rightContent: '', loading: false, unsupported: false, isImage: false }))
+      setActiveTabId(BLANK_TAB_ID)
+    })
+  }, [t])
 
   // Cuando termina un escaneo completo, mostrar y activar el tab de Comparación
   // scanCount solo cambia en scan() real, no en patchFileStatus
@@ -278,6 +331,7 @@ export default function App(): React.JSX.Element {
       label: t.file.name,
       extension: t.file.extension,
       loading: t.loading,
+      ...((t.file.relativePath === BLANK_TAB_ID || t.isFilesComparison) ? { closeable: false } : {}),
     }))
   ]
 

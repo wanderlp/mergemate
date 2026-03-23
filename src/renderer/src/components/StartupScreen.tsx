@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { FolderOpen, FileText, GitBranch, Clock, ArrowRight, X, Info } from 'lucide-react'
+import { FolderOpen, FileText, GitBranch, Clock, ArrowRight, X, Info, Clipboard } from 'lucide-react'
 import { version } from '../../../../package.json'
 import { useTranslation, type TFunction } from 'react-i18next'
 import { TitleBar } from './TitleBar'
@@ -41,8 +41,20 @@ export function StartupScreen(): React.JSX.Element {
     window.electronAPI.openMainWindow()
   }
 
+  async function handleOpenFiles(): Promise<void> {
+    const left = await window.electronAPI.showFileDialog()
+    if (!left) return
+    const right = await window.electronAPI.showFileDialog()
+    if (!right) return
+    window.electronAPI.openMainWindow(left, right, 'files')
+  }
+
+  function handleOpenBlank(): void {
+    window.electronAPI.openMainWindow(undefined, undefined, 'blank')
+  }
+
   function handleOpenRecent(r: RecentComparison): void {
-    window.electronAPI.openMainWindow(r.left, r.right)
+    window.electronAPI.openMainWindow(r.left, r.right, r.mode)
   }
 
   function handleRemoveClick(e: React.MouseEvent, r: RecentComparison): void {
@@ -139,6 +151,20 @@ export function StartupScreen(): React.JSX.Element {
           <SectionHeader label={t('startup.sectionStart')} />
 
           <ActionButton
+            icon={<Clipboard size={18} aria-hidden="true" />}
+            label={t('startup.blankComparison')}
+            description={t('startup.blankComparisonDesc')}
+            onClick={handleOpenBlank}
+          />
+
+          <ActionButton
+            icon={<FileText size={18} aria-hidden="true" />}
+            label={t('startup.compareFiles')}
+            description={t('startup.compareFilesDesc')}
+            onClick={handleOpenFiles}
+          />
+
+          <ActionButton
             icon={<FolderOpen size={18} aria-hidden="true" />}
             label={t('startup.compareFolders')}
             description={t('startup.compareFoldersDesc')}
@@ -147,13 +173,6 @@ export function StartupScreen(): React.JSX.Element {
 
           {/* Sección: Próximamente */}
           <SectionHeader label={t('startup.comingSoon')} className="mt-8" />
-
-          <ActionButton
-            icon={<FileText size={18} aria-hidden="true" />}
-            label={t('startup.compareFiles')}
-            description={t('startup.compareFilesDesc')}
-            disabled
-          />
 
           <ActionButton
             icon={<GitBranch size={18} aria-hidden="true" />}
@@ -195,7 +214,10 @@ export function StartupScreen(): React.JSX.Element {
                     onClick={() => handleOpenRecent(r)}
                     aria-label={t('startup.openAriaLabel', { left: basename(r.left), right: basename(r.right) })}
                   >
-                    <FolderOpen size={16} className="mt-0.5 shrink-0 text-[#007acc]" aria-hidden="true" />
+                    {r.mode === 'files'
+                      ? <FileText size={16} className="mt-0.5 shrink-0 text-[#007acc]" aria-hidden="true" />
+                      : <FolderOpen size={16} className="mt-0.5 shrink-0 text-[#007acc]" aria-hidden="true" />
+                    }
                     <div className="min-w-0 flex-1 pr-6">
                       <div className="flex items-center gap-2">
                         <span className="truncate text-sm font-medium text-[#cccccc]">

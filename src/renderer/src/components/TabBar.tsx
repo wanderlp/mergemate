@@ -1,9 +1,9 @@
 import React from 'react'
-import { X, FolderOpen } from 'lucide-react'
+import { X, FolderOpen, Clipboard } from 'lucide-react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { FileTypeIcon } from './FileTypeIcon'
-import { COMPARISON_TAB_ID } from '../constants'
+import { COMPARISON_TAB_ID, BLANK_TAB_ID } from '../constants'
 
 export interface TabItem {
   id: string
@@ -56,9 +56,11 @@ export function TabBar({ tabs, activeTabId, onSelectTab, onCloseTab }: TabBarPro
           const isActive = tab.id === activeTabId
           const icon = tab.id === COMPARISON_TAB_ID
             ? <FolderOpen size={13} className="flex-shrink-0" aria-hidden="true" />
-            : tab.loading
-              ? <span className="flex-shrink-0 text-xs" aria-hidden="true">⏳</span>
-              : <FileTypeIcon extension={tab.extension} name={tab.label} size={14} />
+            : tab.id === BLANK_TAB_ID
+              ? <Clipboard size={13} className="flex-shrink-0" aria-hidden="true" />
+              : tab.loading
+                ? <span className="flex-shrink-0 text-xs" aria-hidden="true">⏳</span>
+                : <FileTypeIcon extension={tab.extension} name={tab.label} size={14} />
 
           const isCloseable = tab.closeable !== false
 

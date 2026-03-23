@@ -25,6 +25,8 @@ const store = new Store<StoreSchema>()
 let startupWindow: BrowserWindow | null = null
 let mainWindow: BrowserWindow | null = null
 let pendingFolders: { left: string; right: string } | null = null
+let pendingFiles: { left: string; right: string } | null = null
+let pendingBlank = false
 let mainWindowClosing = false
 
 function setupMaximizeEvents(win: BrowserWindow): void {
@@ -148,8 +150,22 @@ function registerIpcHandlers(): void {
     store.get('recentComparisons') ?? []
   )
 
-  ipcMain.handle('startup-open-main', (_event, left?: string, right?: string) => {
-    if (left && right) pendingFolders = { left, right }
+  ipcMain.handle('startup-open-main', (_event, left?: string, right?: string, mode?: string) => {
+    if (mode === 'blank') {
+      pendingBlank = true
+    } else if (left && right) {
+      // Si el mode no viene explícito, detectar por el sistema de archivos
+      const effectiveMode = mode === 'files' || (
+        mode !== 'folders' &&
+        fs.existsSync(left) && fs.statSync(left).isFile()
+      ) ? 'files' : 'folders'
+
+      if (effectiveMode === 'files') {
+        pendingFiles = { left, right }
+      } else {
+        pendingFolders = { left, right }
+      }
+    }
     createMainWindow()
     startupWindow?.close()
   })
@@ -162,10 +178,31 @@ function registerIpcHandlers(): void {
     return f
   })
 
-  ipcMain.handle('save-recent-comparison', (_event, left: string, right: string) => {
+  ipcMain.handle('get-pending-files', () => {
+    const f = pendingFiles
+    pendingFiles = null
+    return f
+  })
+
+  ipcMain.handle('get-pending-blank', () => {
+    const b = pendingBlank
+    pendingBlank = false
+    return b
+  })
+
+  ipcMain.handle('show-file-dialog', async (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender)
+    const result = await dialog.showOpenDialog(win ?? startupWindow!, {
+      properties: ['openFile']
+    })
+    if (result.canceled || result.filePaths.length === 0) return null
+    return result.filePaths[0]
+  })
+
+  ipcMain.handle('save-recent-comparison', (_event, left: string, right: string, mode?: 'folders' | 'files') => {
     const existing: RecentComparison[] = store.get('recentComparisons') ?? []
     const filtered = existing.filter((r) => r.left !== left || r.right !== right)
-    store.set('recentComparisons', [{ left, right, lastUsed: Date.now() }, ...filtered].slice(0, 8))
+    store.set('recentComparisons', [{ left, right, lastUsed: Date.now(), mode }, ...filtered].slice(0, 8))
   })
 
   ipcMain.handle('remove-recent-comparison', (_event, left: string, right: string) => {

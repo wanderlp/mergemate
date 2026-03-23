@@ -17,6 +17,9 @@ const api: ElectronAPI = {
   showFolderDialog: () =>
     ipcRenderer.invoke('show-folder-dialog'),
 
+  showFileDialog: () =>
+    ipcRenderer.invoke('show-file-dialog'),
+
   getFileHash: (filePath) =>
     ipcRenderer.invoke('get-file-hash', filePath),
 
@@ -37,15 +40,21 @@ const api: ElectronAPI = {
   getRecentComparisons: () =>
     ipcRenderer.invoke('startup-get-recent'),
 
-  openMainWindow: (left?, right?) =>
-    ipcRenderer.invoke('startup-open-main', left, right),
+  openMainWindow: (left?, right?, mode?) =>
+    ipcRenderer.invoke('startup-open-main', left, right, mode),
 
   // Main window
   getPendingFolders: () =>
     ipcRenderer.invoke('get-pending-folders'),
 
-  saveRecentComparison: (left, right) =>
-    ipcRenderer.invoke('save-recent-comparison', left, right),
+  getPendingFiles: () =>
+    ipcRenderer.invoke('get-pending-files'),
+
+  getPendingBlank: () =>
+    ipcRenderer.invoke('get-pending-blank'),
+
+  saveRecentComparison: (left, right, mode?) =>
+    ipcRenderer.invoke('save-recent-comparison', left, right, mode),
 
   removeRecentComparison: (left, right) =>
     ipcRenderer.invoke('remove-recent-comparison', left, right),

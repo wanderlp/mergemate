@@ -4,6 +4,7 @@ export interface RecentComparison {
   left: string
   right: string
   lastUsed: number
+  mode?: 'folders' | 'files'
 }
 
 export type FileStatus = 'identical' | 'different' | 'comments-only' | 'left-only' | 'right-only'
@@ -46,6 +47,7 @@ export interface ElectronAPI {
   writeFile: (filePath: string, content: string) => Promise<void>
   copyFileWithBak: (src: string, dest: string) => Promise<void>
   showFolderDialog: () => Promise<string | null>
+  showFileDialog: () => Promise<string | null>
   getFileHash: (filePath: string) => Promise<string>
   readFileBase64: (filePath: string) => Promise<string>
   onScanProgress: (callback: (progress: ScanProgress) => void) => () => void
@@ -53,10 +55,12 @@ export interface ElectronAPI {
   classifyFiles: (leftPath: string | null, rightPath: string | null, ext: string) => Promise<FileStatus>
   // Startup window
   getRecentComparisons: () => Promise<RecentComparison[]>
-  openMainWindow: (left?: string, right?: string) => Promise<void>
+  openMainWindow: (left?: string, right?: string, mode?: 'folders' | 'files' | 'blank') => Promise<void>
   // Main window
   getPendingFolders: () => Promise<{ left: string; right: string } | null>
-  saveRecentComparison: (left: string, right: string) => Promise<void>
+  getPendingFiles: () => Promise<{ left: string; right: string } | null>
+  getPendingBlank: () => Promise<boolean>
+  saveRecentComparison: (left: string, right: string, mode?: 'folders' | 'files') => Promise<void>
   removeRecentComparison: (left: string, right: string) => Promise<void>
   // Window controls
   minimizeWindow: () => Promise<void>
