@@ -34,6 +34,13 @@ La app es un proyecto estándar de electron-vite con tres targets de compilació
 - Esperar siempre a que el programador indique explícitamente cuándo hacer cada acción por separado: primero el commit, luego el push, luego el PR si aplica.
 - El programador necesita tiempo para probar los cambios antes de confirmarlos.
 
+### Mensajes de commit
+
+Seguir la convención **Conventional Commits**: el prefijo va en inglés (`fix:`, `feat:`, `chore:`, `ci:`, `docs:`, etc.), pero la descripción que sigue al prefijo debe estar en **español**.
+
+- Correcto: `fix: corregir valor inicial del selector de idioma`
+- Incorrecto: `fix: fix language selector initial value`
+
 ## Idioma
 
 Toda la comunicación con Claude, comentarios en el código y respuestas deben ser en **español**. Esto incluye explicaciones, sugerencias, mensajes de error y cualquier interacción durante el desarrollo.
