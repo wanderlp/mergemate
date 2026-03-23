@@ -4,7 +4,10 @@
   "description": "MergeMate — Folder Comparison Tool",
   "productName": "MergeMate",
   "main": "./out/main/index.js",
-  "author": "MergeMate",
+  "author": {
+    "name": "wanderlp",
+    "email": "lopez.wanderson@gmail.com"
+  },
   "homepage": ".",
   "scripts": {
     "dev": "electron-vite dev",
