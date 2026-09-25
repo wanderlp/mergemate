@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { useTranslation } from 'react-i18next'
 import { FileRow } from './FileRow'
 import type { FileEntry } from '../types'
 
@@ -52,6 +53,7 @@ export function FileTree({
   onFileOpen,
   onHover
 }: FileTreeProps): React.JSX.Element {
+  const { t } = useTranslation()
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set())
   const [focusedPath, setFocusedPath] = useState<string | null>(null)
   const rowRefsMap = useRef<Map<string, HTMLDivElement>>(new Map())
@@ -151,7 +153,7 @@ export function FileTree({
   if (entries.length === 0) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-2 text-[#858585]">
-        <div className="text-sm">No se encontraron archivos en las carpetas seleccionadas</div>
+        <div className="text-sm">{t('fileTree.emptyState')}</div>
       </div>
     )
   }

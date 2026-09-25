@@ -1,5 +1,6 @@
 import React, { useRef } from 'react'
 import { ChevronRight, ChevronDown, Folder, FolderOpen } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { FileTypeIcon } from './FileTypeIcon'
 import type { FileEntry, FileStatus } from '../types'
 import { formatSize } from '../utils/format'
@@ -25,12 +26,12 @@ const STATUS_COLORS: Record<FileStatus, string> = {
   'right-only': '#a855f7'
 }
 
-const STATUS_LABELS: Record<FileStatus, string> = {
-  identical: 'Idéntico',
-  different: 'Diferente',
-  'comments-only': 'Solo comentarios',
-  'left-only': 'Solo en izquierda',
-  'right-only': 'Solo en derecha'
+const STATUS_KEYS: Record<FileStatus, string> = {
+  identical: 'fileRow.status.identical',
+  different: 'fileRow.status.different',
+  'comments-only': 'fileRow.status.commentsOnly',
+  'left-only': 'fileRow.status.leftOnly',
+  'right-only': 'fileRow.status.rightOnly'
 }
 
 const DOUBLE_CLICK_MS = 300
@@ -48,9 +49,10 @@ export function FileRow({
   onFocusPath,
   refCallback
 }: FileRowProps): React.JSX.Element {
+  const { t } = useTranslation()
   const color = STATUS_COLORS[entry.status]
   const indent = depth * 16
-  const label = STATUS_LABELS[entry.status]
+  const label = t(STATUS_KEYS[entry.status])
 
   const leftExists = Boolean(entry.leftPath)
   const rightExists = Boolean(entry.rightPath)

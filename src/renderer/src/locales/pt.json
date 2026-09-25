@@ -103,7 +103,10 @@
     "copyToLeftAriaLabel": "Copiar conteúdo para pasta esquerda",
     "copyToRightAriaLabel": "Copiar conteúdo para pasta direita",
     "saveLeftAriaLabel": "Salvar arquivo esquerdo",
-    "saveRightAriaLabel": "Salvar arquivo direito"
+    "saveRightAriaLabel": "Salvar arquivo direito",
+    "find": "Buscar",
+    "findTooltip": "Buscar no painel ativo (Ctrl+F)",
+    "findAriaLabel": "Abrir busca no painel ativo"
   },
   "progress": {
     "ariaLabel": "Escaneando pastas",
@@ -150,5 +153,17 @@
   "copy": {
     "confirmLeft": "Sobrescrever \"{{name}}\" na pasta esquerda?\nUma cópia de segurança .bak será criada automaticamente.",
     "confirmRight": "Sobrescrever \"{{name}}\" na pasta direita?\nUma cópia de segurança .bak será criada automaticamente."
+  },
+  "fileRow": {
+    "status": {
+      "identical": "Idêntico",
+      "different": "Diferente",
+      "commentsOnly": "Apenas comentários",
+      "leftOnly": "Apenas à esquerda",
+      "rightOnly": "Apenas à direita"
+    }
+  },
+  "fileTree": {
+    "emptyState": "Nenhum arquivo encontrado nas pastas selecionadas"
   }
 }

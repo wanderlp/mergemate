@@ -103,7 +103,10 @@
     "copyToLeftAriaLabel": "Copy content to left folder",
     "copyToRightAriaLabel": "Copy content to right folder",
     "saveLeftAriaLabel": "Save left file",
-    "saveRightAriaLabel": "Save right file"
+    "saveRightAriaLabel": "Save right file",
+    "find": "Find",
+    "findTooltip": "Find in active panel (Ctrl+F)",
+    "findAriaLabel": "Open search in active panel"
   },
   "progress": {
     "ariaLabel": "Scanning folders",
@@ -150,5 +153,17 @@
   "copy": {
     "confirmLeft": "Overwrite \"{{name}}\" in the left folder?\nA .bak backup will be created automatically.",
     "confirmRight": "Overwrite \"{{name}}\" in the right folder?\nA .bak backup will be created automatically."
+  },
+  "fileRow": {
+    "status": {
+      "identical": "Identical",
+      "different": "Different",
+      "commentsOnly": "Comments only",
+      "leftOnly": "Left only",
+      "rightOnly": "Right only"
+    }
+  },
+  "fileTree": {
+    "emptyState": "No files were found in the selected folders"
   }
 }

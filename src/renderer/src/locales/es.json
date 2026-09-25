@@ -103,7 +103,10 @@
     "copyToLeftAriaLabel": "Copiar contenido a carpeta izquierda",
     "copyToRightAriaLabel": "Copiar contenido a carpeta derecha",
     "saveLeftAriaLabel": "Guardar archivo izquierdo",
-    "saveRightAriaLabel": "Guardar archivo derecho"
+    "saveRightAriaLabel": "Guardar archivo derecho",
+    "find": "Buscar",
+    "findTooltip": "Buscar en el panel activo (Ctrl+F)",
+    "findAriaLabel": "Abrir búsqueda en el panel activo"
   },
   "progress": {
     "ariaLabel": "Escaneando carpetas",
@@ -150,5 +153,17 @@
   "copy": {
     "confirmLeft": "¿Sobreescribir \"{{name}}\" en la carpeta izquierda?\nSe creará una copia de seguridad .bak automáticamente.",
     "confirmRight": "¿Sobreescribir \"{{name}}\" en la carpeta derecha?\nSe creará una copia de seguridad .bak automáticamente."
+  },
+  "fileRow": {
+    "status": {
+      "identical": "Idéntico",
+      "different": "Diferente",
+      "commentsOnly": "Solo comentarios",
+      "leftOnly": "Solo en izquierda",
+      "rightOnly": "Solo en derecha"
+    }
+  },
+  "fileTree": {
+    "emptyState": "No se encontraron archivos en las carpetas seleccionadas"
   }
 }

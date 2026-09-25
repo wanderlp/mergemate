@@ -103,7 +103,10 @@
     "copyToLeftAriaLabel": "Inhalt in linken Ordner kopieren",
     "copyToRightAriaLabel": "Inhalt in rechten Ordner kopieren",
     "saveLeftAriaLabel": "Linke Datei speichern",
-    "saveRightAriaLabel": "Rechte Datei speichern"
+    "saveRightAriaLabel": "Rechte Datei speichern",
+    "find": "Suchen",
+    "findTooltip": "Im aktiven Panel suchen (Ctrl+F)",
+    "findAriaLabel": "Suche im aktiven Panel öffnen"
   },
   "progress": {
     "ariaLabel": "Ordner werden gescannt",
@@ -150,5 +153,17 @@
   "copy": {
     "confirmLeft": "\"{{name}}\" im linken Ordner überschreiben?\nEine .bak-Sicherungskopie wird automatisch erstellt.",
     "confirmRight": "\"{{name}}\" im rechten Ordner überschreiben?\nEine .bak-Sicherungskopie wird automatisch erstellt."
+  },
+  "fileRow": {
+    "status": {
+      "identical": "Identisch",
+      "different": "Unterschiedlich",
+      "commentsOnly": "Nur Kommentare",
+      "leftOnly": "Nur links",
+      "rightOnly": "Nur rechts"
+    }
+  },
+  "fileTree": {
+    "emptyState": "Keine Dateien in den ausgewählten Ordnern gefunden"
   }
 }

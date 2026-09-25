@@ -103,7 +103,10 @@
     "copyToLeftAriaLabel": "Copier le contenu dans le dossier gauche",
     "copyToRightAriaLabel": "Copier le contenu dans le dossier droit",
     "saveLeftAriaLabel": "Enregistrer le fichier gauche",
-    "saveRightAriaLabel": "Enregistrer le fichier droit"
+    "saveRightAriaLabel": "Enregistrer le fichier droit",
+    "find": "Rechercher",
+    "findTooltip": "Rechercher dans le panneau actif (Ctrl+F)",
+    "findAriaLabel": "Ouvrir la recherche dans le panneau actif"
   },
   "progress": {
     "ariaLabel": "Analyse des dossiers",
@@ -150,5 +153,17 @@
   "copy": {
     "confirmLeft": "Écraser « {{name}} » dans le dossier gauche ?\nUne sauvegarde .bak sera créée automatiquement.",
     "confirmRight": "Écraser « {{name}} » dans le dossier droit ?\nUne sauvegarde .bak sera créée automatiquement."
+  },
+  "fileRow": {
+    "status": {
+      "identical": "Identique",
+      "different": "Différent",
+      "commentsOnly": "Commentaires uniquement",
+      "leftOnly": "Gauche uniquement",
+      "rightOnly": "Droite uniquement"
+    }
+  },
+  "fileTree": {
+    "emptyState": "Aucun fichier trouvé dans les dossiers sélectionnés"
   }
 }
