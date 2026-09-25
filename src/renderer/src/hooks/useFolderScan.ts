@@ -19,6 +19,7 @@ interface UseFolderScanReturn {
   setLeftFolder: (path: string) => void
   setRightFolder: (path: string) => void
   scan: () => Promise<void>
+  swapFolders: () => Promise<void>
   openLeft: () => Promise<void>
   openRight: () => Promise<void>
   clear: () => void
@@ -50,13 +51,15 @@ export function useFolderScan(): UseFolderScanReturn {
     return unsubscribe
   }, [])
 
-  const scan = useCallback(async () => {
-    if (!leftFolder || !rightFolder) return
+  const scan = useCallback(async (leftOverride?: string, rightOverride?: string) => {
+    const left = leftOverride ?? leftFolder
+    const right = rightOverride ?? rightFolder
+    if (!left || !right) return
     setScanning(true)
     setProgress({ percent: 0, currentFile: '' })
     try {
-      await window.electronAPI.saveRecentComparison(leftFolder, rightFolder)
-      const result = await window.electronAPI.scanFolder(leftFolder, rightFolder)
+      await window.electronAPI.saveRecentComparison(left, right)
+      const result = await window.electronAPI.scanFolder(left, right)
       setScanResult(result)
       setScanCount((c) => c + 1)
     } finally {
@@ -64,6 +67,13 @@ export function useFolderScan(): UseFolderScanReturn {
       setProgress(null)
     }
   }, [leftFolder, rightFolder])
+
+  const swapFolders = useCallback(async () => {
+    if (!leftFolder || !rightFolder) return
+    setLeftFolder(rightFolder)
+    setRightFolder(leftFolder)
+    await scan(rightFolder, leftFolder)
+  }, [leftFolder, rightFolder, scan])
 
   // Auto-scan cuando se cargan carpetas desde recientes
   useEffect(() => {
@@ -107,6 +117,7 @@ export function useFolderScan(): UseFolderScanReturn {
     setLeftFolder,
     setRightFolder,
     scan,
+    swapFolders,
     openLeft,
     openRight,
     clear,

@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { FolderOpen, GitCompareArrows } from 'lucide-react'
+import { FolderOpen, GitCompareArrows, ArrowLeftRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Button } from './ui/button'
 import { Separator } from './ui/separator'
@@ -12,6 +12,7 @@ interface ToolbarProps {
   onChangeLeft: (path: string) => void
   onChangeRight: (path: string) => void
   onRefresh: () => void
+  onSwap: () => void
   scanning: boolean
 }
 
@@ -23,6 +24,7 @@ export function Toolbar({
   onChangeLeft,
   onChangeRight,
   onRefresh,
+  onSwap,
   scanning
 }: ToolbarProps): React.JSX.Element {
   const { t } = useTranslation()
@@ -145,6 +147,15 @@ export function Toolbar({
           disabled={scanning}
           spellCheck={false}
         />
+
+        <Button
+          onClick={onSwap}
+          disabled={scanning || !leftFolder || !rightFolder}
+          title={t('toolbar.swapTooltip')}
+          aria-label={t('toolbar.swapAriaLabel')}
+        >
+          <ArrowLeftRight size={16} aria-hidden="true" className="rotate-90" />
+        </Button>
 
         <Separator orientation="vertical" className="mx-1" />
 

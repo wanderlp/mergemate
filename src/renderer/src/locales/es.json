@@ -27,6 +27,8 @@
     "changeRightTooltip": "Cambiar carpeta derecha (Ctrl+R)",
     "compare": "Comparar",
     "compareTooltip": "Comparar carpetas (Ctrl+F5)",
+    "swapTooltip": "Intercambiar carpetas izquierda y derecha (Ctrl+Shift+R)",
+    "swapAriaLabel": "Intercambiar carpetas izquierda y derecha",
     "noFolder": "Ninguna carpeta seleccionada",
     "folderNotFoundTitle": "Carpeta no encontrada",
     "folderNotFoundMessage_one": "La siguiente carpeta no existe:",

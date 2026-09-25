@@ -27,6 +27,8 @@
     "changeRightTooltip": "Changer le dossier droit (Ctrl+R)",
     "compare": "Comparer",
     "compareTooltip": "Comparer les dossiers (Ctrl+F5)",
+    "swapTooltip": "Échanger les dossiers gauche et droit (Ctrl+Shift+R)",
+    "swapAriaLabel": "Échanger les dossiers gauche et droit",
     "noFolder": "Aucun dossier sélectionné",
     "folderNotFoundTitle": "Dossier introuvable",
     "folderNotFoundMessage_one": "Le dossier suivant n'existe pas :",

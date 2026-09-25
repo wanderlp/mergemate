@@ -103,6 +103,7 @@ export default function App(): React.JSX.Element {
     setLeftFolder,
     setRightFolder,
     scan,
+    swapFolders,
     openLeft,
     openRight,
     clear,
@@ -194,9 +195,9 @@ export default function App(): React.JSX.Element {
       if (ctrl && e.key === 'l') {
         e.preventDefault()
         openLeft()
-      } else if (ctrl && e.key === 'r') {
+      } else if (ctrl && e.shiftKey && (e.key === 'r' || e.key === 'R')) {
         e.preventDefault()
-        openRight()
+        void swapFolders()
       } else if (ctrl && e.key === 'F5') {
         e.preventDefault()
         scan()
@@ -206,7 +207,7 @@ export default function App(): React.JSX.Element {
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [openLeft, openRight, scan, activeTabId, showComparisonTab])
+  }, [openLeft, swapFolders, scan, activeTabId, showComparisonTab])
 
   const handleFileOpen = useCallback(async (file: FileEntry) => {
     const id = file.relativePath
@@ -394,6 +395,7 @@ export default function App(): React.JSX.Element {
             onChangeLeft={setLeftFolder}
             onChangeRight={setRightFolder}
             onRefresh={scan}
+            onSwap={swapFolders}
             scanning={scanning}
           />
         )}

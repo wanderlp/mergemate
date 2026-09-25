@@ -27,6 +27,8 @@
     "changeRightTooltip": "Alterar pasta direita (Ctrl+R)",
     "compare": "Comparar",
     "compareTooltip": "Comparar pastas (Ctrl+F5)",
+    "swapTooltip": "Trocar pastas esquerda e direita (Ctrl+Shift+R)",
+    "swapAriaLabel": "Trocar pastas esquerda e direita",
     "noFolder": "Nenhuma pasta selecionada",
     "folderNotFoundTitle": "Pasta não encontrada",
     "folderNotFoundMessage_one": "A seguinte pasta não existe:",
