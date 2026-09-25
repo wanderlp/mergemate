@@ -99,7 +99,15 @@ export function DiffViewer({
     const handler = (e: KeyboardEvent): void => {
       if ((e.ctrlKey || e.metaKey) && e.key === 's') {
         e.preventDefault()
-        handleSaveRight()
+        const editor = editorRef.current
+        if (!editor) return
+        const originalEditor = editor.getOriginalEditor()
+        const modifiedEditor = editor.getModifiedEditor()
+        if (originalEditor.hasTextFocus()) {
+          void handleSaveLeft()
+        } else if (modifiedEditor.hasTextFocus()) {
+          void handleSaveRight()
+        }
       } else if (e.altKey && e.key === 'ArrowUp') {
         e.preventDefault()
         navigateDiff('prev')
@@ -110,7 +118,7 @@ export function DiffViewer({
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [handleSaveRight, navigateDiff])
+  }, [handleSaveLeft, handleSaveRight, navigateDiff])
 
   const canCopyLeft = Boolean(file.leftPath)
   const canCopyRight = Boolean(file.rightPath)

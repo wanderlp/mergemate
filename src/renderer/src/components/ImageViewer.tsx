@@ -121,11 +121,21 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
     setIsDragging(false)
   }, [])
 
-  const handleWheel = useCallback((e: React.WheelEvent) => {
+  const sliderContainerRef = useRef<HTMLDivElement>(null)
+
+  const handleWheel = useCallback((e: WheelEvent) => {
+    if (!e.cancelable) return
     e.preventDefault()
     const delta = e.deltaY < 0 ? 0.15 : -0.15
     setZoom((z) => Math.min(4, Math.max(0.25, parseFloat((z + delta).toFixed(2)))))
   }, [])
+
+  useEffect(() => {
+    const el = sliderContainerRef.current
+    if (!el) return
+    el.addEventListener('wheel', handleWheel, { passive: false })
+    return () => el.removeEventListener('wheel', handleWheel)
+  }, [handleWheel, effectiveMode])
 
   function handleZoomIn():  void { setZoom((z) => Math.min(z + 0.25, 4)) }
   function handleZoomOut(): void { setZoom((z) => Math.max(z - 0.25, 0.25)) }
@@ -178,6 +188,7 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
         </div>
       ) : effectiveMode === 'slider' && leftUrl && rightUrl ? (
         <div
+          ref={sliderContainerRef}
           role="img"
           aria-label={t('image.compareAriaLabel', { path: file.relativePath })}
           className="relative flex flex-1 items-center justify-center overflow-hidden bg-[#181818] p-12"
@@ -186,7 +197,6 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
           onMouseLeave={handleMouseUp}
-          onWheel={handleWheel}
         >
           <div style={{
             width: '100%',
@@ -249,13 +259,23 @@ interface ImagePanelProps {
   onMouseDown: (e: React.MouseEvent) => void
   onMouseMove: (e: React.MouseEvent) => void
   onMouseUp: () => void
-  onWheel: (e: React.WheelEvent) => void
+  onWheel: (e: WheelEvent) => void
 }
 
 function ImagePanel({ url, label, zoom, pan, isDragging, panelAriaLabel, onMouseDown, onMouseMove, onMouseUp, onWheel }: ImagePanelProps): React.JSX.Element {
+  const wheelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = wheelRef.current
+    if (!el) return
+    el.addEventListener('wheel', onWheel, { passive: false })
+    return () => el.removeEventListener('wheel', onWheel)
+  }, [onWheel])
+
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       <div
+        ref={wheelRef}
         role="img"
         aria-label={panelAriaLabel}
         className="relative flex flex-1 items-center justify-center overflow-hidden p-12"
@@ -264,7 +284,6 @@ function ImagePanel({ url, label, zoom, pan, isDragging, panelAriaLabel, onMouse
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseUp}
-        onWheel={onWheel}
       >
         <img
           src={url}

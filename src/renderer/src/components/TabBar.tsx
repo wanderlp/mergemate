@@ -87,7 +87,7 @@ export function TabBar({ tabs, activeTabId, onSelectTab, onCloseTab }: TabBarPro
               onClick={() => onSelectTab(tab.id)}
               onKeyDown={(e) => handleKeyDown(e, tab.id, index)}
               onAuxClick={(e) => { if (e.button === 1 && isCloseable) { e.preventDefault(); onCloseTab(tab.id) } }}
-              title={tab.id}
+              title={tab.label}
             >
               {icon}
               <span className="flex-1 truncate">{tab.label}</span>
