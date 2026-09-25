@@ -151,7 +151,7 @@ export function FileRow({
             </>
           )
         ) : (
-          <span className="truncate text-[#6e6e6e">—</span>
+          <span className="truncate text-[#6e6e6e]">—</span>
         )}
       </div>
 
