@@ -104,7 +104,7 @@ export function StartupScreen(): React.JSX.Element {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-[#1e1e1e]" role="main">
+    <div className="flex h-screen flex-col bg-[hsl(var(--surface-app))]" role="main">
       {showAbout && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
@@ -112,31 +112,31 @@ export function StartupScreen(): React.JSX.Element {
           aria-modal="true"
           aria-labelledby="about-title"
         >
-          <div className="mx-4 w-full max-w-md rounded-lg border border-[#3e3e42] bg-[#252526] p-6 shadow-2xl">
+          <div className="mx-4 w-full max-w-md rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-2xl">
             <div className="mb-4 flex items-center gap-3">
-              <Info size={20} className="shrink-0 text-[#007acc]" aria-hidden="true" />
+              <Info size={20} className="shrink-0 text-[hsl(var(--primary))]" aria-hidden="true" />
               <div>
-                <h2 id="about-title" className="text-base font-semibold text-[#cccccc]">
+                <h2 id="about-title" className="text-base font-semibold text-[hsl(var(--foreground))]">
                   {t("about.title")}
                 </h2>
-                <p className="text-xs text-[#858585]">{t("about.version", { version })}</p>
+                <p className="text-xs text-[hsl(var(--text-muted))]">{t("about.version", { version })}</p>
               </div>
             </div>
-            <div className="space-y-4 text-sm leading-relaxed text-[#aaaaaa]">
+            <div className="space-y-4 text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
               <p className="text-justify">{t("about.description")}</p>
               <p className="text-justify">{t("about.origin")}</p>
-              <div className="flex items-start gap-2.5 rounded border border-[#3e3e42] bg-[#1e1e1e] px-3 py-2.5">
+              <div className="flex items-start gap-2.5 rounded border border-[hsl(var(--border))] bg-[hsl(var(--surface-app))] px-3 py-2.5">
                 <span className="text-2xl leading-tight" aria-hidden="true">
                   🚧
                 </span>
-                <p className="text-justify text-xs leading-relaxed text-[#858585]">
+                <p className="text-justify text-xs leading-relaxed text-[hsl(var(--text-muted))]">
                   {t("about.activeDev")}
                 </p>
               </div>
             </div>
             <div className="mt-5 flex items-center justify-between">
               <button
-                className="text-xs text-[#007acc] hover:underline"
+                className="text-xs text-[hsl(var(--primary))] hover:underline"
                 onClick={() =>
                   window.electronAPI.openExternal("https://github.com/wanderlp/mergemate")
                 }
@@ -144,7 +144,7 @@ export function StartupScreen(): React.JSX.Element {
                 {t("about.repo")}
               </button>
               <button
-                className="rounded px-3 py-1.5 text-sm text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
+                className="rounded px-3 py-1.5 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
                 onClick={() => setShowAbout(false)}
                 autoFocus
               >
@@ -162,11 +162,11 @@ export function StartupScreen(): React.JSX.Element {
           aria-modal="true"
           aria-labelledby="remove-confirm-title"
         >
-          <div className="mx-4 w-full max-w-sm rounded-lg border border-[#3e3e42] bg-[#252526] p-6 shadow-2xl">
-            <h2 id="remove-confirm-title" className="mb-2 text-base font-semibold text-[#cccccc]">
+          <div className="mx-4 w-full max-w-sm rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-2xl">
+            <h2 id="remove-confirm-title" className="mb-2 text-base font-semibold text-[hsl(var(--foreground))]">
               {t("startup.removeConfirmTitle")}
             </h2>
-            <p className="mb-6 text-sm text-[#aaaaaa]">
+            <p className="mb-6 text-sm text-[hsl(var(--muted-foreground))]">
               {t("startup.removeConfirmMessage", {
                 left: basename(pendingRemove.left),
                 right: basename(pendingRemove.right)
@@ -174,7 +174,7 @@ export function StartupScreen(): React.JSX.Element {
             </p>
             <div className="flex justify-end gap-2">
               <button
-                className="rounded px-3 py-1.5 text-sm text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
+                className="rounded px-3 py-1.5 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
                 onClick={() => setPendingRemove(null)}
                 autoFocus
               >
@@ -199,8 +199,8 @@ export function StartupScreen(): React.JSX.Element {
           <div className="mb-10 flex flex-col items-center gap-4">
             <MergeMateLogo size={140} />
             <div className="text-center">
-              <div className="text-2xl font-bold tracking-wide text-[#cccccc]">MergeMate</div>
-              <div className="text-xs text-[#858585]">{t("startup.subtitle")}</div>
+              <div className="text-2xl font-bold tracking-wide text-[hsl(var(--foreground))]">MergeMate</div>
+              <div className="text-xs text-[hsl(var(--text-muted))]">{t("startup.subtitle")}</div>
             </div>
           </div>
 
@@ -221,7 +221,7 @@ export function StartupScreen(): React.JSX.Element {
             onClick={handleOpenFiles}
           />
           {fileError && (
-            <p className="mb-1 px-3 text-xs text-[#f48771]" role="alert" aria-live="polite">
+            <p className="mb-1 px-3 text-xs text-[hsl(var(--folder-icon))]" role="alert" aria-live="polite">
               {fileError}
             </p>
           )}
@@ -235,7 +235,7 @@ export function StartupScreen(): React.JSX.Element {
 
           <div className="mt-auto flex justify-center pt-8">
             <button
-              className="flex items-center gap-1.5 text-xs text-[#555555] transition-colors hover:text-[#858585]"
+              className="flex items-center gap-1.5 text-xs text-[hsl(var(--text-faint))] transition-colors hover:text-[hsl(var(--text-muted))]"
               onClick={() => setShowAbout(true)}
             >
               <Info size={13} aria-hidden="true" />
@@ -252,10 +252,10 @@ export function StartupScreen(): React.JSX.Element {
           <SectionHeader label={t("startup.sectionRecent")} />
 
           {recents.length === 0 ? (
-            <div className="mt-4 flex flex-col items-center gap-3 py-8 text-center text-[#858585]">
+            <div className="mt-4 flex flex-col items-center gap-3 py-8 text-center text-[hsl(var(--text-muted))]">
               <Clock size={32} aria-hidden="true" className="opacity-40" />
               <p className="text-sm">{t("startup.noRecent")}</p>
-              <p className="text-xs text-[#555555]">{t("startup.noRecentDesc")}</p>
+              <p className="text-xs text-[hsl(var(--text-faint))]">{t("startup.noRecentDesc")}</p>
             </div>
           ) : (
             <ul
@@ -266,7 +266,7 @@ export function StartupScreen(): React.JSX.Element {
               {recents.map((r, i) => (
                 <li key={i} className="group/item relative">
                   <button
-                    className="group flex w-full items-start gap-3 rounded px-3 py-2.5 text-left transition-colors hover:bg-[#2a2d2e] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#007acc]"
+                    className="group flex w-full items-start gap-3 rounded px-3 py-2.5 text-left transition-colors hover:bg-[hsl(var(--accent))] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[hsl(var(--primary))]"
                     onClick={() => handleOpenRecent(r)}
                     aria-label={t("startup.openAriaLabel", {
                       left: basename(r.left),
@@ -276,37 +276,37 @@ export function StartupScreen(): React.JSX.Element {
                     {r.mode === "files" ? (
                       <FileText
                         size={16}
-                        className="mt-0.5 shrink-0 text-[#007acc]"
+                        className="mt-0.5 shrink-0 text-[hsl(var(--primary))]"
                         aria-hidden="true"
                       />
                     ) : (
                       <FolderOpen
                         size={16}
-                        className="mt-0.5 shrink-0 text-[#007acc]"
+                        className="mt-0.5 shrink-0 text-[hsl(var(--primary))]"
                         aria-hidden="true"
                       />
                     )}
                     <div className="min-w-0 flex-1 pr-6">
                       <div className="flex items-center gap-2">
-                        <span className="truncate text-sm font-medium text-[#cccccc]">
+                        <span className="truncate text-sm font-medium text-[hsl(var(--foreground))]">
                           {basename(r.left)}
                         </span>
                         <ArrowRight
                           size={12}
-                          className="shrink-0 text-[#555555]"
+                          className="shrink-0 text-[hsl(var(--text-faint))]"
                           aria-hidden="true"
                         />
-                        <span className="truncate text-sm font-medium text-[#cccccc]">
+                        <span className="truncate text-sm font-medium text-[hsl(var(--foreground))]">
                           {basename(r.right)}
                         </span>
                       </div>
-                      <div className="mt-0.5 truncate text-xs text-[#858585]">{r.left}</div>
-                      <div className="truncate text-xs text-[#858585]">{r.right}</div>
-                      <div className="mt-1 text-xs text-[#555555]">{timeAgo(r.lastUsed, t)}</div>
+                      <div className="mt-0.5 truncate text-xs text-[hsl(var(--text-muted))]">{r.left}</div>
+                      <div className="truncate text-xs text-[hsl(var(--text-muted))]">{r.right}</div>
+                      <div className="mt-1 text-xs text-[hsl(var(--text-faint))]">{timeAgo(r.lastUsed, t)}</div>
                     </div>
                   </button>
                   <button
-                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-[#555555] opacity-0 transition-opacity hover:bg-[#3e3e42] hover:text-[#cccccc] group-hover/item:opacity-100"
+                    className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-[hsl(var(--text-faint))] opacity-0 transition-opacity hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))] group-hover/item:opacity-100"
                     onClick={(e) => handleRemoveClick(e, r)}
                     aria-label={t("startup.removeAriaLabel", {
                       left: basename(r.left),
@@ -337,7 +337,7 @@ function SectionHeader({
 }): React.JSX.Element {
   return (
     <h2
-      className={`mb-3 text-[11px] font-semibold uppercase tracking-widest text-[#858585] ${className}`}
+      className={`mb-3 text-[11px] font-semibold uppercase tracking-widest text-[hsl(var(--text-muted))] ${className}`}
     >
       {label}
     </h2>
@@ -362,16 +362,16 @@ function ActionButton({
   return (
     <button
       className="mb-1 flex w-full items-center gap-3 rounded px-3 py-2.5 text-left transition-colors
-        enabled:hover:bg-[#2a2d2e] enabled:focus-visible:outline-none enabled:focus-visible:ring-1 enabled:focus-visible:ring-[#007acc]
+        enabled:hover:bg-[hsl(var(--accent))] enabled:focus-visible:outline-none enabled:focus-visible:ring-1 enabled:focus-visible:ring-[hsl(var(--primary))]
         disabled:cursor-not-allowed disabled:opacity-40"
       onClick={onClick}
       disabled={disabled}
       aria-disabled={disabled}
     >
-      <span className="shrink-0 text-[#007acc]">{icon}</span>
+      <span className="shrink-0 text-[hsl(var(--primary))]">{icon}</span>
       <div className="min-w-0">
-        <div className="text-sm font-medium text-[#cccccc]">{label}</div>
-        <div className="text-xs text-[#858585]">{description}</div>
+        <div className="text-sm font-medium text-[hsl(var(--foreground))]">{label}</div>
+        <div className="text-xs text-[hsl(var(--text-muted))]">{description}</div>
       </div>
     </button>
   );
