@@ -1,4 +1,4 @@
-import React, { useRef, useCallback, useEffect } from "react";
+import React, { useRef, useState, useCallback, useEffect } from "react";
 import { DiffEditor, type DiffEditorProps } from "@monaco-editor/react";
 import { ChevronUp, ChevronDown, ArrowLeftRight, Save, Search, Columns2, Rows } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -7,6 +7,7 @@ import type * as monaco from "monaco-editor";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip";
+import { useAppSettings } from "../hooks/useAppSettings";
 
 export type DiffViewMode = "side-by-side" | "inline";
 
@@ -79,11 +80,20 @@ export function DiffViewer({
   ignoreWhitespace
 }: DiffViewerProps): React.JSX.Element {
   const { t } = useTranslation();
+  const { settings } = useAppSettings();
   const editorRef = useRef<monaco.editor.IStandaloneDiffEditor | null>(null);
+  const [editorReady, setEditorReady] = useState(false);
   const language = detectLanguage(file.extension);
+
+  useEffect(() => {
+    if (editorReady) {
+      monaco.editor.setTheme(settings.theme === "light" ? "vs" : "vs-dark");
+    }
+  }, [settings.theme, editorReady]);
 
   const handleEditorDidMount: DiffEditorProps["onMount"] = useCallback((editor) => {
     editorRef.current = editor;
+    setEditorReady(true);
   }, []);
 
   const navigateDiff = useCallback((direction: "prev" | "next") => {
@@ -279,7 +289,7 @@ export function DiffViewer({
           original={leftContent}
           modified={rightContent}
           language={language}
-          theme="vs-dark"
+          theme={settings.theme === "light" ? "vs" : "vs-dark"}
           options={{
             readOnly: false,
             renderSideBySide: diffViewMode === "side-by-side",
