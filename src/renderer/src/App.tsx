@@ -664,6 +664,9 @@ export default function App(): React.JSX.Element {
           {Array.from(openTabs.entries()).map(([id, tab]) => (
             <div
               key={id}
+              id={`tab-panel-${id}`}
+              role="tabpanel"
+              aria-labelledby={`tab-${id}`}
               className={activeTabId === id ? "flex flex-1 flex-col overflow-hidden" : "hidden"}
               aria-hidden={activeTabId !== id ? true : undefined}
             >

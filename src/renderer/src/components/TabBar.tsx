@@ -78,6 +78,7 @@ export function TabBar({
           return (
             <motion.div
               key={tab.id}
+              id={`tab-${tab.id}`}
               role="tab"
               tabIndex={isActive ? 0 : -1}
               aria-selected={isActive}
@@ -91,6 +92,7 @@ export function TabBar({
                 transition: { duration: shouldReduceMotion ? 0 : 0.12 }
               }}
               transition={{ duration, ease: "easeOut" }}
+              aria-controls={`tab-panel-${tab.id}`}
               className="group flex flex-shrink-0 cursor-pointer select-none items-center gap-1.5 border-r border-[#3e3e42] px-3 text-xs transition-colors"
               style={{
                 backgroundColor: isActive ? "#1e1e1e" : "#2d2d2d",
