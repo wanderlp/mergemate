@@ -215,6 +215,7 @@
     "clearFilters": "Limpiar filtros",
     "clear": "Limpiar",
     "matchCount": "{{shown}} archivos mostrados",
-    "noMatches": "Sin coincidencias"
+    "noMatches": "Sin coincidencias",
+    "ariaLabel": "Árbol de archivos"
   }
 }

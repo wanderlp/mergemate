@@ -160,9 +160,10 @@ export function StartupScreen(): React.JSX.Element {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
           role="dialog"
           aria-modal="true"
+          aria-labelledby="remove-confirm-title"
         >
           <div className="mx-4 w-full max-w-sm rounded-lg border border-[#3e3e42] bg-[#252526] p-6 shadow-2xl">
-            <h2 className="mb-2 text-base font-semibold text-[#cccccc]">
+            <h2 id="remove-confirm-title" className="mb-2 text-base font-semibold text-[#cccccc]">
               {t("startup.removeConfirmTitle")}
             </h2>
             <p className="mb-6 text-sm text-[#aaaaaa]">

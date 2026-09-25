@@ -625,14 +625,14 @@ export default function App(): React.JSX.Element {
               <MergeMateLogo size={160} />
               <div className="text-3xl font-bold tracking-wide text-[#cccccc]">MergeMate</div>
               <div className="text-sm">{t("welcome.description")}</div>
-              <div
-                className="mt-1 flex gap-4 text-sm text-[#aaaaaa]"
+              <ul
+                className="mt-1 flex list-none gap-4 text-sm text-[#aaaaaa]"
                 aria-label={t("welcome.ariaLabel")}
               >
-                <span>{t("welcome.shortcutLeft")}</span>
-                <span>{t("welcome.shortcutRight")}</span>
-                <span>{t("welcome.shortcutRefresh")}</span>
-              </div>
+                <li>{t("welcome.shortcutLeft")}</li>
+                <li>{t("welcome.shortcutRight")}</li>
+                <li>{t("welcome.shortcutRefresh")}</li>
+              </ul>
             </div>
           )}
 

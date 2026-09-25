@@ -286,6 +286,7 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
                 key={m}
                 size="sm"
                 variant={mode === m ? "primary" : "default"}
+                aria-pressed={mode === m}
                 onClick={() => setMode(m)}
               >
                 {t(`image.${m}`)}

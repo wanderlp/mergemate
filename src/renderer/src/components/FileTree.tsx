@@ -346,6 +346,8 @@ export function FileTree({
       {/* Rows */}
       <div
         ref={containerRef}
+        role="tree"
+        aria-label={t("fileTree.ariaLabel")}
         className="flex-1 overflow-y-auto outline-none"
         onKeyDown={handleKeyDown}
         tabIndex={0}
@@ -381,6 +383,7 @@ export function FileTree({
                     else rowRefsMap.current.delete(entry.relativePath);
                   }}
                   highlight={isFiltering ? searchQuery : undefined}
+                  ariaLevel={depth + 1}
                 />
               </motion.div>
             ))}

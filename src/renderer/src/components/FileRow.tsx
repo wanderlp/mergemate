@@ -17,6 +17,7 @@ interface FileRowProps {
   onFocusPath?: (path: string) => void;
   refCallback?: (el: HTMLDivElement | null) => void;
   highlight?: string;
+  ariaLevel?: number;
 }
 
 const STATUS_COLORS: Record<FileStatus, string> = {
@@ -48,7 +49,8 @@ export function FileRow({
   isOpen,
   onFocusPath,
   refCallback,
-  highlight
+  highlight,
+  ariaLevel
 }: FileRowProps): React.JSX.Element {
   const { t } = useTranslation();
   const color = STATUS_COLORS[entry.status];
@@ -109,7 +111,8 @@ export function FileRow({
   return (
     <div
       ref={refCallback}
-      role={entry.isDirectory ? "button" : "row"}
+      role="treeitem"
+      aria-level={ariaLevel ?? depth + 1}
       tabIndex={0}
       className="group flex cursor-pointer items-center border-b border-[#2a2d2e]/50 hover:bg-[#2a2d2e] focus:bg-[#2a2d2e] focus:outline-none transition-colors select-none"
       style={isFocused ? { backgroundColor: "#37373d" } : undefined}

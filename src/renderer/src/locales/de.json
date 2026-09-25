@@ -215,6 +215,7 @@
     "clearFilters": "Filter zurücksetzen",
     "clear": "Zurücksetzen",
     "matchCount": "{{shown}} Dateien angezeigt",
-    "noMatches": "Keine Treffer"
+    "noMatches": "Keine Treffer",
+    "ariaLabel": "Dateibaum"
   }
 }
