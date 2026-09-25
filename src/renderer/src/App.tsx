@@ -192,6 +192,7 @@ export default function App(): React.JSX.Element {
     setRightFolder,
     scan,
     swapFolders,
+    cancelScan,
     openLeft,
     openRight,
     patchFileStatus
@@ -353,6 +354,10 @@ export default function App(): React.JSX.Element {
       void scan();
     },
     closeTab: () => {
+      if (scanning) {
+        cancelScan();
+        return;
+      }
       if (activeTabId !== COMPARISON_TAB_ID && showComparisonTab) {
         setActiveTabId(COMPARISON_TAB_ID);
       }
@@ -646,9 +651,11 @@ export default function App(): React.JSX.Element {
               }
               aria-hidden={activeTabId !== COMPARISON_TAB_ID ? true : undefined}
             >
-              <AnimatePresence>
-                {scanning && progress && <ProgressBar progress={progress} />}
-              </AnimatePresence>
+            <AnimatePresence>
+              {scanning && progress && (
+                <ProgressBar progress={progress} onCancel={cancelScan} />
+              )}
+            </AnimatePresence>
               <FileTree
                 entries={scanResult?.files ?? []}
                 openTabIds={new Set(openTabs.keys())}

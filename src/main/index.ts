@@ -276,18 +276,26 @@ function registerIpcHandlers(): void {
 
   // ── File operations ───────────────────────────────────────────────────────
 
+  let scanController: AbortController | null = null;
+
   ipcMain.handle("scan-folder", async (event, leftPath: string, rightPath: string) => {
     const win = BrowserWindow.fromWebContents(event.sender);
-    return new Promise((resolve, reject) => {
-      try {
-        const result = scanFolders(leftPath, rightPath, (percent, currentFile) => {
-          win?.webContents.send("scan-progress", { percent, currentFile });
-        });
-        resolve(result);
-      } catch (err) {
-        reject(err);
-      }
-    });
+    scanController?.abort();
+    scanController = new AbortController();
+    const signal = scanController.signal;
+    try {
+      const result = await scanFolders(leftPath, rightPath, (percent, currentFile) => {
+        win?.webContents.send("scan-progress", { percent, currentFile });
+      }, signal);
+      return result;
+    } finally {
+      if (scanController?.signal === signal) scanController = null;
+    }
+  });
+
+  ipcMain.handle("cancel-scan", () => {
+    scanController?.abort();
+    scanController = null;
   });
 
   ipcMain.handle("read-file", async (_event, filePath: string) =>

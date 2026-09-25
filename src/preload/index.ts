@@ -3,6 +3,7 @@ import type { ElectronAPI, ScanProgress } from "../types";
 
 const api: ElectronAPI = {
   scanFolder: (leftPath, rightPath) => ipcRenderer.invoke("scan-folder", leftPath, rightPath),
+  cancelScan: () => ipcRenderer.invoke("cancel-scan"),
 
   readFile: (filePath) => ipcRenderer.invoke("read-file", filePath),
 

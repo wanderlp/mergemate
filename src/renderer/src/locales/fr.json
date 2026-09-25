@@ -146,7 +146,8 @@
   "progress": {
     "ariaLabel": "Analyse des dossiers",
     "title": "Analyse des dossiers…",
-    "starting": "Démarrage…"
+    "starting": "Démarrage…",
+    "cancel": "Annuler"
   },
   "status": {
     "identical": "{{count}} identiques",

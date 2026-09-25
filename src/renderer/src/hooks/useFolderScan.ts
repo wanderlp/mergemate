@@ -24,6 +24,7 @@ interface UseFolderScanReturn {
   setLeftFolder: (path: string) => void;
   setRightFolder: (path: string) => void;
   scan: () => Promise<void>;
+  cancelScan: () => void;
   swapFolders: () => Promise<void>;
   openLeft: () => Promise<void>;
   openRight: () => Promise<void>;
@@ -85,10 +86,15 @@ export function useFolderScan(): UseFolderScanReturn {
         if (signal.aborted) return;
         await window.electronAPI.saveRecentComparison(left, right);
         if (signal.aborted) return;
-        const result = await window.electronAPI.scanFolder(left, right);
-        if (signal.aborted) return;
-        setScanResult(result);
-        setScanCount((c) => c + 1);
+        try {
+          const result = await window.electronAPI.scanFolder(left, right);
+          if (signal.aborted) return;
+          setScanResult(result);
+          setScanCount((c) => c + 1);
+        } catch (err) {
+          if (signal.aborted) return;
+          throw err;
+        }
       } finally {
         if (!signal.aborted) {
           setScanning(false);
@@ -98,6 +104,11 @@ export function useFolderScan(): UseFolderScanReturn {
     },
     [leftFolder, rightFolder]
   );
+
+  const cancelScan = useCallback(() => {
+    scanAbortRef.current?.abort();
+    void window.electronAPI.cancelScan();
+  }, []);
 
   const swapFolders = useCallback(async () => {
     if (!leftFolder || !rightFolder) return;
@@ -155,6 +166,7 @@ export function useFolderScan(): UseFolderScanReturn {
     setLeftFolder,
     setRightFolder,
     scan,
+    cancelScan,
     swapFolders,
     openLeft,
     openRight,

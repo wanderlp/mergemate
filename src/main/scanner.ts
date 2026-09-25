@@ -71,7 +71,13 @@ function shouldIgnore(name: string, isDirectory: boolean): boolean {
   return false;
 }
 
-function collectPaths(dir: string, base: string, result: Map<string, string>): void {
+function collectPaths(
+  dir: string,
+  base: string,
+  result: Map<string, string>,
+  signal?: AbortSignal
+): void {
+  if (signal?.aborted) return;
   let entries: fs.Dirent[];
   try {
     entries = fs.readdirSync(dir, { withFileTypes: true });
@@ -79,6 +85,7 @@ function collectPaths(dir: string, base: string, result: Map<string, string>): v
     return;
   }
   for (const entry of entries) {
+    if (signal?.aborted) return;
     // Symlinks no se siguen para evitar ciclos infinitos y ELOOP
     if (entry.isSymbolicLink()) {
       console.debug(`[scanner] skipping symlink: ${path.join(base, entry.name)}`);
@@ -89,19 +96,20 @@ function collectPaths(dir: string, base: string, result: Map<string, string>): v
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       result.set(rel + "/", full);
-      collectPaths(full, rel, result);
+      collectPaths(full, rel, result, signal);
     } else {
       result.set(rel, full);
     }
   }
 }
 
-function buildTree(
+async function buildTree(
   allPaths: Set<string>,
   leftMap: Map<string, string>,
   rightMap: Map<string, string>,
-  onProgress: (file: string) => void
-): { entries: FileEntry[]; stats: ScanStats } {
+  onProgress: (file: string) => void,
+  signal?: AbortSignal
+): Promise<{ entries: FileEntry[]; stats: ScanStats }> {
   const stats: ScanStats = {
     identical: 0,
     different: 0,
@@ -145,8 +153,13 @@ function buildTree(
     return entry;
   }
 
-  for (const rel of filePaths) {
+  for (let i = 0; i < filePaths.length; i++) {
+    if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
+    const rel = filePaths[i];
     onProgress(rel);
+    if (i > 0 && i % 50 === 0) {
+      await new Promise<void>((resolve) => setImmediate(resolve));
+    }
     const ext = path.extname(rel).replace(".", "").toLowerCase();
     const leftPath = leftMap.get(rel) ?? null;
     const rightPath = rightMap.get(rel) ?? null;
@@ -281,25 +294,34 @@ function buildTree(
   return { entries: rootEntries, stats };
 }
 
-export function scanFolders(
+export async function scanFolders(
   leftFolder: string,
   rightFolder: string,
-  onProgress: (percent: number, currentFile: string) => void
-): ScanResult {
+  onProgress: (percent: number, currentFile: string) => void,
+  signal?: AbortSignal
+): Promise<ScanResult> {
   const leftMap = new Map<string, string>();
   const rightMap = new Map<string, string>();
 
-  collectPaths(leftFolder, "", leftMap);
-  collectPaths(rightFolder, "", rightMap);
+  collectPaths(leftFolder, "", leftMap, signal);
+  collectPaths(rightFolder, "", rightMap, signal);
+
+  if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
 
   const allPaths = new Set([...leftMap.keys(), ...rightMap.keys()]);
   const total = Array.from(allPaths).filter((p) => !p.endsWith("/")).length;
   let processed = 0;
 
-  const { entries, stats } = buildTree(allPaths, leftMap, rightMap, (file) => {
-    processed++;
-    onProgress(Math.round((processed / total) * 100), file);
-  });
+  const { entries, stats } = await buildTree(
+    allPaths,
+    leftMap,
+    rightMap,
+    (file) => {
+      processed++;
+      onProgress(Math.round((processed / total) * 100), file);
+    },
+    signal
+  );
 
   return { files: entries, stats };
 }

@@ -146,7 +146,8 @@
   "progress": {
     "ariaLabel": "Escaneando pastas",
     "title": "Escaneando pastas…",
-    "starting": "Iniciando…"
+    "starting": "Iniciando…",
+    "cancel": "Cancelar"
   },
   "status": {
     "identical": "{{count}} idênticos",

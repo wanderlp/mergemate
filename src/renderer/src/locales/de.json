@@ -146,7 +146,8 @@
   "progress": {
     "ariaLabel": "Ordner werden gescannt",
     "title": "Ordner werden gescannt…",
-    "starting": "Wird gestartet…"
+    "starting": "Wird gestartet…",
+    "cancel": "Abbrechen"
   },
   "status": {
     "identical": "{{count}} identisch",

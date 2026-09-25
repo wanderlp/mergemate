@@ -43,6 +43,7 @@ export interface ScanProgress {
 
 export interface ElectronAPI {
   scanFolder: (leftPath: string, rightPath: string) => Promise<ScanResult>;
+  cancelScan: () => Promise<void>;
   readFile: (filePath: string) => Promise<string>;
   writeFile: (filePath: string, content: string) => Promise<void>;
   copyFileWithBak: (src: string, dest: string) => Promise<void>;

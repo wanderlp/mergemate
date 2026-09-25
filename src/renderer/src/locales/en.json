@@ -146,7 +146,8 @@
   "progress": {
     "ariaLabel": "Scanning folders",
     "title": "Scanning folders…",
-    "starting": "Starting…"
+    "starting": "Starting…",
+    "cancel": "Cancel"
   },
   "status": {
     "identical": "{{count}} identical",

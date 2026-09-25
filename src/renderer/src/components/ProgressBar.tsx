@@ -3,12 +3,14 @@ import { motion, useReducedMotion } from "framer-motion";
 import { useTranslation } from "react-i18next";
 import type { ScanProgress } from "../types";
 import { Progress } from "./ui/progress";
+import { Button } from "./ui/button";
 
 interface ProgressBarProps {
   progress: ScanProgress;
+  onCancel: () => void;
 }
 
-export function ProgressBar({ progress }: ProgressBarProps): React.JSX.Element {
+export function ProgressBar({ progress, onCancel }: ProgressBarProps): React.JSX.Element {
   const { t } = useTranslation();
   const shouldReduceMotion = useReducedMotion();
   const duration = shouldReduceMotion ? 0 : 0.2;
@@ -41,6 +43,9 @@ export function ProgressBar({ progress }: ProgressBarProps): React.JSX.Element {
           {progress.currentFile || t("progress.starting")}
         </div>
         <div className="mt-1 text-right text-sm text-[#aaaaaa]">{progress.percent}%</div>
+        <Button onClick={onCancel} variant="ghost" size="sm" className="mt-3 w-full">
+          {t("progress.cancel")}
+        </Button>
       </motion.div>
     </motion.div>
   );
