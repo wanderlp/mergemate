@@ -53,6 +53,64 @@ const IGNORE_EXTENSIONS = new Set([
   ".url" // accesos directos de internet de Windows
 ]);
 
+const IGNORE_FILE_NAME = ".mergemate-ignore";
+
+interface CompiledPattern {
+  re: RegExp;
+  dirOnly: boolean;
+  baseOnly: boolean;
+}
+
+function compilePattern(raw: string): CompiledPattern | null {
+  const line = raw.trim();
+  if (!line || line.startsWith("#")) return null;
+  let p = line.replace(/^!/, "");
+  const dirOnly = p.endsWith("/");
+  if (dirOnly) p = p.slice(0, -1);
+  const anchoredStart = p.startsWith("/");
+  if (anchoredStart) p = p.slice(1);
+  const anchoredEnd = !p.includes("*") && !p.includes("?");
+  let regex = "";
+  for (const ch of p) {
+    if (ch === "*") regex += "[^/]*";
+    else if (ch === "?") regex += "[^/]";
+    else if (ch === "." || ch === "+" || ch === "(" || ch === ")" || ch === "{" || ch === "}" || ch === "|" || ch === "^" || ch === "$" || ch === "\\") regex += "\\" + ch;
+    else regex += ch;
+  }
+  regex = (anchoredStart ? "^" : "(^|/)") + regex + (anchoredEnd ? "($|/)" : "");
+  return { re: new RegExp(regex), dirOnly, baseOnly: !p.includes("/") };
+}
+
+function loadIgnorePatterns(folder: string): CompiledPattern[] {
+  const file = path.join(folder, IGNORE_FILE_NAME);
+  let content: string;
+  try {
+    content = fs.readFileSync(file, "utf-8");
+  } catch {
+    return [];
+  }
+  const out: CompiledPattern[] = [];
+  for (const line of content.split(/\r?\n/)) {
+    const compiled = compilePattern(line);
+    if (compiled) out.push(compiled);
+  }
+  return out;
+}
+
+function matchesIgnore(relPath: string, isDir: boolean, patterns: CompiledPattern[]): boolean {
+  const normalized = relPath.replace(/\\/g, "/");
+  const base = path.posix.basename(normalized);
+  for (const p of patterns) {
+    if (p.dirOnly && !isDir) continue;
+    if (p.baseOnly) {
+      if (p.re.test(base)) return true;
+    } else {
+      if (p.re.test(normalized)) return true;
+    }
+  }
+  return false;
+}
+
 function shouldIgnore(name: string, isDirectory: boolean): boolean {
   if (isDirectory && IGNORE_DIRS.has(name)) return true;
   if (name.endsWith(".bak")) return true;
@@ -75,6 +133,7 @@ function collectPaths(
   dir: string,
   base: string,
   result: Map<string, string>,
+  ignorePatterns: CompiledPattern[],
   signal?: AbortSignal
 ): void {
   if (signal?.aborted) return;
@@ -93,10 +152,11 @@ function collectPaths(
     }
     if (shouldIgnore(entry.name, entry.isDirectory())) continue;
     const rel = path.join(base, entry.name).replace(/\\/g, "/");
+    if (matchesIgnore(rel, entry.isDirectory(), ignorePatterns)) continue;
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       result.set(rel + "/", full);
-      collectPaths(full, rel, result, signal);
+      collectPaths(full, rel, result, ignorePatterns, signal);
     } else {
       result.set(rel, full);
     }
@@ -303,8 +363,13 @@ export async function scanFolders(
   const leftMap = new Map<string, string>();
   const rightMap = new Map<string, string>();
 
-  collectPaths(leftFolder, "", leftMap, signal);
-  collectPaths(rightFolder, "", rightMap, signal);
+  const ignorePatterns = [
+    ...loadIgnorePatterns(leftFolder),
+    ...loadIgnorePatterns(rightFolder)
+  ];
+
+  collectPaths(leftFolder, "", leftMap, ignorePatterns, signal);
+  collectPaths(rightFolder, "", rightMap, ignorePatterns, signal);
 
   if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
 
