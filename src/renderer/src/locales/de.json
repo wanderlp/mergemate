@@ -112,7 +112,13 @@
     "saveRightAriaLabel": "Rechte Datei speichern",
     "find": "Suchen",
     "findTooltip": "Im aktiven Panel suchen (Ctrl+F)",
-    "findAriaLabel": "Suche im aktiven Panel öffnen"
+    "findAriaLabel": "Suche im aktiven Panel öffnen",
+    "viewMode": {
+      "side-by-side": "Nebeneinander",
+      "inline": "Inline"
+    },
+    "viewModeTooltip": "Ansichtsmodus wechseln (Alt+V)",
+    "viewModeAriaLabel": "Ansichtsmodus wechseln"
   },
   "progress": {
     "ariaLabel": "Ordner werden gescannt",
@@ -135,7 +141,12 @@
     "rightImage": "Re: {{w}} × {{h}} px",
     "rightImageNone": "Re: —",
     "sameDimensions": "Gleiche Abmessungen",
-    "differentDimensions": "Unterschiedliche Abmessungen"
+    "differentDimensions": "Unterschiedliche Abmessungen",
+    "filterByIdentical": "Nach identischen filtern ({{count}})",
+    "filterByDifferent": "Nach unterschiedlichen filtern ({{count}})",
+    "filterByCommentsOnly": "Nach nur Kommentaren filtern ({{count}})",
+    "filterByLeftOnly": "Nach nur links filtern ({{count}})",
+    "filterByRightOnly": "Nach nur rechts filtern ({{count}})"
   },
   "image": {
     "sidebyside": "Nebeneinander",

@@ -86,7 +86,10 @@ const api: ElectronAPI = {
 
   openExternal: (url) => ipcRenderer.invoke('open-external', url),
 
-  getPathForFile: (file: File) => webUtils.getPathForFile(file)
+  getPathForFile: (file: File) => webUtils.getPathForFile(file),
+
+  getAppSettings: () => ipcRenderer.invoke('app-settings-get'),
+  setAppSettings: (partial) => ipcRenderer.invoke('app-settings-set', partial)
 }
 
 contextBridge.exposeInMainWorld('electronAPI', api)

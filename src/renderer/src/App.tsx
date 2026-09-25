@@ -7,6 +7,7 @@ import { MergeMateLogo } from './components/MergeMateLogo'
 import { TitleBar } from './components/TitleBar'
 import { Toolbar } from './components/Toolbar'
 import { FileTree } from './components/FileTree'
+import type { FileStatus } from './types'
 import { DiffViewer } from './components/DiffViewer'
 import { ImageViewer } from './components/ImageViewer'
 import { ProgressBar } from './components/ProgressBar'
@@ -112,6 +113,20 @@ export default function App(): React.JSX.Element {
 
   const [openTabs, setOpenTabs] = useState<Map<string, DiffTabData>>(new Map())
   const [activeTabId, setActiveTabId] = useState<string>('')
+  const [statusFilter, setStatusFilter] = useState<FileStatus | null>(null)
+  const [diffViewMode, setDiffViewMode] = useState<'side-by-side' | 'inline'>('side-by-side')
+
+  useEffect(() => {
+    window.electronAPI.getAppSettings().then((s) => setDiffViewMode(s.diffViewMode))
+  }, [])
+
+  const toggleDiffViewMode = useCallback(() => {
+    setDiffViewMode((prev) => {
+      const next: 'side-by-side' | 'inline' = prev === 'side-by-side' ? 'inline' : 'side-by-side'
+      void window.electronAPI.setAppSettings({ diffViewMode: next })
+      return next
+    })
+  }, [])
   const [showComparisonTab, setShowComparisonTab] = useState(false)
   const [showCloseDialog, setShowCloseDialog] = useState(false)
   const [scanVersion, setScanVersion] = useState(0)
@@ -429,6 +444,7 @@ export default function App(): React.JSX.Element {
               scanVersion={scanVersion}
               onFileOpen={handleFileOpen}
               onHover={() => {}}
+              statusFilter={statusFilter}
             />
           </div>
         )}
@@ -466,13 +482,15 @@ export default function App(): React.JSX.Element {
                 onSaveRight={saveRight}
                 onCopyToLeft={copyToLeft}
                 onCopyToRight={copyToRight}
+                diffViewMode={diffViewMode}
+                onToggleDiffViewMode={toggleDiffViewMode}
               />
             )}
           </div>
         ))}
       </div>
 
-      <StatusBar info={statusInfo} />
+      <StatusBar info={statusInfo} activeStatusFilter={statusFilter} onStatusFilterChange={setStatusFilter} />
     </div>
     </TooltipProvider>
   )

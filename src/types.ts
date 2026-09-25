@@ -72,6 +72,9 @@ export interface ElectronAPI {
   confirmClose: () => Promise<void>
   openExternal: (url: string) => Promise<void>
   getPathForFile: (file: File) => string
+  // App settings
+  getAppSettings: () => Promise<{ diffViewMode: 'side-by-side' | 'inline' }>
+  setAppSettings: (partial: Partial<{ diffViewMode: 'side-by-side' | 'inline' }>) => Promise<{ diffViewMode: 'side-by-side' | 'inline' }>
 }
 
 declare global {

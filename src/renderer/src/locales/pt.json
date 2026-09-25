@@ -112,7 +112,13 @@
     "saveRightAriaLabel": "Salvar arquivo direito",
     "find": "Buscar",
     "findTooltip": "Buscar no painel ativo (Ctrl+F)",
-    "findAriaLabel": "Abrir busca no painel ativo"
+    "findAriaLabel": "Abrir busca no painel ativo",
+    "viewMode": {
+      "side-by-side": "Lado a lado",
+      "inline": "Em linha"
+    },
+    "viewModeTooltip": "Alternar modo de visualização (Alt+V)",
+    "viewModeAriaLabel": "Alternar modo de visualização"
   },
   "progress": {
     "ariaLabel": "Escaneando pastas",
@@ -135,7 +141,12 @@
     "rightImage": "Dir: {{w}} × {{h}} px",
     "rightImageNone": "Dir: —",
     "sameDimensions": "Mesmas dimensões",
-    "differentDimensions": "Dimensões diferentes"
+    "differentDimensions": "Dimensões diferentes",
+    "filterByIdentical": "Filtrar por idênticos ({{count}})",
+    "filterByDifferent": "Filtrar por diferentes ({{count}})",
+    "filterByCommentsOnly": "Filtrar por só comentários ({{count}})",
+    "filterByLeftOnly": "Filtrar por só esquerda ({{count}})",
+    "filterByRightOnly": "Filtrar por só direita ({{count}})"
   },
   "image": {
     "sidebyside": "Lado a lado",

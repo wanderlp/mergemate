@@ -1,11 +1,13 @@
 import React, { useRef, useCallback, useEffect } from 'react'
 import { DiffEditor, type DiffEditorProps } from '@monaco-editor/react'
-import { ChevronUp, ChevronDown, ArrowLeftRight, Save, Search } from 'lucide-react'
+import { ChevronUp, ChevronDown, ArrowLeftRight, Save, Search, Columns2, Rows } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { FileEntry } from '../types'
 import type * as monaco from 'monaco-editor'
 import { Button } from './ui/button'
 import { Separator } from './ui/separator'
+
+export type DiffViewMode = 'side-by-side' | 'inline'
 
 interface DiffViewerProps {
   file: FileEntry
@@ -15,6 +17,8 @@ interface DiffViewerProps {
   onSaveRight: (content: string) => Promise<void>
   onCopyToLeft: (content: string) => Promise<boolean>
   onCopyToRight: (content: string) => Promise<boolean>
+  diffViewMode: DiffViewMode
+  onToggleDiffViewMode: () => void
 }
 
 const LANGUAGE_MAP: Record<string, string> = {
@@ -52,7 +56,9 @@ export function DiffViewer({
   onSaveLeft,
   onSaveRight,
   onCopyToLeft,
-  onCopyToRight
+  onCopyToRight,
+  diffViewMode,
+  onToggleDiffViewMode
 }: DiffViewerProps): React.JSX.Element {
   const { t } = useTranslation()
   const editorRef = useRef<monaco.editor.IStandaloneDiffEditor | null>(null)
@@ -120,6 +126,9 @@ export function DiffViewer({
       } else if ((e.ctrlKey || e.metaKey) && (e.key === 'f' || e.key === 'F')) {
         e.preventDefault()
         openFind()
+      } else if (e.altKey && (e.key === 'v' || e.key === 'V')) {
+        e.preventDefault()
+        onToggleDiffViewMode()
       } else if (e.altKey && e.key === 'ArrowUp') {
         e.preventDefault()
         navigateDiff('prev')
@@ -130,7 +139,7 @@ export function DiffViewer({
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [handleSaveLeft, handleSaveRight, navigateDiff, openFind])
+  }, [handleSaveLeft, handleSaveRight, navigateDiff, openFind, onToggleDiffViewMode])
 
   const canCopyLeft = Boolean(file.leftPath)
   const canCopyRight = Boolean(file.rightPath)
@@ -143,6 +152,17 @@ export function DiffViewer({
         </div>
 
         <div className="flex items-center gap-1">
+          <Button
+            onClick={onToggleDiffViewMode}
+            title={t('diff.viewModeTooltip')}
+            aria-label={t('diff.viewModeAriaLabel')}
+            aria-pressed={diffViewMode === 'inline'}
+          >
+            {diffViewMode === 'side-by-side'
+              ? <Columns2 size={16} aria-hidden="true" />
+              : <Rows size={16} aria-hidden="true" />}
+            {t(`diff.viewMode.${diffViewMode}`)}
+          </Button>
           <Button
             onClick={() => navigateDiff('prev')}
             title={t('diff.prevTooltip')}
@@ -218,7 +238,7 @@ export function DiffViewer({
           theme="vs-dark"
           options={{
             readOnly: false,
-            renderSideBySide: true,
+            renderSideBySide: diffViewMode === 'side-by-side',
             scrollBeyondLastLine: false,
             minimap: { enabled: true },
             fontSize: 15,

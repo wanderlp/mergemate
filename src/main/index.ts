@@ -19,9 +19,20 @@ interface WindowState {
 interface StoreSchema {
   recentComparisons: RecentComparison[]
   windowState: WindowState | null
+  appSettings: {
+    diffViewMode: 'side-by-side' | 'inline'
+  }
 }
 
-const store = new Store<StoreSchema>()
+const DEFAULT_SETTINGS: StoreSchema['appSettings'] = {
+  diffViewMode: 'side-by-side'
+}
+
+const store = new Store<StoreSchema>({
+  defaults: {
+    appSettings: DEFAULT_SETTINGS
+  }
+})
 
 let startupWindow: BrowserWindow | null = null
 let mainWindow: BrowserWindow | null = null
@@ -279,6 +290,19 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle('open-external', (_event, url: string) => {
     shell.openExternal(url)
+  })
+
+  // ── App settings ──────────────────────────────────────────────────────────
+
+  ipcMain.handle('app-settings-get', () =>
+    store.get('appSettings') ?? DEFAULT_SETTINGS
+  )
+
+  ipcMain.handle('app-settings-set', (_event, partial: Partial<StoreSchema['appSettings']>) => {
+    const current = store.get('appSettings') ?? DEFAULT_SETTINGS
+    const next = { ...current, ...partial }
+    store.set('appSettings', next)
+    return next
   })
 
   ipcMain.handle('window-confirm-close', () => {

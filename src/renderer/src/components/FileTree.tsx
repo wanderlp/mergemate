@@ -25,6 +25,7 @@ interface FileTreeProps {
   scanVersion: number
   onFileOpen: (file: FileEntry) => void
   onHover: (path: string) => void
+  statusFilter?: import('../types').FileStatus | null
 }
 
 function flattenVisible(entries: FileEntry[], expandedDirs: Set<string>, depth = 0): FlatEntry[] {
@@ -82,7 +83,8 @@ export function FileTree({
   openTabIds,
   scanVersion,
   onFileOpen,
-  onHover
+  onHover,
+  statusFilter = null
 }: FileTreeProps): React.JSX.Element {
   const { t } = useTranslation()
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set())
@@ -94,7 +96,13 @@ export function FileTree({
   const containerRef = useRef<HTMLDivElement>(null)
   const keyboardNav = useRef(false)
 
-  const isFiltering = searchQuery.length > 0 || statusFilters.size > 0
+  const isFiltering = searchQuery.length > 0 || statusFilters.size > 0 || Boolean(statusFilter)
+
+  const effectiveStatusFilters = useMemo<Set<FileStatus>>(() => {
+    if (statusFilter && !statusFilters.size) return new Set([statusFilter])
+    if (statusFilter) return new Set([...statusFilters, statusFilter])
+    return statusFilters
+  }, [statusFilter, statusFilters])
 
   useEffect(() => {
     const handle = setTimeout(() => setSearchQuery(searchInput.toLowerCase()), 200)
@@ -102,8 +110,8 @@ export function FileTree({
   }, [searchInput])
 
   const matchingDirs = useMemo(
-    () => isFiltering ? collectMatchingDirs(entries, searchQuery, statusFilters) : new Set<string>(),
-    [entries, searchQuery, statusFilters, isFiltering]
+    () => isFiltering ? collectMatchingDirs(entries, searchQuery, effectiveStatusFilters) : new Set<string>(),
+    [entries, searchQuery, effectiveStatusFilters, isFiltering]
   )
 
   const effectiveExpanded = useMemo(() => {
@@ -115,21 +123,21 @@ export function FileTree({
     if (!isFiltering) return entries
     return entries.filter((e) => {
       if (e.isDirectory) return matchingDirs.has(e.relativePath)
-      return matchesFilters(e, searchQuery, statusFilters)
+      return matchesFilters(e, searchQuery, effectiveStatusFilters)
     })
-  }, [entries, searchQuery, statusFilters, isFiltering, matchingDirs])
+  }, [entries, searchQuery, effectiveStatusFilters, isFiltering, matchingDirs])
 
   const matchCount = useMemo(() => {
     let n = 0
     function walk(list: FileEntry[]): void {
       for (const e of list) {
         if (e.isDirectory && e.children) walk(e.children)
-        else if (matchesFilters(e, searchQuery, statusFilters)) n++
+        else if (matchesFilters(e, searchQuery, effectiveStatusFilters)) n++
       }
     }
     walk(entries)
     return n
-  }, [entries, searchQuery, statusFilters])
+  }, [entries, searchQuery, effectiveStatusFilters])
 
   function toggleStatusFilter(status: FileStatus): void {
     setStatusFilters((prev) => {
