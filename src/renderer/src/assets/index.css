@@ -31,6 +31,8 @@
     --surface-toolbar: 240 1% 15%; /* #252526 */
     --surface-input: 0 0% 12%; /* #1e1e1e */
     --surface-accent: 195 4% 18%; /* #2a2d2e */
+    --surface-content: 240 6% 9%; /* #181818 */
+    --tabbar-bg: 230 5% 17%; /* #2d2d2d */
     --text-primary: 0 0% 80%; /* #cccccc */
     --text-secondary: 0 0% 67%; /* #aaaaaa */
     --text-muted: 0 0% 52%; /* #858585 */
@@ -68,6 +70,8 @@
     --surface-toolbar: 0 0% 98%; /* #fafafa */
     --surface-input: 0 0% 100%;
     --surface-accent: 0 0% 95%; /* #f2f2f2 */
+    --surface-content: 0 0% 96%; /* #f5f5f5 */
+    --tabbar-bg: 0 0% 94%; /* #f0f0f0 */
     --text-primary: 0 0% 12%; /* #1e1e1e */
     --text-secondary: 0 0% 30%; /* #4d4d4d */
     --text-muted: 0 0% 45%; /* #737373 */

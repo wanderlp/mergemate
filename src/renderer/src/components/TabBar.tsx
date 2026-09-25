@@ -54,7 +54,7 @@ export function TabBar({
     <div
       role="tablist"
       aria-label={t("tabBar.ariaLabel")}
-      className="flex overflow-x-auto border-b border-[#3e3e42] bg-[#2d2d2d]"
+      className="flex overflow-x-auto border-b border-[hsl(var(--border))] bg-[hsl(var(--tabbar-bg))]"
       style={{ minHeight: 35, maxHeight: 35 }}
     >
       <AnimatePresence mode="popLayout" initial={false}>
@@ -93,7 +93,7 @@ export function TabBar({
               }}
               transition={{ duration, ease: "easeOut" }}
               aria-controls={`tab-panel-${tab.id}`}
-              className="group flex flex-shrink-0 cursor-pointer select-none items-center gap-1.5 border-r border-[#3e3e42] px-3 text-xs transition-colors"
+              className="group flex flex-shrink-0 cursor-pointer select-none items-center gap-1.5 border-r border-[hsl(var(--border))] px-3 text-xs transition-colors"
               style={{
                 backgroundColor: isActive ? "#1e1e1e" : "#2d2d2d",
                 color: isActive ? "#ffffff" : "#969696",
@@ -117,7 +117,7 @@ export function TabBar({
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button
-                      className="ml-1 flex-shrink-0 rounded p-0.5 opacity-0 transition-opacity hover:bg-[#5a5a5a] group-hover:opacity-100"
+                      className="ml-1 flex-shrink-0 rounded p-0.5 opacity-0 transition-opacity hover:bg-[hsl(var(--secondary))] group-hover:opacity-100"
                       style={{ opacity: isActive ? 1 : undefined }}
                       onClick={(e) => {
                         e.stopPropagation();
