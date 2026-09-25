@@ -112,18 +112,18 @@ export function Toolbar({
           aria-modal="true"
           aria-labelledby="folder-not-found-title"
         >
-          <div className="mx-4 w-full max-w-sm rounded-lg border border-[#3e3e42] bg-[#252526] p-6 shadow-2xl">
-            <h2 id="folder-not-found-title" className="mb-2 text-base font-semibold text-[#cccccc]">
+          <div className="mx-4 w-full max-w-sm rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-2xl">
+            <h2 id="folder-not-found-title" className="mb-2 text-base font-semibold text-[hsl(var(--foreground))]">
               {t("toolbar.folderNotFoundTitle")}
             </h2>
-            <p className="mb-3 text-sm text-[#aaaaaa]">
+            <p className="mb-3 text-sm text-[hsl(var(--muted-foreground))]">
               {t("toolbar.folderNotFoundMessage", { count: missingFolders.length })}
             </p>
             <ul className="mb-6 space-y-1">
               {missingFolders.map((p) => (
                 <li
                   key={p}
-                  className="truncate rounded bg-[#1e1e1e] px-3 py-1.5 font-mono text-xs text-[#cccccc]"
+                  className="truncate rounded bg-[hsl(var(--surface-app))] px-3 py-1.5 font-mono text-xs text-[hsl(var(--foreground))]"
                   title={p}
                 >
                   {p}
@@ -132,14 +132,14 @@ export function Toolbar({
             </ul>
             <div className="flex justify-end gap-2">
               <button
-                className="rounded px-3 py-1.5 text-sm text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
+                className="rounded px-3 py-1.5 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
                 onClick={() => setMissingFolders([])}
                 autoFocus
               >
                 {t("toolbar.folderNotFoundCancel")}
               </button>
               <button
-                className="rounded bg-[#007acc] px-3 py-1.5 text-sm text-white transition-colors hover:bg-[#005fa3]"
+                className="rounded bg-[hsl(var(--primary))] px-3 py-1.5 text-sm text-[hsl(var(--text-inverse))] transition-colors hover:opacity-90"
                 onClick={handleConfirm}
               >
                 {t("toolbar.folderNotFoundContinue")}
@@ -149,7 +149,7 @@ export function Toolbar({
         </div>
       )}
 
-      <div className="flex items-center gap-2 border-b border-[#3e3e42] bg-[#252526] px-3 py-2">
+      <div className="flex items-center gap-2 border-b border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-2">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
@@ -167,7 +167,7 @@ export function Toolbar({
         </Tooltip>
 
         <input
-          className={`flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa] placeholder-[#555] focus:outline-none focus:ring-1 focus:ring-[#007acc] ${dragOver === "left" ? "ring-2 ring-[#007acc]" : ""}`}
+          className={`flex-1 truncate rounded bg-[hsl(var(--surface-app))] px-3 py-2 text-sm text-[hsl(var(--muted-foreground))] placeholder:opacity-60 focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))] ${dragOver === "left" ? "ring-2 ring-[hsl(var(--primary))]" : ""}`}
           value={leftFolder}
           onChange={(e) => onChangeLeft(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -197,7 +197,7 @@ export function Toolbar({
         </Tooltip>
 
         <input
-          className={`flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa] placeholder-[#555] focus:outline-none focus:ring-1 focus:ring-[#007acc] ${dragOver === "right" ? "ring-2 ring-[#007acc]" : ""}`}
+          className={`flex-1 truncate rounded bg-[hsl(var(--surface-app))] px-3 py-2 text-sm text-[hsl(var(--muted-foreground))] placeholder:opacity-60 focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))] ${dragOver === "right" ? "ring-2 ring-[hsl(var(--primary))]" : ""}`}
           value={rightFolder}
           onChange={(e) => onChangeRight(e.target.value)}
           onKeyDown={handleKeyDown}
