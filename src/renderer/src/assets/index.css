@@ -5,23 +5,23 @@
 @layer base {
   :root {
     /* VS Code dark theme mapped to shadcn CSS variables */
-    --background: 0 0% 12%;          /* #1e1e1e */
-    --foreground: 0 0% 80%;          /* #cccccc */
-    --card: 240 1% 15%;              /* #252526 */
+    --background: 0 0% 12%; /* #1e1e1e */
+    --foreground: 0 0% 80%; /* #cccccc */
+    --card: 240 1% 15%; /* #252526 */
     --card-foreground: 0 0% 80%;
     --popover: 240 1% 15%;
     --popover-foreground: 0 0% 80%;
-    --primary: 206 100% 40%;         /* #007acc */
+    --primary: 206 100% 40%; /* #007acc */
     --primary-foreground: 0 0% 100%;
-    --secondary: 240 3% 25%;         /* #3e3e42 */
+    --secondary: 240 3% 25%; /* #3e3e42 */
     --secondary-foreground: 0 0% 80%;
     --muted: 240 3% 25%;
-    --muted-foreground: 0 0% 52%;    /* #858585 */
-    --accent: 195 4% 18%;            /* #2a2d2e */
+    --muted-foreground: 0 0% 52%; /* #858585 */
+    --accent: 195 4% 18%; /* #2a2d2e */
     --accent-foreground: 0 0% 80%;
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
-    --border: 240 3% 25%;            /* #3e3e42 */
+    --border: 240 3% 25%; /* #3e3e42 */
     --input: 240 3% 25%;
     --ring: 206 100% 40%;
     --radius: 0.25rem;
@@ -34,13 +34,15 @@
   padding: 0;
 }
 
-html, body, #root {
+html,
+body,
+#root {
   height: 100%;
   width: 100%;
   overflow: hidden;
   background-color: #1e1e1e;
   color: #cccccc;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
   font-size: 15px;
 }
 

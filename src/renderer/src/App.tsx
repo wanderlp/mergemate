@@ -1,69 +1,151 @@
-import React, { useState, useCallback, useEffect, useRef } from 'react'
-import { useTranslation } from 'react-i18next'
-import { AnimatePresence } from 'framer-motion'
-import { TooltipProvider } from './components/ui/tooltip'
-import { COMPARISON_TAB_ID, BLANK_TAB_ID } from './constants'
-import { MergeMateLogo } from './components/MergeMateLogo'
-import { TitleBar } from './components/TitleBar'
-import { Toolbar } from './components/Toolbar'
-import { FileTree } from './components/FileTree'
-import type { FileStatus } from './types'
-import { DiffViewer } from './components/DiffViewer'
-import { ImageViewer } from './components/ImageViewer'
-import { ProgressBar } from './components/ProgressBar'
-import { StatusBar } from './components/StatusBar'
-import type { StatusInfo, ImageDims } from './components/StatusBar'
-import { TabBar } from './components/TabBar'
-import type { TabItem } from './components/TabBar'
-import { useFolderScan } from './hooks/useFolderScan'
-import { computeDiffStats } from './utils/diffStats'
-import { Button } from './components/ui/button'
-import type { FileEntry } from './types'
+import React, { useState, useCallback, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
+import { AnimatePresence } from "framer-motion";
+import { TooltipProvider } from "./components/ui/tooltip";
+import { COMPARISON_TAB_ID, BLANK_TAB_ID } from "./constants";
+import { MergeMateLogo } from "./components/MergeMateLogo";
+import { TitleBar } from "./components/TitleBar";
+import { Toolbar } from "./components/Toolbar";
+import { FileTree } from "./components/FileTree";
+import type { FileStatus } from "./types";
+import { DiffViewer } from "./components/DiffViewer";
+import { ImageViewer } from "./components/ImageViewer";
+import { ProgressBar } from "./components/ProgressBar";
+import { StatusBar } from "./components/StatusBar";
+import type { StatusInfo, ImageDims } from "./components/StatusBar";
+import { TabBar } from "./components/TabBar";
+import type { TabItem } from "./components/TabBar";
+import { useFolderScan } from "./hooks/useFolderScan";
+import { computeDiffStats } from "./utils/diffStats";
+import { Button } from "./components/ui/button";
+import type { FileEntry } from "./types";
 
 const IMAGE_EXTENSIONS = new Set([
-  'png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico', 'tiff', 'tif', 'webp', 'avif', 'svg',
-])
+  "png",
+  "jpg",
+  "jpeg",
+  "gif",
+  "bmp",
+  "ico",
+  "tiff",
+  "tif",
+  "webp",
+  "avif",
+  "svg"
+]);
 
 const BINARY_EXTENSIONS = new Set([
   // Archivos comprimidos
-  'zip', 'gz', 'tar', 'rar', '7z', 'bz2', 'xz', 'zst', 'cab', 'iso',
+  "zip",
+  "gz",
+  "tar",
+  "rar",
+  "7z",
+  "bz2",
+  "xz",
+  "zst",
+  "cab",
+  "iso",
   // Documentos de Office y PDF
-  'pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'odt', 'ods', 'odp',
+  "pdf",
+  "doc",
+  "docx",
+  "xls",
+  "xlsx",
+  "ppt",
+  "pptx",
+  "odt",
+  "ods",
+  "odp",
   // Ejecutables y bibliotecas
-  'exe', 'dll', 'so', 'dylib', 'bin', 'obj', 'o', 'a', 'lib', 'wasm', 'class', 'pyc', 'pyo',
+  "exe",
+  "dll",
+  "so",
+  "dylib",
+  "bin",
+  "obj",
+  "o",
+  "a",
+  "lib",
+  "wasm",
+  "class",
+  "pyc",
+  "pyo",
   // Multimedia
-  'mp3', 'mp4', 'wav', 'avi', 'mov', 'mkv', 'flac', 'ogg', 'webm', 'aac', 'm4a', 'm4v',
+  "mp3",
+  "mp4",
+  "wav",
+  "avi",
+  "mov",
+  "mkv",
+  "flac",
+  "ogg",
+  "webm",
+  "aac",
+  "m4a",
+  "m4v",
   // Imágenes no soportadas por el navegador
-  'heic', 'heif', 'psd', 'ai', 'raw', 'cr2', 'nef',
+  "heic",
+  "heif",
+  "psd",
+  "ai",
+  "raw",
+  "cr2",
+  "nef",
   // Bases de datos y otros binarios
-  'db', 'sqlite', 'sqlite3', 'mdb', 'accdb', 'dat', 'pak', 'cache', 'jar', 'apk', 'ipa',
-])
+  "db",
+  "sqlite",
+  "sqlite3",
+  "mdb",
+  "accdb",
+  "dat",
+  "pak",
+  "cache",
+  "jar",
+  "apk",
+  "ipa"
+]);
 
 function isImageExtension(ext: string): boolean {
-  return IMAGE_EXTENSIONS.has(ext.toLowerCase())
+  return IMAGE_EXTENSIONS.has(ext.toLowerCase());
 }
 
 function isBinaryExtension(ext: string): boolean {
-  return BINARY_EXTENSIONS.has(ext.toLowerCase())
+  return BINARY_EXTENSIONS.has(ext.toLowerCase());
 }
 
 interface DiffTabData {
-  file: FileEntry
-  leftContent: string
-  rightContent: string
-  loading: boolean
-  unsupported: boolean
-  isImage: boolean
-  isFilesComparison?: boolean
+  file: FileEntry;
+  leftContent: string;
+  rightContent: string;
+  loading: boolean;
+  unsupported: boolean;
+  isImage: boolean;
+  isFilesComparison?: boolean;
   // stats para la barra de estado
-  diffStats?: { identical: number; different: number; commentsOnly: number; leftOnly: number; rightOnly: number; total: number }
-  imageDims?: { left: ImageDims | null; right: ImageDims | null }
+  diffStats?: {
+    identical: number;
+    different: number;
+    commentsOnly: number;
+    leftOnly: number;
+    rightOnly: number;
+    total: number;
+  };
+  imageDims?: { left: ImageDims | null; right: ImageDims | null };
 }
 
-function CloseConfirmDialog({ onConfirm, onCancel }: { onConfirm: () => void; onCancel: () => void }): React.JSX.Element {
-  const { t } = useTranslation()
-  const cancelRef = useRef<HTMLButtonElement>(null)
-  useEffect(() => { cancelRef.current?.focus() }, [])
+function CloseConfirmDialog({
+  onConfirm,
+  onCancel
+}: {
+  onConfirm: () => void;
+  onCancel: () => void;
+}): React.JSX.Element {
+  const { t } = useTranslation();
+  const cancelRef = useRef<HTMLButtonElement>(null);
+  useEffect(() => {
+    cancelRef.current?.focus();
+  }, []);
 
   return (
     <div
@@ -74,26 +156,24 @@ function CloseConfirmDialog({ onConfirm, onCancel }: { onConfirm: () => void; on
     >
       <div className="mx-4 w-full max-w-sm rounded-lg border border-[#3e3e42] bg-[#252526] p-6 shadow-2xl">
         <h2 id="close-dialog-title" className="mb-2 text-base font-semibold text-[#cccccc]">
-          {t('closeDialog.title')}
+          {t("closeDialog.title")}
         </h2>
-        <p className="mb-6 text-sm text-[#aaaaaa]">
-          {t('closeDialog.message')}
-        </p>
+        <p className="mb-6 text-sm text-[#aaaaaa]">{t("closeDialog.message")}</p>
         <div className="flex justify-end gap-2">
           <Button ref={cancelRef} variant="ghost" onClick={onCancel}>
-            {t('closeDialog.cancel')}
+            {t("closeDialog.cancel")}
           </Button>
           <Button variant="primary" onClick={onConfirm}>
-            {t('closeDialog.confirm')}
+            {t("closeDialog.confirm")}
           </Button>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 export default function App(): React.JSX.Element {
-  const { t } = useTranslation()
+  const { t } = useTranslation();
   const {
     scanResult,
     scanCount,
@@ -108,393 +188,541 @@ export default function App(): React.JSX.Element {
     openLeft,
     openRight,
     patchFileStatus
-  } = useFolderScan()
+  } = useFolderScan();
 
-  const [openTabs, setOpenTabs] = useState<Map<string, DiffTabData>>(new Map())
-  const [activeTabId, setActiveTabId] = useState<string>('')
-  const [statusFilter, setStatusFilter] = useState<FileStatus | null>(null)
-  const [diffViewMode, setDiffViewMode] = useState<'side-by-side' | 'inline'>('side-by-side')
+  const [openTabs, setOpenTabs] = useState<Map<string, DiffTabData>>(new Map());
+  const [activeTabId, setActiveTabId] = useState<string>("");
+  const [statusFilter, setStatusFilter] = useState<FileStatus | null>(null);
+  const [diffViewMode, setDiffViewMode] = useState<"side-by-side" | "inline">("side-by-side");
 
   useEffect(() => {
-    window.electronAPI.getAppSettings().then((s) => setDiffViewMode(s.diffViewMode))
-  }, [])
+    window.electronAPI.getAppSettings().then((s) => setDiffViewMode(s.diffViewMode));
+  }, []);
 
   const toggleDiffViewMode = useCallback(() => {
     setDiffViewMode((prev) => {
-      const next: 'side-by-side' | 'inline' = prev === 'side-by-side' ? 'inline' : 'side-by-side'
-      void window.electronAPI.setAppSettings({ diffViewMode: next })
-      return next
-    })
-  }, [])
-  const [showComparisonTab, setShowComparisonTab] = useState(false)
-  const [showCloseDialog, setShowCloseDialog] = useState(false)
-  const [scanVersion, setScanVersion] = useState(0)
+      const next: "side-by-side" | "inline" = prev === "side-by-side" ? "inline" : "side-by-side";
+      void window.electronAPI.setAppSettings({ diffViewMode: next });
+      return next;
+    });
+  }, []);
+  const [showComparisonTab, setShowComparisonTab] = useState(false);
+  const [showCloseDialog, setShowCloseDialog] = useState(false);
+  const [scanVersion, setScanVersion] = useState(0);
 
   // Modo "comparar 2 archivos": abrir tab directo con los dos archivos
   useEffect(() => {
     window.electronAPI.getPendingFiles().then(async (pending) => {
-      if (!pending) return
-      const { left, right } = pending
-      const ext = left.split('.').pop() ?? ''
-      const leftName = left.replace(/[/\\]+$/, '').split(/[/\\]/).pop() ?? left
-      const rightName = right.replace(/[/\\]+$/, '').split(/[/\\]/).pop() ?? right
-      const tabLabel = `${leftName} ↔ ${rightName}`
+      if (!pending) return;
+      const { left, right } = pending;
+      const ext = left.split(".").pop() ?? "";
+      const leftName =
+        left
+          .replace(/[/\\]+$/, "")
+          .split(/[/\\]/)
+          .pop() ?? left;
+      const rightName =
+        right
+          .replace(/[/\\]+$/, "")
+          .split(/[/\\]/)
+          .pop() ?? right;
+      const tabLabel = `${leftName} ↔ ${rightName}`;
       const file: FileEntry = {
         relativePath: tabLabel,
         leftPath: left,
         rightPath: right,
-        status: 'different',
+        status: "different",
         isDirectory: false,
         name: tabLabel,
         extension: ext,
         leftSize: null,
-        rightSize: null,
-      }
+        rightSize: null
+      };
       if (isImageExtension(ext)) {
-        setOpenTabs((prev) => new Map(prev).set(tabLabel, { file, leftContent: '', rightContent: '', loading: false, unsupported: false, isImage: true, isFilesComparison: true }))
-        setActiveTabId(tabLabel)
-        await window.electronAPI.saveRecentComparison(left, right, 'files')
-        return
+        setOpenTabs((prev) =>
+          new Map(prev).set(tabLabel, {
+            file,
+            leftContent: "",
+            rightContent: "",
+            loading: false,
+            unsupported: false,
+            isImage: true,
+            isFilesComparison: true
+          })
+        );
+        setActiveTabId(tabLabel);
+        await window.electronAPI.saveRecentComparison(left, right, "files");
+        return;
       }
-      setOpenTabs((prev) => new Map(prev).set(tabLabel, { file, leftContent: '', rightContent: '', loading: true, unsupported: false, isImage: false, isFilesComparison: true }))
-      setActiveTabId(tabLabel)
+      setOpenTabs((prev) =>
+        new Map(prev).set(tabLabel, {
+          file,
+          leftContent: "",
+          rightContent: "",
+          loading: true,
+          unsupported: false,
+          isImage: false,
+          isFilesComparison: true
+        })
+      );
+      setActiveTabId(tabLabel);
       const [leftContent, rightContent] = await Promise.all([
         window.electronAPI.readFile(left),
-        window.electronAPI.readFile(right),
-      ])
-      await window.electronAPI.saveRecentComparison(left, right, 'files')
-      const diffStats = computeDiffStats(leftContent, rightContent)
-      setOpenTabs((prev) => new Map(prev).set(tabLabel, { file, leftContent, rightContent, loading: false, unsupported: false, isImage: false, isFilesComparison: true, diffStats }))
-    })
-  }, [])
+        window.electronAPI.readFile(right)
+      ]);
+      await window.electronAPI.saveRecentComparison(left, right, "files");
+      const diffStats = computeDiffStats(leftContent, rightContent);
+      setOpenTabs((prev) =>
+        new Map(prev).set(tabLabel, {
+          file,
+          leftContent,
+          rightContent,
+          loading: false,
+          unsupported: false,
+          isImage: false,
+          isFilesComparison: true,
+          diffStats
+        })
+      );
+    });
+  }, []);
 
   // Modo "comparación en blanco": abrir tab vacío en Monaco
   useEffect(() => {
     window.electronAPI.getPendingBlank().then((pending) => {
-      if (!pending) return
+      if (!pending) return;
       const file: FileEntry = {
         relativePath: BLANK_TAB_ID,
         leftPath: null,
         rightPath: null,
-        status: 'different',
+        status: "different",
         isDirectory: false,
-        name: t('diff.tabBlank'),
-        extension: '',
+        name: t("diff.tabBlank"),
+        extension: "",
         leftSize: null,
-        rightSize: null,
-      }
-      setOpenTabs((prev) => new Map(prev).set(BLANK_TAB_ID, { file, leftContent: '', rightContent: '', loading: false, unsupported: false, isImage: false }))
-      setActiveTabId(BLANK_TAB_ID)
-    })
-  }, [t])
+        rightSize: null
+      };
+      setOpenTabs((prev) =>
+        new Map(prev).set(BLANK_TAB_ID, {
+          file,
+          leftContent: "",
+          rightContent: "",
+          loading: false,
+          unsupported: false,
+          isImage: false
+        })
+      );
+      setActiveTabId(BLANK_TAB_ID);
+    });
+  }, [t]);
 
   // Cuando termina un escaneo completo, mostrar y activar el tab de Comparación
   // scanCount solo cambia en scan() real, no en patchFileStatus
   useEffect(() => {
-    if (scanCount === 0) return
-    setShowComparisonTab(true)
-    setActiveTabId(COMPARISON_TAB_ID)
-    setScanVersion((v) => v + 1)
-  }, [scanCount])
+    if (scanCount === 0) return;
+    setShowComparisonTab(true);
+    setActiveTabId(COMPARISON_TAB_ID);
+    setScanVersion((v) => v + 1);
+  }, [scanCount]);
 
   // Diálogo de confirmación al cerrar
   useEffect(() => {
-    return window.electronAPI.onCloseRequested(() => setShowCloseDialog(true))
-  }, [])
+    return window.electronAPI.onCloseRequested(() => setShowCloseDialog(true));
+  }, []);
 
   // Previene que Chromium navegue a file:// al soltar fuera de los inputs del Toolbar
   useEffect(() => {
-    const stop = (e: DragEvent): void => { e.preventDefault() }
-    window.addEventListener('dragover', stop)
-    window.addEventListener('drop', stop)
+    const stop = (e: DragEvent): void => {
+      e.preventDefault();
+    };
+    window.addEventListener("dragover", stop);
+    window.addEventListener("drop", stop);
     return () => {
-      window.removeEventListener('dragover', stop)
-      window.removeEventListener('drop', stop)
-    }
-  }, [])
+      window.removeEventListener("dragover", stop);
+      window.removeEventListener("drop", stop);
+    };
+  }, []);
 
   // Keyboard shortcuts globales
   useEffect(() => {
     const handler = (e: KeyboardEvent): void => {
-      const ctrl = e.ctrlKey || e.metaKey
-      if (ctrl && e.key === 'l') {
-        e.preventDefault()
-        openLeft()
-      } else if (ctrl && e.shiftKey && (e.key === 'r' || e.key === 'R')) {
-        e.preventDefault()
-        void swapFolders()
-      } else if (ctrl && e.key === 'F5') {
-        e.preventDefault()
-        scan()
-      } else if (e.key === 'Escape' && activeTabId !== COMPARISON_TAB_ID && showComparisonTab) {
-        setActiveTabId(COMPARISON_TAB_ID)
+      const ctrl = e.ctrlKey || e.metaKey;
+      if (ctrl && e.key === "l") {
+        e.preventDefault();
+        openLeft();
+      } else if (ctrl && e.shiftKey && (e.key === "r" || e.key === "R")) {
+        e.preventDefault();
+        void swapFolders();
+      } else if (ctrl && e.key === "F5") {
+        e.preventDefault();
+        scan();
+      } else if (e.key === "Escape" && activeTabId !== COMPARISON_TAB_ID && showComparisonTab) {
+        setActiveTabId(COMPARISON_TAB_ID);
       }
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [openLeft, swapFolders, scan, activeTabId, showComparisonTab])
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [openLeft, swapFolders, scan, activeTabId, showComparisonTab]);
 
-  const handleFileOpen = useCallback(async (file: FileEntry) => {
-    const id = file.relativePath
-    if (openTabs.has(id)) {
-      setActiveTabId(id)
-      return
-    }
-    // Imágenes: visor dedicado sin necesidad de leer contenido
-    if (isImageExtension(file.extension)) {
+  const handleFileOpen = useCallback(
+    async (file: FileEntry) => {
+      const id = file.relativePath;
+      if (openTabs.has(id)) {
+        setActiveTabId(id);
+        return;
+      }
+      // Imágenes: visor dedicado sin necesidad de leer contenido
+      if (isImageExtension(file.extension)) {
+        setOpenTabs((prev) => {
+          const next = new Map(prev);
+          next.set(id, {
+            file,
+            leftContent: "",
+            rightContent: "",
+            loading: false,
+            unsupported: false,
+            isImage: true
+          });
+          return next;
+        });
+        setActiveTabId(id);
+        return;
+      }
+      // Binarios no soportados
+      if (isBinaryExtension(file.extension)) {
+        setOpenTabs((prev) => {
+          const next = new Map(prev);
+          next.set(id, {
+            file,
+            leftContent: "",
+            rightContent: "",
+            loading: false,
+            unsupported: true,
+            isImage: false
+          });
+          return next;
+        });
+        setActiveTabId(id);
+        return;
+      }
+      // Archivos de texto: cargar contenido
       setOpenTabs((prev) => {
-        const next = new Map(prev)
-        next.set(id, { file, leftContent: '', rightContent: '', loading: false, unsupported: false, isImage: true })
-        return next
-      })
-      setActiveTabId(id)
-      return
-    }
-    // Binarios no soportados
-    if (isBinaryExtension(file.extension)) {
+        const next = new Map(prev);
+        next.set(id, {
+          file,
+          leftContent: "",
+          rightContent: "",
+          loading: true,
+          unsupported: false,
+          isImage: false
+        });
+        return next;
+      });
+      setActiveTabId(id);
+      const [left, right] = await Promise.all([
+        file.leftPath ? window.electronAPI.readFile(file.leftPath) : Promise.resolve(""),
+        file.rightPath ? window.electronAPI.readFile(file.rightPath) : Promise.resolve("")
+      ]);
+      const diffStats = computeDiffStats(left, right);
       setOpenTabs((prev) => {
-        const next = new Map(prev)
-        next.set(id, { file, leftContent: '', rightContent: '', loading: false, unsupported: true, isImage: false })
-        return next
-      })
-      setActiveTabId(id)
-      return
-    }
-    // Archivos de texto: cargar contenido
-    setOpenTabs((prev) => {
-      const next = new Map(prev)
-      next.set(id, { file, leftContent: '', rightContent: '', loading: true, unsupported: false, isImage: false })
-      return next
-    })
-    setActiveTabId(id)
-    const [left, right] = await Promise.all([
-      file.leftPath ? window.electronAPI.readFile(file.leftPath) : Promise.resolve(''),
-      file.rightPath ? window.electronAPI.readFile(file.rightPath) : Promise.resolve('')
-    ])
-    const diffStats = computeDiffStats(left, right)
-    setOpenTabs((prev) => {
-      const next = new Map(prev)
-      next.set(id, { file, leftContent: left, rightContent: right, loading: false, unsupported: false, isImage: false, diffStats })
-      return next
-    })
-  }, [openTabs])
+        const next = new Map(prev);
+        next.set(id, {
+          file,
+          leftContent: left,
+          rightContent: right,
+          loading: false,
+          unsupported: false,
+          isImage: false,
+          diffStats
+        });
+        return next;
+      });
+    },
+    [openTabs]
+  );
 
-  const handleCloseTab = useCallback((id: string) => {
-    if (id === COMPARISON_TAB_ID) return
-    setOpenTabs((prev) => {
-      const next = new Map(prev)
-      next.delete(id)
-      return next
-    })
-    if (activeTabId === id) {
-      const remaining = Array.from(openTabs.keys()).filter((k) => k !== id)
-      setActiveTabId(showComparisonTab ? COMPARISON_TAB_ID : (remaining[0] ?? ''))
-    }
-  }, [activeTabId, openTabs, showComparisonTab])
+  const handleCloseTab = useCallback(
+    (id: string) => {
+      if (id === COMPARISON_TAB_ID) return;
+      setOpenTabs((prev) => {
+        const next = new Map(prev);
+        next.delete(id);
+        return next;
+      });
+      if (activeTabId === id) {
+        const remaining = Array.from(openTabs.keys()).filter((k) => k !== id);
+        setActiveTabId(showComparisonTab ? COMPARISON_TAB_ID : (remaining[0] ?? ""));
+      }
+    },
+    [activeTabId, openTabs, showComparisonTab]
+  );
 
-  const saveSide = useCallback(async (
-    pathKey: 'leftPath' | 'rightPath',
-    contentKey: 'leftContent' | 'rightContent',
-    content: string
-  ) => {
-    const tab = openTabs.get(activeTabId)
-    const filePath = tab?.file[pathKey]
-    if (!filePath) return
-    await window.electronAPI.writeFile(filePath, content)
-    setOpenTabs((prev) => {
-      const t = prev.get(activeTabId)!
-      return new Map(prev).set(activeTabId, { ...t, [contentKey]: content })
-    })
-    // Actualizar el estado de la fila en el árbol sin re-escanear todo
-    if (tab) {
-      const newStatus = await window.electronAPI.classifyFiles(tab.file.leftPath, tab.file.rightPath, tab.file.extension)
-      patchFileStatus(tab.file.relativePath, newStatus)
-    }
-  }, [openTabs, activeTabId, patchFileStatus])
+  const saveSide = useCallback(
+    async (
+      pathKey: "leftPath" | "rightPath",
+      contentKey: "leftContent" | "rightContent",
+      content: string
+    ) => {
+      const tab = openTabs.get(activeTabId);
+      const filePath = tab?.file[pathKey];
+      if (!filePath) return;
+      await window.electronAPI.writeFile(filePath, content);
+      setOpenTabs((prev) => {
+        const t = prev.get(activeTabId)!;
+        return new Map(prev).set(activeTabId, { ...t, [contentKey]: content });
+      });
+      // Actualizar el estado de la fila en el árbol sin re-escanear todo
+      if (tab) {
+        const newStatus = await window.electronAPI.classifyFiles(
+          tab.file.leftPath,
+          tab.file.rightPath,
+          tab.file.extension
+        );
+        patchFileStatus(tab.file.relativePath, newStatus);
+      }
+    },
+    [openTabs, activeTabId, patchFileStatus]
+  );
 
-  const saveLeft  = useCallback((content: string) => saveSide('leftPath',  'leftContent',  content), [saveSide])
-  const saveRight = useCallback((content: string) => saveSide('rightPath', 'rightContent', content), [saveSide])
+  const saveLeft = useCallback(
+    (content: string) => saveSide("leftPath", "leftContent", content),
+    [saveSide]
+  );
+  const saveRight = useCallback(
+    (content: string) => saveSide("rightPath", "rightContent", content),
+    [saveSide]
+  );
 
-  const copySide = useCallback(async (
-    src: 'leftPath' | 'rightPath',
-    dest: 'leftPath' | 'rightPath',
-    contentKey: 'leftContent' | 'rightContent',
-    destLabel: string,
-    content: string
-  ): Promise<boolean> => {
-    const tab = openTabs.get(activeTabId)
-    if (!tab?.file[src] || !tab?.file[dest]) return false
-    const confirmed = window.confirm(
-      t(destLabel === 'derecha' ? 'copy.confirmRight' : 'copy.confirmLeft', { name: tab.file.name })
-    )
-    if (!confirmed) return false
-    await window.electronAPI.copyFileWithBak(tab.file[src]!, tab.file[dest]!)
-    setOpenTabs((prev) => {
-      const t = prev.get(activeTabId)!
-      return new Map(prev).set(activeTabId, { ...t, [contentKey]: content })
-    })
-    scan()
-    return true
-  }, [openTabs, activeTabId, scan, t])
+  const copySide = useCallback(
+    async (
+      src: "leftPath" | "rightPath",
+      dest: "leftPath" | "rightPath",
+      contentKey: "leftContent" | "rightContent",
+      destLabel: string,
+      content: string
+    ): Promise<boolean> => {
+      const tab = openTabs.get(activeTabId);
+      if (!tab?.file[src] || !tab?.file[dest]) return false;
+      const confirmed = window.confirm(
+        t(destLabel === "derecha" ? "copy.confirmRight" : "copy.confirmLeft", {
+          name: tab.file.name
+        })
+      );
+      if (!confirmed) return false;
+      await window.electronAPI.copyFileWithBak(tab.file[src]!, tab.file[dest]!);
+      setOpenTabs((prev) => {
+        const t = prev.get(activeTabId)!;
+        return new Map(prev).set(activeTabId, { ...t, [contentKey]: content });
+      });
+      scan();
+      return true;
+    },
+    [openTabs, activeTabId, scan, t]
+  );
 
-  const copyToRight = useCallback((content: string) => copySide('leftPath',  'rightPath', 'rightContent', 'derecha',    content), [copySide])
-  const copyToLeft  = useCallback((content: string) => copySide('rightPath', 'leftPath',  'leftContent',  'izquierda', content), [copySide])
+  const copyToRight = useCallback(
+    (content: string) => copySide("leftPath", "rightPath", "rightContent", "derecha", content),
+    [copySide]
+  );
+  const copyToLeft = useCallback(
+    (content: string) => copySide("rightPath", "leftPath", "leftContent", "izquierda", content),
+    [copySide]
+  );
 
-  const handleImageDimsLoaded = useCallback((id: string, left: ImageDims | null, right: ImageDims | null) => {
-    setOpenTabs((prev) => {
-      const t = prev.get(id)
-      if (!t) return prev
-      return new Map(prev).set(id, { ...t, imageDims: { left, right } })
-    })
-  }, [])
+  const handleImageDimsLoaded = useCallback(
+    (id: string, left: ImageDims | null, right: ImageDims | null) => {
+      setOpenTabs((prev) => {
+        const t = prev.get(id);
+        if (!t) return prev;
+        return new Map(prev).set(id, { ...t, imageDims: { left, right } });
+      });
+    },
+    []
+  );
 
   // Construir lista de tabs visible
   const tabItems: TabItem[] = [
-    ...(showComparisonTab ? [{ id: COMPARISON_TAB_ID, label: t('diff.tabComparison'), extension: '', loading: false, closeable: false }] : []),
+    ...(showComparisonTab
+      ? [
+          {
+            id: COMPARISON_TAB_ID,
+            label: t("diff.tabComparison"),
+            extension: "",
+            loading: false,
+            closeable: false
+          }
+        ]
+      : []),
     ...Array.from(openTabs.values()).map((t) => ({
       id: t.file.relativePath,
       label: t.file.name,
       extension: t.file.extension,
       loading: t.loading,
-      ...((t.file.relativePath === BLANK_TAB_ID || t.isFilesComparison) ? { closeable: false } : {}),
+      ...(t.file.relativePath === BLANK_TAB_ID || t.isFilesComparison ? { closeable: false } : {})
     }))
-  ]
+  ];
 
-  const noTabs = tabItems.length === 0
+  const noTabs = tabItems.length === 0;
 
   // StatusInfo según el tab activo
   const statusInfo: StatusInfo = (() => {
-    if (activeTabId === COMPARISON_TAB_ID || activeTabId === '') {
-      return scanResult ? { kind: 'comparison', stats: scanResult.stats } : { kind: 'empty' }
+    if (activeTabId === COMPARISON_TAB_ID || activeTabId === "") {
+      return scanResult ? { kind: "comparison", stats: scanResult.stats } : { kind: "empty" };
     }
-    const tab = openTabs.get(activeTabId)
-    if (!tab) return { kind: 'empty' }
+    const tab = openTabs.get(activeTabId);
+    if (!tab) return { kind: "empty" };
     if (tab.isImage) {
       return {
-        kind: 'image',
+        kind: "image",
         leftDims: tab.imageDims?.left ?? null,
         rightDims: tab.imageDims?.right ?? null,
         leftSize: tab.file.leftSize,
-        rightSize: tab.file.rightSize,
-      }
+        rightSize: tab.file.rightSize
+      };
     }
     if (tab.diffStats) {
-      return { kind: 'diff', ...tab.diffStats }
+      return { kind: "diff", ...tab.diffStats };
     }
-    return { kind: 'empty' }
-  })()
+    return { kind: "empty" };
+  })();
 
   return (
     <TooltipProvider delayDuration={400}>
-    <div className="flex h-screen flex-col bg-[#1e1e1e]">
-      {showCloseDialog && (
-        <CloseConfirmDialog
-          onConfirm={() => window.electronAPI.confirmClose()}
-          onCancel={() => setShowCloseDialog(false)}
-        />
-      )}
-      <TitleBar />
-
-      <TabBar
-        tabs={tabItems}
-        activeTabId={activeTabId}
-        onSelectTab={setActiveTabId}
-        onCloseTab={handleCloseTab}
-      />
-
-      <div className="relative flex flex-1 flex-col overflow-hidden">
-        {/* Toolbar: visible en pantalla de bienvenida y en el tab de Comparación */}
-        {(noTabs || activeTabId === COMPARISON_TAB_ID) && (
-          <Toolbar
-            leftFolder={leftFolder}
-            rightFolder={rightFolder}
-            onOpenLeft={openLeft}
-            onOpenRight={openRight}
-            onChangeLeft={setLeftFolder}
-            onChangeRight={setRightFolder}
-            onRefresh={scan}
-            onSwap={swapFolders}
-            scanning={scanning}
+      <div className="flex h-screen flex-col bg-[#1e1e1e]">
+        {showCloseDialog && (
+          <CloseConfirmDialog
+            onConfirm={() => window.electronAPI.confirmClose()}
+            onCancel={() => setShowCloseDialog(false)}
           />
         )}
+        <TitleBar />
 
-        {/* Sin tabs: pantalla de bienvenida */}
-        {noTabs && (
-          <div className="flex flex-1 flex-col items-center justify-center gap-5 text-[#858585]" role="main" aria-label={t('welcome.ariaLabel')}>
-            <MergeMateLogo size={160} />
-            <div className="text-3xl font-bold tracking-wide text-[#cccccc]">MergeMate</div>
-            <div className="text-sm">{t('welcome.description')}</div>
-            <div className="mt-1 flex gap-4 text-sm text-[#aaaaaa]" aria-label={t('welcome.ariaLabel')}>
-              <span>{t('welcome.shortcutLeft')}</span>
-              <span>{t('welcome.shortcutRight')}</span>
-              <span>{t('welcome.shortcutRefresh')}</span>
-            </div>
-          </div>
-        )}
+        <TabBar
+          tabs={tabItems}
+          activeTabId={activeTabId}
+          onSelectTab={setActiveTabId}
+          onCloseTab={handleCloseTab}
+        />
 
-        {/* Tab: Comparación */}
-        {showComparisonTab && (
-          <div
-            className={activeTabId === COMPARISON_TAB_ID ? 'flex flex-1 flex-col overflow-hidden' : 'hidden'}
-            aria-hidden={activeTabId !== COMPARISON_TAB_ID ? true : undefined}
-          >
-            <AnimatePresence>
-              {scanning && progress && <ProgressBar progress={progress} />}
-            </AnimatePresence>
-            <FileTree
-              entries={scanResult?.files ?? []}
-              openTabIds={new Set(openTabs.keys())}
-              scanVersion={scanVersion}
-              onFileOpen={handleFileOpen}
-              onHover={() => {}}
-              statusFilter={statusFilter}
+        <div className="relative flex flex-1 flex-col overflow-hidden">
+          {/* Toolbar: visible en pantalla de bienvenida y en el tab de Comparación */}
+          {(noTabs || activeTabId === COMPARISON_TAB_ID) && (
+            <Toolbar
+              leftFolder={leftFolder}
+              rightFolder={rightFolder}
+              onOpenLeft={openLeft}
+              onOpenRight={openRight}
+              onChangeLeft={setLeftFolder}
+              onChangeRight={setRightFolder}
+              onRefresh={scan}
+              onSwap={swapFolders}
+              scanning={scanning}
             />
-          </div>
-        )}
+          )}
 
-        {/* Tabs de archivos */}
-        {Array.from(openTabs.entries()).map(([id, tab]) => (
-          <div
-            key={id}
-            className={activeTabId === id ? 'flex flex-1 flex-col overflow-hidden' : 'hidden'}
-            aria-hidden={activeTabId !== id ? true : undefined}
-          >
-            {tab.loading ? (
-              <div className="flex flex-1 items-center justify-center text-[#858585]" role="status" aria-live="polite">
-                {t('diff.loading')}
+          {/* Sin tabs: pantalla de bienvenida */}
+          {noTabs && (
+            <div
+              className="flex flex-1 flex-col items-center justify-center gap-5 text-[#858585]"
+              role="main"
+              aria-label={t("welcome.ariaLabel")}
+            >
+              <MergeMateLogo size={160} />
+              <div className="text-3xl font-bold tracking-wide text-[#cccccc]">MergeMate</div>
+              <div className="text-sm">{t("welcome.description")}</div>
+              <div
+                className="mt-1 flex gap-4 text-sm text-[#aaaaaa]"
+                aria-label={t("welcome.ariaLabel")}
+              >
+                <span>{t("welcome.shortcutLeft")}</span>
+                <span>{t("welcome.shortcutRight")}</span>
+                <span>{t("welcome.shortcutRefresh")}</span>
               </div>
-            ) : tab.isImage ? (
-              <ImageViewer
-                file={tab.file}
-                onDimsLoaded={(l, r) => handleImageDimsLoaded(id, l, r)}
+            </div>
+          )}
+
+          {/* Tab: Comparación */}
+          {showComparisonTab && (
+            <div
+              className={
+                activeTabId === COMPARISON_TAB_ID
+                  ? "flex flex-1 flex-col overflow-hidden"
+                  : "hidden"
+              }
+              aria-hidden={activeTabId !== COMPARISON_TAB_ID ? true : undefined}
+            >
+              <AnimatePresence>
+                {scanning && progress && <ProgressBar progress={progress} />}
+              </AnimatePresence>
+              <FileTree
+                entries={scanResult?.files ?? []}
+                openTabIds={new Set(openTabs.keys())}
+                scanVersion={scanVersion}
+                onFileOpen={handleFileOpen}
+                onHover={() => {}}
+                statusFilter={statusFilter}
               />
-            ) : tab.unsupported ? (
-              <div className="flex flex-1 flex-col items-center justify-center gap-3 text-[#858585]" role="alert">
-                <div className="text-5xl" aria-hidden="true">🚫</div>
-                <div className="text-lg font-semibold text-[#cccccc]">{t('diff.unsupportedTitle')}</div>
-                <div className="text-sm">
-                  {t('diff.unsupportedMessage', { ext: tab.file.extension })}
+            </div>
+          )}
+
+          {/* Tabs de archivos */}
+          {Array.from(openTabs.entries()).map(([id, tab]) => (
+            <div
+              key={id}
+              className={activeTabId === id ? "flex flex-1 flex-col overflow-hidden" : "hidden"}
+              aria-hidden={activeTabId !== id ? true : undefined}
+            >
+              {tab.loading ? (
+                <div
+                  className="flex flex-1 items-center justify-center text-[#858585]"
+                  role="status"
+                  aria-live="polite"
+                >
+                  {t("diff.loading")}
                 </div>
-              </div>
-            ) : (
-              <DiffViewer
-                file={tab.file}
-                leftContent={tab.leftContent}
-                rightContent={tab.rightContent}
-                onSaveLeft={saveLeft}
-                onSaveRight={saveRight}
-                onCopyToLeft={copyToLeft}
-                onCopyToRight={copyToRight}
-                diffViewMode={diffViewMode}
-                onToggleDiffViewMode={toggleDiffViewMode}
-              />
-            )}
-          </div>
-        ))}
-      </div>
+              ) : tab.isImage ? (
+                <ImageViewer
+                  file={tab.file}
+                  onDimsLoaded={(l, r) => handleImageDimsLoaded(id, l, r)}
+                />
+              ) : tab.unsupported ? (
+                <div
+                  className="flex flex-1 flex-col items-center justify-center gap-3 text-[#858585]"
+                  role="alert"
+                >
+                  <div className="text-5xl" aria-hidden="true">
+                    🚫
+                  </div>
+                  <div className="text-lg font-semibold text-[#cccccc]">
+                    {t("diff.unsupportedTitle")}
+                  </div>
+                  <div className="text-sm">
+                    {t("diff.unsupportedMessage", { ext: tab.file.extension })}
+                  </div>
+                </div>
+              ) : (
+                <DiffViewer
+                  file={tab.file}
+                  leftContent={tab.leftContent}
+                  rightContent={tab.rightContent}
+                  onSaveLeft={saveLeft}
+                  onSaveRight={saveRight}
+                  onCopyToLeft={copyToLeft}
+                  onCopyToRight={copyToRight}
+                  diffViewMode={diffViewMode}
+                  onToggleDiffViewMode={toggleDiffViewMode}
+                />
+              )}
+            </div>
+          ))}
+        </div>
 
-      <StatusBar info={statusInfo} activeStatusFilter={statusFilter} onStatusFilterChange={setStatusFilter} />
-    </div>
+        <StatusBar
+          info={statusInfo}
+          activeStatusFilter={statusFilter}
+          onStatusFilterChange={setStatusFilter}
+        />
+      </div>
     </TooltipProvider>
-  )
+  );
 }

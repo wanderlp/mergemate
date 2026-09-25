@@ -6,4 +6,4 @@ export type {
   ScanStats,
   ScanProgress,
   ElectronAPI
-} from '../../types'
+} from "../../types";

@@ -1,20 +1,20 @@
-import React, { useState } from 'react'
-import { FolderOpen, GitCompareArrows, ArrowLeftRight } from 'lucide-react'
-import { useTranslation } from 'react-i18next'
-import { Button } from './ui/button'
-import { Separator } from './ui/separator'
-import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip'
+import React, { useState } from "react";
+import { FolderOpen, GitCompareArrows, ArrowLeftRight } from "lucide-react";
+import { useTranslation } from "react-i18next";
+import { Button } from "./ui/button";
+import { Separator } from "./ui/separator";
+import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 
 interface ToolbarProps {
-  leftFolder: string
-  rightFolder: string
-  onOpenLeft: () => void
-  onOpenRight: () => void
-  onChangeLeft: (path: string) => void
-  onChangeRight: (path: string) => void
-  onRefresh: () => void
-  onSwap: () => void
-  scanning: boolean
+  leftFolder: string;
+  rightFolder: string;
+  onOpenLeft: () => void;
+  onOpenRight: () => void;
+  onChangeLeft: (path: string) => void;
+  onChangeRight: (path: string) => void;
+  onRefresh: () => void;
+  onSwap: () => void;
+  scanning: boolean;
 }
 
 export function Toolbar({
@@ -28,69 +28,77 @@ export function Toolbar({
   onSwap,
   scanning
 }: ToolbarProps): React.JSX.Element {
-  const { t } = useTranslation()
-  const [missingFolders, setMissingFolders] = useState<string[]>([])
-  const [dragOver, setDragOver] = useState<'left' | 'right' | null>(null)
-  const [dropAnnouncement, setDropAnnouncement] = useState('')
+  const { t } = useTranslation();
+  const [missingFolders, setMissingFolders] = useState<string[]>([]);
+  const [dragOver, setDragOver] = useState<"left" | "right" | null>(null);
+  const [dropAnnouncement, setDropAnnouncement] = useState("");
 
-  async function handleDrop(side: 'left' | 'right', e: React.DragEvent<HTMLInputElement>): Promise<void> {
-    e.preventDefault()
-    setDragOver(null)
-    const files = Array.from(e.dataTransfer.files)
-    if (files.length === 0) return
+  async function handleDrop(
+    side: "left" | "right",
+    e: React.DragEvent<HTMLInputElement>
+  ): Promise<void> {
+    e.preventDefault();
+    setDragOver(null);
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length === 0) return;
 
     for (const file of files) {
-      const path = window.electronAPI.getPathForFile(file)
-      if (!path) continue
-      const isDir = await window.electronAPI.folderExists(path)
+      const path = window.electronAPI.getPathForFile(file);
+      if (!path) continue;
+      const isDir = await window.electronAPI.folderExists(path);
       if (isDir) {
-        if (side === 'left') onChangeLeft(path)
-        else onChangeRight(path)
-        const basename = path.split(/[\\/]/).pop() ?? path
-        setDropAnnouncement(t('toolbar.dropAnnouncement', { side: t(side === 'left' ? 'toolbar.sideLeft' : 'toolbar.sideRight'), folder: basename }))
-        return
+        if (side === "left") onChangeLeft(path);
+        else onChangeRight(path);
+        const basename = path.split(/[\\/]/).pop() ?? path;
+        setDropAnnouncement(
+          t("toolbar.dropAnnouncement", {
+            side: t(side === "left" ? "toolbar.sideLeft" : "toolbar.sideRight"),
+            folder: basename
+          })
+        );
+        return;
       }
     }
-    setDropAnnouncement(t('toolbar.dropInvalid'))
+    setDropAnnouncement(t("toolbar.dropInvalid"));
   }
 
-  function handleDragOver(side: 'left' | 'right', e: React.DragEvent<HTMLInputElement>): void {
-    e.preventDefault()
-    e.dataTransfer.dropEffect = 'copy'
-    setDragOver(side)
+  function handleDragOver(side: "left" | "right", e: React.DragEvent<HTMLInputElement>): void {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+    setDragOver(side);
   }
 
   function handleDragLeave(): void {
-    setDragOver(null)
+    setDragOver(null);
   }
 
   async function handleCompare(): Promise<void> {
-    if (!leftFolder || !rightFolder) return
+    if (!leftFolder || !rightFolder) return;
 
     const [leftExists, rightExists] = await Promise.all([
       window.electronAPI.folderExists(leftFolder),
       window.electronAPI.folderExists(rightFolder)
-    ])
+    ]);
 
-    const missing: string[] = []
-    if (!leftExists) missing.push(leftFolder)
-    if (!rightExists) missing.push(rightFolder)
+    const missing: string[] = [];
+    if (!leftExists) missing.push(leftFolder);
+    if (!rightExists) missing.push(rightFolder);
 
     if (missing.length > 0) {
-      setMissingFolders(missing)
-      return
+      setMissingFolders(missing);
+      return;
     }
 
-    onRefresh()
+    onRefresh();
   }
 
   function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>): void {
-    if (e.key === 'Enter' && leftFolder && rightFolder) handleCompare()
+    if (e.key === "Enter" && leftFolder && rightFolder) handleCompare();
   }
 
   function handleConfirm(): void {
-    setMissingFolders([])
-    onRefresh()
+    setMissingFolders([]);
+    onRefresh();
   }
 
   return (
@@ -104,10 +112,10 @@ export function Toolbar({
         >
           <div className="mx-4 w-full max-w-sm rounded-lg border border-[#3e3e42] bg-[#252526] p-6 shadow-2xl">
             <h2 id="folder-not-found-title" className="mb-2 text-base font-semibold text-[#cccccc]">
-              {t('toolbar.folderNotFoundTitle')}
+              {t("toolbar.folderNotFoundTitle")}
             </h2>
             <p className="mb-3 text-sm text-[#aaaaaa]">
-              {t('toolbar.folderNotFoundMessage', { count: missingFolders.length })}
+              {t("toolbar.folderNotFoundMessage", { count: missingFolders.length })}
             </p>
             <ul className="mb-6 space-y-1">
               {missingFolders.map((p) => (
@@ -126,13 +134,13 @@ export function Toolbar({
                 onClick={() => setMissingFolders([])}
                 autoFocus
               >
-                {t('toolbar.folderNotFoundCancel')}
+                {t("toolbar.folderNotFoundCancel")}
               </button>
               <button
                 className="rounded bg-[#007acc] px-3 py-1.5 text-sm text-white transition-colors hover:bg-[#005fa3]"
                 onClick={handleConfirm}
               >
-                {t('toolbar.folderNotFoundContinue')}
+                {t("toolbar.folderNotFoundContinue")}
               </button>
             </div>
           </div>
@@ -145,25 +153,27 @@ export function Toolbar({
             <Button
               onClick={onOpenLeft}
               disabled={scanning}
-              aria-label={leftFolder ? t('toolbar.changeLeft') : t('toolbar.openLeft')}
+              aria-label={leftFolder ? t("toolbar.changeLeft") : t("toolbar.openLeft")}
             >
               <FolderOpen size={16} aria-hidden="true" />
-              {leftFolder ? t('toolbar.changeLeft') : t('toolbar.openLeft')}
+              {leftFolder ? t("toolbar.changeLeft") : t("toolbar.openLeft")}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>{leftFolder ? t('toolbar.changeLeftTooltip') : t('toolbar.openLeftTooltip')}</TooltipContent>
+          <TooltipContent>
+            {leftFolder ? t("toolbar.changeLeftTooltip") : t("toolbar.openLeftTooltip")}
+          </TooltipContent>
         </Tooltip>
 
         <input
-          className={`flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa] placeholder-[#555] focus:outline-none focus:ring-1 focus:ring-[#007acc] ${dragOver === 'left' ? 'ring-2 ring-[#007acc]' : ''}`}
+          className={`flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa] placeholder-[#555] focus:outline-none focus:ring-1 focus:ring-[#007acc] ${dragOver === "left" ? "ring-2 ring-[#007acc]" : ""}`}
           value={leftFolder}
           onChange={(e) => onChangeLeft(e.target.value)}
           onKeyDown={handleKeyDown}
-          onDragOver={(e) => handleDragOver('left', e)}
+          onDragOver={(e) => handleDragOver("left", e)}
           onDragLeave={handleDragLeave}
-          onDrop={(e) => void handleDrop('left', e)}
-          placeholder={t('toolbar.noFolder')}
-          aria-label={leftFolder ? t('toolbar.changeLeft') : t('toolbar.openLeft')}
+          onDrop={(e) => void handleDrop("left", e)}
+          placeholder={t("toolbar.noFolder")}
+          aria-label={leftFolder ? t("toolbar.changeLeft") : t("toolbar.openLeft")}
           disabled={scanning}
           spellCheck={false}
         />
@@ -173,25 +183,27 @@ export function Toolbar({
             <Button
               onClick={onOpenRight}
               disabled={scanning}
-              aria-label={rightFolder ? t('toolbar.changeRight') : t('toolbar.openRight')}
+              aria-label={rightFolder ? t("toolbar.changeRight") : t("toolbar.openRight")}
             >
               <FolderOpen size={16} aria-hidden="true" />
-              {rightFolder ? t('toolbar.changeRight') : t('toolbar.openRight')}
+              {rightFolder ? t("toolbar.changeRight") : t("toolbar.openRight")}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>{rightFolder ? t('toolbar.changeRightTooltip') : t('toolbar.openRightTooltip')}</TooltipContent>
+          <TooltipContent>
+            {rightFolder ? t("toolbar.changeRightTooltip") : t("toolbar.openRightTooltip")}
+          </TooltipContent>
         </Tooltip>
 
         <input
-          className={`flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa] placeholder-[#555] focus:outline-none focus:ring-1 focus:ring-[#007acc] ${dragOver === 'right' ? 'ring-2 ring-[#007acc]' : ''}`}
+          className={`flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa] placeholder-[#555] focus:outline-none focus:ring-1 focus:ring-[#007acc] ${dragOver === "right" ? "ring-2 ring-[#007acc]" : ""}`}
           value={rightFolder}
           onChange={(e) => onChangeRight(e.target.value)}
           onKeyDown={handleKeyDown}
-          onDragOver={(e) => handleDragOver('right', e)}
+          onDragOver={(e) => handleDragOver("right", e)}
           onDragLeave={handleDragLeave}
-          onDrop={(e) => void handleDrop('right', e)}
-          placeholder={t('toolbar.noFolder')}
-          aria-label={rightFolder ? t('toolbar.changeRight') : t('toolbar.openRight')}
+          onDrop={(e) => void handleDrop("right", e)}
+          placeholder={t("toolbar.noFolder")}
+          aria-label={rightFolder ? t("toolbar.changeRight") : t("toolbar.openRight")}
           disabled={scanning}
           spellCheck={false}
         />
@@ -201,12 +213,12 @@ export function Toolbar({
             <Button
               onClick={onSwap}
               disabled={scanning || !leftFolder || !rightFolder}
-              aria-label={t('toolbar.swapAriaLabel')}
+              aria-label={t("toolbar.swapAriaLabel")}
             >
               <ArrowLeftRight size={16} aria-hidden="true" className="rotate-90" />
             </Button>
           </TooltipTrigger>
-          <TooltipContent>{t('toolbar.swapTooltip')}</TooltipContent>
+          <TooltipContent>{t("toolbar.swapTooltip")}</TooltipContent>
         </Tooltip>
 
         <Separator orientation="vertical" className="mx-1" />
@@ -216,13 +228,13 @@ export function Toolbar({
             <Button
               onClick={handleCompare}
               disabled={scanning || !leftFolder || !rightFolder}
-              aria-label={t('toolbar.compare')}
+              aria-label={t("toolbar.compare")}
             >
               <GitCompareArrows size={16} aria-hidden="true" />
-              {t('toolbar.compare')}
+              {t("toolbar.compare")}
             </Button>
           </TooltipTrigger>
-          <TooltipContent>{t('toolbar.compareTooltip')}</TooltipContent>
+          <TooltipContent>{t("toolbar.compareTooltip")}</TooltipContent>
         </Tooltip>
       </div>
 
@@ -230,5 +242,5 @@ export function Toolbar({
         {dropAnnouncement}
       </div>
     </>
-  )
+  );
 }

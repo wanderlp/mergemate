@@ -9,8 +9,5 @@
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "skipLibCheck": true
   },
-  "include": [
-    "**/*",
-    "../../types.ts"
-  ]
+  "include": ["**/*", "../../types.ts"]
 }

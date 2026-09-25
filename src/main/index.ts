@@ -1,49 +1,49 @@
-import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
-import { join } from 'path'
-import { electronApp, optimizer, is } from '@electron-toolkit/utils'
-import { autoUpdater } from 'electron-updater'
-import Store from 'electron-store'
-import * as fs from 'fs'
-import { scanFolders } from './scanner'
-import { hashFile, classifyFiles } from './classifier'
-import type { RecentComparison } from '../types'
+import { app, shell, BrowserWindow, ipcMain, dialog } from "electron";
+import { join } from "path";
+import { electronApp, optimizer, is } from "@electron-toolkit/utils";
+import { autoUpdater } from "electron-updater";
+import Store from "electron-store";
+import * as fs from "fs";
+import { scanFolders } from "./scanner";
+import { hashFile, classifyFiles } from "./classifier";
+import type { RecentComparison } from "../types";
 
 interface WindowState {
-  x: number | undefined
-  y: number | undefined
-  width: number
-  height: number
-  maximized: boolean
+  x: number | undefined;
+  y: number | undefined;
+  width: number;
+  height: number;
+  maximized: boolean;
 }
 
 interface StoreSchema {
-  recentComparisons: RecentComparison[]
-  windowState: WindowState | null
+  recentComparisons: RecentComparison[];
+  windowState: WindowState | null;
   appSettings: {
-    diffViewMode: 'side-by-side' | 'inline'
-  }
+    diffViewMode: "side-by-side" | "inline";
+  };
 }
 
-const DEFAULT_SETTINGS: StoreSchema['appSettings'] = {
-  diffViewMode: 'side-by-side'
-}
+const DEFAULT_SETTINGS: StoreSchema["appSettings"] = {
+  diffViewMode: "side-by-side"
+};
 
 const store = new Store<StoreSchema>({
   defaults: {
     appSettings: DEFAULT_SETTINGS
   }
-})
+});
 
-let startupWindow: BrowserWindow | null = null
-let mainWindow: BrowserWindow | null = null
-let pendingFolders: { left: string; right: string } | null = null
-let pendingFiles: { left: string; right: string } | null = null
-let pendingBlank = false
-let mainWindowClosing = false
+let startupWindow: BrowserWindow | null = null;
+let mainWindow: BrowserWindow | null = null;
+let pendingFolders: { left: string; right: string } | null = null;
+let pendingFiles: { left: string; right: string } | null = null;
+let pendingBlank = false;
+let mainWindowClosing = false;
 
 function setupMaximizeEvents(win: BrowserWindow): void {
-  win.on('maximize',   () => win.webContents.send('window-maximize-change', true))
-  win.on('unmaximize', () => win.webContents.send('window-maximize-change', false))
+  win.on("maximize", () => win.webContents.send("window-maximize-change", true));
+  win.on("unmaximize", () => win.webContents.send("window-maximize-change", false));
 }
 
 function createStartupWindow(): void {
@@ -55,38 +55,38 @@ function createStartupWindow(): void {
     center: true,
     show: false,
     frame: false,
-    icon: join(__dirname, '../../resources/icon.ico'),
-    title: 'MergeMate',
-    backgroundColor: '#1e1e1e',
+    icon: join(__dirname, "../../resources/icon.ico"),
+    title: "MergeMate",
+    backgroundColor: "#1e1e1e",
     autoHideMenuBar: true,
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: join(__dirname, "../preload/index.js"),
       sandbox: false,
       contextIsolation: true,
       nodeIntegration: false
     }
-  })
+  });
 
-  startupWindow.on('ready-to-show', () => startupWindow?.show())
+  startupWindow.on("ready-to-show", () => startupWindow?.show());
 
   // Si el usuario cierra la startup sin haber abierto main → salir
-  startupWindow.on('close', () => {
+  startupWindow.on("close", () => {
     if (!mainWindow || mainWindow.isDestroyed()) {
-      app.quit()
+      app.quit();
     }
-  })
+  });
 
-  setupMaximizeEvents(startupWindow)
+  setupMaximizeEvents(startupWindow);
 
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    startupWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + '#startup')
+  if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
+    startupWindow.loadURL(process.env["ELECTRON_RENDERER_URL"] + "#startup");
   } else {
-    startupWindow.loadFile(join(__dirname, '../renderer/index.html'), { hash: 'startup' })
+    startupWindow.loadFile(join(__dirname, "../renderer/index.html"), { hash: "startup" });
   }
 }
 
 function createMainWindow(): void {
-  const savedState = store.get('windowState') ?? null
+  const savedState = store.get("windowState") ?? null;
 
   mainWindow = new BrowserWindow({
     x: savedState?.x,
@@ -97,287 +97,310 @@ function createMainWindow(): void {
     minHeight: 700,
     show: false,
     frame: false,
-    icon: join(__dirname, '../../resources/icon.ico'),
-    title: 'MergeMate',
-    backgroundColor: '#1e1e1e',
+    icon: join(__dirname, "../../resources/icon.ico"),
+    title: "MergeMate",
+    backgroundColor: "#1e1e1e",
     autoHideMenuBar: true,
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
+      preload: join(__dirname, "../preload/index.js"),
       sandbox: false,
       contextIsolation: true,
       nodeIntegration: false
     }
-  })
+  });
 
-  mainWindow.on('ready-to-show', () => {
+  mainWindow.on("ready-to-show", () => {
     if (!savedState || savedState.maximized) {
-      mainWindow?.maximize()
+      mainWindow?.maximize();
     }
-    mainWindow?.show()
-  })
+    mainWindow?.show();
+  });
 
-  mainWindow.on('close', (event) => {
-    if (!mainWindow) return
+  mainWindow.on("close", (event) => {
+    if (!mainWindow) return;
     // Guardar estado siempre (antes de cualquier decisión)
-    const isMaximized = mainWindow.isMaximized()
-    const bounds = mainWindow.getNormalBounds()
-    store.set('windowState', {
+    const isMaximized = mainWindow.isMaximized();
+    const bounds = mainWindow.getNormalBounds();
+    store.set("windowState", {
       x: bounds.x,
       y: bounds.y,
       width: bounds.width,
       height: bounds.height,
       maximized: isMaximized
-    })
+    });
     // Pedir confirmación al renderer (solo la primera vez)
     if (!mainWindowClosing) {
-      event.preventDefault()
-      mainWindow.webContents.send('window-close-requested')
+      event.preventDefault();
+      mainWindow.webContents.send("window-close-requested");
     }
-  })
+  });
 
-  mainWindow.on('closed', () => {
-    mainWindow = null
-    mainWindowClosing = false
-    createStartupWindow()
-  })
+  mainWindow.on("closed", () => {
+    mainWindow = null;
+    mainWindowClosing = false;
+    createStartupWindow();
+  });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-    return { action: 'deny' }
-  })
+    shell.openExternal(details.url);
+    return { action: "deny" };
+  });
 
-  setupMaximizeEvents(mainWindow)
+  setupMaximizeEvents(mainWindow);
 
-  if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
-    mainWindow.loadURL(process.env['ELECTRON_RENDERER_URL'] + '#main')
+  if (is.dev && process.env["ELECTRON_RENDERER_URL"]) {
+    mainWindow.loadURL(process.env["ELECTRON_RENDERER_URL"] + "#main");
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'), { hash: 'main' })
+    mainWindow.loadFile(join(__dirname, "../renderer/index.html"), { hash: "main" });
   }
 }
 
 function registerIpcHandlers(): void {
   // ── Startup ───────────────────────────────────────────────────────────────
 
-  ipcMain.handle('startup-get-recent', () =>
-    store.get('recentComparisons') ?? []
-  )
+  ipcMain.handle("startup-get-recent", () => store.get("recentComparisons") ?? []);
 
-  ipcMain.handle('startup-open-main', (_event, left?: string, right?: string, mode?: string) => {
-    if (mode === 'blank') {
-      pendingBlank = true
+  ipcMain.handle("startup-open-main", (_event, left?: string, right?: string, mode?: string) => {
+    if (mode === "blank") {
+      pendingBlank = true;
     } else if (left && right) {
       // Si el mode no viene explícito, detectar por el sistema de archivos
-      const effectiveMode = mode === 'files' || (
-        mode !== 'folders' &&
-        fs.existsSync(left) && fs.statSync(left).isFile()
-      ) ? 'files' : 'folders'
+      const effectiveMode =
+        mode === "files" ||
+        (mode !== "folders" && fs.existsSync(left) && fs.statSync(left).isFile())
+          ? "files"
+          : "folders";
 
-      if (effectiveMode === 'files') {
-        const assertFile = (p: string, side: 'left' | 'right'): void => {
+      if (effectiveMode === "files") {
+        const assertFile = (p: string, side: "left" | "right"): void => {
           if (!fs.existsSync(p) || !fs.statSync(p).isFile()) {
-            console.error(`[startup-open-main] invalid file path for ${side}: ${p}`)
-            throw new Error(`Invalid file path for ${side}: ${p}`)
+            console.error(`[startup-open-main] invalid file path for ${side}: ${p}`);
+            throw new Error(`Invalid file path for ${side}: ${p}`);
           }
-        }
-        assertFile(left, 'left')
-        assertFile(right, 'right')
-        pendingFiles = { left, right }
+        };
+        assertFile(left, "left");
+        assertFile(right, "right");
+        pendingFiles = { left, right };
       } else {
-        pendingFolders = { left, right }
+        pendingFolders = { left, right };
       }
     }
-    createMainWindow()
-    startupWindow?.close()
-  })
+    createMainWindow();
+    startupWindow?.close();
+  });
 
   // ── Main window ───────────────────────────────────────────────────────────
 
-  ipcMain.handle('get-pending-folders', () => {
-    const f = pendingFolders
-    pendingFolders = null
-    return f
-  })
+  ipcMain.handle("get-pending-folders", () => {
+    const f = pendingFolders;
+    pendingFolders = null;
+    return f;
+  });
 
-  ipcMain.handle('get-pending-files', () => {
-    const f = pendingFiles
-    pendingFiles = null
-    return f
-  })
+  ipcMain.handle("get-pending-files", () => {
+    const f = pendingFiles;
+    pendingFiles = null;
+    return f;
+  });
 
-  ipcMain.handle('get-pending-blank', () => {
-    const b = pendingBlank
-    pendingBlank = false
-    return b
-  })
+  ipcMain.handle("get-pending-blank", () => {
+    const b = pendingBlank;
+    pendingBlank = false;
+    return b;
+  });
 
-  ipcMain.handle('show-file-dialog', async (event, filter?: string) => {
-    const win = BrowserWindow.fromWebContents(event.sender)
-    const imageExts = ['png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico', 'tiff', 'tif', 'webp', 'avif', 'svg']
+  ipcMain.handle("show-file-dialog", async (event, filter?: string) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const imageExts = [
+      "png",
+      "jpg",
+      "jpeg",
+      "gif",
+      "bmp",
+      "ico",
+      "tiff",
+      "tif",
+      "webp",
+      "avif",
+      "svg"
+    ];
     const result = await dialog.showOpenDialog(win ?? startupWindow!, {
-      properties: ['openFile'],
-      filters: filter === 'images-only'
-        ? [{ name: 'Imágenes', extensions: imageExts }]
-        : undefined
-    })
-    if (result.canceled || result.filePaths.length === 0) return null
-    return result.filePaths[0]
-  })
+      properties: ["openFile"],
+      filters: filter === "images-only" ? [{ name: "Imágenes", extensions: imageExts }] : undefined
+    });
+    if (result.canceled || result.filePaths.length === 0) return null;
+    return result.filePaths[0];
+  });
 
-  ipcMain.handle('save-recent-comparison', (_event, left: string, right: string, mode?: 'folders' | 'files') => {
-    const existing: RecentComparison[] = store.get('recentComparisons') ?? []
-    const filtered = existing.filter((r) => r.left !== left || r.right !== right)
-    store.set('recentComparisons', [{ left, right, lastUsed: Date.now(), mode }, ...filtered].slice(0, 8))
-  })
+  ipcMain.handle(
+    "save-recent-comparison",
+    (_event, left: string, right: string, mode?: "folders" | "files") => {
+      const existing: RecentComparison[] = store.get("recentComparisons") ?? [];
+      const filtered = existing.filter((r) => r.left !== left || r.right !== right);
+      store.set(
+        "recentComparisons",
+        [{ left, right, lastUsed: Date.now(), mode }, ...filtered].slice(0, 8)
+      );
+    }
+  );
 
-  ipcMain.handle('remove-recent-comparison', (_event, left: string, right: string) => {
-    const existing: RecentComparison[] = store.get('recentComparisons') ?? []
-    store.set('recentComparisons', existing.filter((r) => r.left !== left || r.right !== right))
-  })
+  ipcMain.handle("remove-recent-comparison", (_event, left: string, right: string) => {
+    const existing: RecentComparison[] = store.get("recentComparisons") ?? [];
+    store.set(
+      "recentComparisons",
+      existing.filter((r) => r.left !== left || r.right !== right)
+    );
+  });
 
   // ── File operations ───────────────────────────────────────────────────────
 
-  ipcMain.handle('scan-folder', async (event, leftPath: string, rightPath: string) => {
-    const win = BrowserWindow.fromWebContents(event.sender)
+  ipcMain.handle("scan-folder", async (event, leftPath: string, rightPath: string) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
     return new Promise((resolve, reject) => {
       try {
         const result = scanFolders(leftPath, rightPath, (percent, currentFile) => {
-          win?.webContents.send('scan-progress', { percent, currentFile })
-        })
-        resolve(result)
+          win?.webContents.send("scan-progress", { percent, currentFile });
+        });
+        resolve(result);
       } catch (err) {
-        reject(err)
+        reject(err);
       }
-    })
-  })
+    });
+  });
 
-  ipcMain.handle('read-file', async (_event, filePath: string) =>
-    fs.readFileSync(filePath, 'utf-8')
-  )
+  ipcMain.handle("read-file", async (_event, filePath: string) =>
+    fs.readFileSync(filePath, "utf-8")
+  );
 
-  ipcMain.handle('read-file-base64', async (_event, filePath: string) =>
-    fs.readFileSync(filePath).toString('base64')
-  )
+  ipcMain.handle("read-file-base64", async (_event, filePath: string) =>
+    fs.readFileSync(filePath).toString("base64")
+  );
 
-  ipcMain.handle('write-file', async (_event, filePath: string, content: string) => {
-    fs.writeFileSync(filePath, content, 'utf-8')
-  })
+  ipcMain.handle("write-file", async (_event, filePath: string, content: string) => {
+    fs.writeFileSync(filePath, content, "utf-8");
+  });
 
-  ipcMain.handle('copy-file-with-bak', async (_event, src: string, dest: string) => {
-    if (fs.existsSync(dest)) fs.copyFileSync(dest, dest + '.bak')
-    fs.copyFileSync(src, dest)
-  })
+  ipcMain.handle("copy-file-with-bak", async (_event, src: string, dest: string) => {
+    if (fs.existsSync(dest)) fs.copyFileSync(dest, dest + ".bak");
+    fs.copyFileSync(src, dest);
+  });
 
-  ipcMain.handle('show-folder-dialog', async (event) => {
-    const win = BrowserWindow.fromWebContents(event.sender)
+  ipcMain.handle("show-folder-dialog", async (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
     const result = await dialog.showOpenDialog(win ?? mainWindow!, {
-      properties: ['openDirectory']
-    })
-    if (result.canceled || result.filePaths.length === 0) return null
-    return result.filePaths[0]
-  })
+      properties: ["openDirectory"]
+    });
+    if (result.canceled || result.filePaths.length === 0) return null;
+    return result.filePaths[0];
+  });
 
-  ipcMain.handle('get-file-hash', async (_event, filePath: string) =>
-    hashFile(filePath)
-  )
+  ipcMain.handle("get-file-hash", async (_event, filePath: string) => hashFile(filePath));
 
-  ipcMain.handle('classify-files', (_event, leftPath: string | null, rightPath: string | null, ext: string) =>
-    classifyFiles(leftPath, rightPath, ext)
-  )
+  ipcMain.handle(
+    "classify-files",
+    (_event, leftPath: string | null, rightPath: string | null, ext: string) =>
+      classifyFiles(leftPath, rightPath, ext)
+  );
 
-  ipcMain.handle('folder-exists', (_event, folderPath: string) =>
-    fs.existsSync(folderPath) && fs.statSync(folderPath).isDirectory()
-  )
+  ipcMain.handle(
+    "folder-exists",
+    (_event, folderPath: string) =>
+      fs.existsSync(folderPath) && fs.statSync(folderPath).isDirectory()
+  );
 
-  ipcMain.handle('open-external', (_event, url: string) => {
-    shell.openExternal(url)
-  })
+  ipcMain.handle("open-external", (_event, url: string) => {
+    shell.openExternal(url);
+  });
 
   // ── App settings ──────────────────────────────────────────────────────────
 
-  ipcMain.handle('app-settings-get', () =>
-    store.get('appSettings') ?? DEFAULT_SETTINGS
-  )
+  ipcMain.handle("app-settings-get", () => store.get("appSettings") ?? DEFAULT_SETTINGS);
 
-  ipcMain.handle('app-settings-set', (_event, partial: Partial<StoreSchema['appSettings']>) => {
-    const current = store.get('appSettings') ?? DEFAULT_SETTINGS
-    const next = { ...current, ...partial }
-    store.set('appSettings', next)
-    return next
-  })
+  ipcMain.handle("app-settings-set", (_event, partial: Partial<StoreSchema["appSettings"]>) => {
+    const current = store.get("appSettings") ?? DEFAULT_SETTINGS;
+    const next = { ...current, ...partial };
+    store.set("appSettings", next);
+    return next;
+  });
 
-  ipcMain.handle('window-confirm-close', () => {
-    mainWindowClosing = true
-    mainWindow?.close()
-  })
+  ipcMain.handle("window-confirm-close", () => {
+    mainWindowClosing = true;
+    mainWindow?.close();
+  });
 
   // ── Window controls (funciona para cualquier ventana via event.sender) ────
 
-  ipcMain.handle('window-minimize', (event) => {
-    BrowserWindow.fromWebContents(event.sender)?.minimize()
-  })
+  ipcMain.handle("window-minimize", (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.minimize();
+  });
 
-  ipcMain.handle('window-maximize', (event) => {
-    const win = BrowserWindow.fromWebContents(event.sender)
+  ipcMain.handle("window-maximize", (event) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
     if (win) {
-      if (win.isMaximized()) win.unmaximize()
-      else win.maximize()
+      if (win.isMaximized()) win.unmaximize();
+      else win.maximize();
     }
-  })
+  });
 
-  ipcMain.handle('window-close', (event) => {
-    BrowserWindow.fromWebContents(event.sender)?.close()
-  })
+  ipcMain.handle("window-close", (event) => {
+    BrowserWindow.fromWebContents(event.sender)?.close();
+  });
 
-  ipcMain.handle('window-is-maximized', (event) =>
-    BrowserWindow.fromWebContents(event.sender)?.isMaximized() ?? false
-  )
+  ipcMain.handle(
+    "window-is-maximized",
+    (event) => BrowserWindow.fromWebContents(event.sender)?.isMaximized() ?? false
+  );
 }
 
 function setupAutoUpdater(): void {
-  autoUpdater.autoDownload = true
-  autoUpdater.autoInstallOnAppQuit = true
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
 
-  autoUpdater.on('update-downloaded', () => {
-    const win = mainWindow ?? startupWindow
-    if (!win) return
-    dialog.showMessageBox(win, {
-      type: 'info',
-      title: 'Actualización lista',
-      message: 'Se descargó una nueva versión de MergeMate.',
-      detail: '¿Deseas reiniciar ahora para aplicar la actualización?',
-      buttons: ['Reiniciar ahora', 'Más tarde'],
-      defaultId: 0,
-      cancelId: 1
-    }).then(({ response }) => {
-      if (response === 0) autoUpdater.quitAndInstall()
-    })
-  })
+  autoUpdater.on("update-downloaded", () => {
+    const win = mainWindow ?? startupWindow;
+    if (!win) return;
+    dialog
+      .showMessageBox(win, {
+        type: "info",
+        title: "Actualización lista",
+        message: "Se descargó una nueva versión de MergeMate.",
+        detail: "¿Deseas reiniciar ahora para aplicar la actualización?",
+        buttons: ["Reiniciar ahora", "Más tarde"],
+        defaultId: 0,
+        cancelId: 1
+      })
+      .then(({ response }) => {
+        if (response === 0) autoUpdater.quitAndInstall();
+      });
+  });
 
   // Errores silenciosos (sin internet, rate limit de GitHub, etc.)
-  autoUpdater.on('error', () => { /* ignorar */ })
+  autoUpdater.on("error", () => {
+    /* ignorar */
+  });
 
-  autoUpdater.checkForUpdates()
+  autoUpdater.checkForUpdates();
 }
 
 app.whenReady().then(() => {
-  electronApp.setAppUserModelId('com.mergemate.app')
+  electronApp.setAppUserModelId("com.mergemate.app");
 
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window)
-  })
+  app.on("browser-window-created", (_, window) => {
+    optimizer.watchWindowShortcuts(window);
+  });
 
-  registerIpcHandlers()
-  createStartupWindow()
+  registerIpcHandlers();
+  createStartupWindow();
 
-  if (!is.dev) setupAutoUpdater()
+  if (!is.dev) setupAutoUpdater();
 
-  app.on('activate', () => {
-    if (BrowserWindow.getAllWindows().length === 0) createStartupWindow()
-  })
-})
+  app.on("activate", () => {
+    if (BrowserWindow.getAllWindows().length === 0) createStartupWindow();
+  });
+});
 
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit()
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
+    app.quit();
   }
-})
+});

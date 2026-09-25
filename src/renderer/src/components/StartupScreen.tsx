@@ -1,122 +1,154 @@
-import React, { useState, useEffect } from 'react'
-import { FolderOpen, FileText, Clock, ArrowRight, X, Info, Clipboard } from 'lucide-react'
-import { version } from '../../../../package.json'
-import { useTranslation } from 'react-i18next'
-import type { TFunction } from 'i18next'
-import { TitleBar } from './TitleBar'
-import { MergeMateLogo } from './MergeMateLogo'
-import type { RecentComparison } from '../../../types'
+import React, { useState, useEffect } from "react";
+import { FolderOpen, FileText, Clock, ArrowRight, X, Info, Clipboard } from "lucide-react";
+import { version } from "../../../../package.json";
+import { useTranslation } from "react-i18next";
+import type { TFunction } from "i18next";
+import { TitleBar } from "./TitleBar";
+import { MergeMateLogo } from "./MergeMateLogo";
+import type { RecentComparison } from "../../../types";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-const IMAGE_EXTS = new Set(['png', 'jpg', 'jpeg', 'gif', 'bmp', 'ico', 'tiff', 'tif', 'webp', 'avif', 'svg'])
+const IMAGE_EXTS = new Set([
+  "png",
+  "jpg",
+  "jpeg",
+  "gif",
+  "bmp",
+  "ico",
+  "tiff",
+  "tif",
+  "webp",
+  "avif",
+  "svg"
+]);
 
 function fileIsImage(filePath: string): boolean {
-  return IMAGE_EXTS.has(filePath.split('.').pop()?.toLowerCase() ?? '')
+  return IMAGE_EXTS.has(filePath.split(".").pop()?.toLowerCase() ?? "");
 }
 
 function basename(p: string): string {
-  return p.replace(/[/\\]+$/, '').split(/[/\\]/).pop() ?? p
+  return (
+    p
+      .replace(/[/\\]+$/, "")
+      .split(/[/\\]/)
+      .pop() ?? p
+  );
 }
 
 function timeAgo(ts: number, t: TFunction): string {
-  const diff = Date.now() - ts
-  if (diff < 0)   return t('startup.timeAgo.justNow')
-  const mins = Math.floor(diff / 60_000)
-  if (mins < 1)   return t('startup.timeAgo.justNow')
-  if (mins < 60)  return t('startup.timeAgo.minutes', { count: mins })
-  const hours = Math.floor(mins / 60)
-  if (hours < 24) return t('startup.timeAgo.hours', { count: hours })
-  const days = Math.floor(hours / 24)
-  if (days === 1) return t('startup.timeAgo.yesterday')
-  if (days < 7)   return t('startup.timeAgo.days', { count: days })
-  return new Date(ts).toLocaleDateString(undefined, { day: 'numeric', month: 'short' })
+  const diff = Date.now() - ts;
+  if (diff < 0) return t("startup.timeAgo.justNow");
+  const mins = Math.floor(diff / 60_000);
+  if (mins < 1) return t("startup.timeAgo.justNow");
+  if (mins < 60) return t("startup.timeAgo.minutes", { count: mins });
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return t("startup.timeAgo.hours", { count: hours });
+  const days = Math.floor(hours / 24);
+  if (days === 1) return t("startup.timeAgo.yesterday");
+  if (days < 7) return t("startup.timeAgo.days", { count: days });
+  return new Date(ts).toLocaleDateString(undefined, { day: "numeric", month: "short" });
 }
 
 // ── Componente principal ──────────────────────────────────────────────────────
 
 export function StartupScreen(): React.JSX.Element {
-  const { t } = useTranslation()
-  const [recents, setRecents] = useState<RecentComparison[]>([])
-  const [pendingRemove, setPendingRemove] = useState<RecentComparison | null>(null)
-  const [showAbout, setShowAbout] = useState(false)
-  const [fileError, setFileError] = useState<string | null>(null)
+  const { t } = useTranslation();
+  const [recents, setRecents] = useState<RecentComparison[]>([]);
+  const [pendingRemove, setPendingRemove] = useState<RecentComparison | null>(null);
+  const [showAbout, setShowAbout] = useState(false);
+  const [fileError, setFileError] = useState<string | null>(null);
 
   useEffect(() => {
-    window.electronAPI.getRecentComparisons().then(setRecents)
-  }, [])
+    window.electronAPI.getRecentComparisons().then(setRecents);
+  }, []);
 
   function handleOpenMain(): void {
-    window.electronAPI.openMainWindow()
+    window.electronAPI.openMainWindow();
   }
 
   async function handleOpenFiles(): Promise<void> {
-    setFileError(null)
-    const left = await window.electronAPI.showFileDialog()
-    if (!left) return
-    const leftIsImage = fileIsImage(left)
-    const right = await window.electronAPI.showFileDialog(leftIsImage ? 'images-only' : undefined)
-    if (!right) return
+    setFileError(null);
+    const left = await window.electronAPI.showFileDialog();
+    if (!left) return;
+    const leftIsImage = fileIsImage(left);
+    const right = await window.electronAPI.showFileDialog(leftIsImage ? "images-only" : undefined);
+    if (!right) return;
     if (!leftIsImage && fileIsImage(right)) {
-      setFileError(t('startup.fileMixedTypeError'))
-      return
+      setFileError(t("startup.fileMixedTypeError"));
+      return;
     }
-    window.electronAPI.openMainWindow(left, right, 'files')
+    window.electronAPI.openMainWindow(left, right, "files");
   }
 
   function handleOpenBlank(): void {
-    window.electronAPI.openMainWindow(undefined, undefined, 'blank')
+    window.electronAPI.openMainWindow(undefined, undefined, "blank");
   }
 
   function handleOpenRecent(r: RecentComparison): void {
-    window.electronAPI.openMainWindow(r.left, r.right, r.mode)
+    window.electronAPI.openMainWindow(r.left, r.right, r.mode);
   }
 
   function handleRemoveClick(e: React.MouseEvent, r: RecentComparison): void {
-    e.stopPropagation()
-    setPendingRemove(r)
+    e.stopPropagation();
+    setPendingRemove(r);
   }
 
   async function handleRemoveConfirm(): Promise<void> {
-    if (!pendingRemove) return
-    await window.electronAPI.removeRecentComparison(pendingRemove.left, pendingRemove.right)
-    setRecents((prev) => prev.filter((x) => x.left !== pendingRemove.left || x.right !== pendingRemove.right))
-    setPendingRemove(null)
+    if (!pendingRemove) return;
+    await window.electronAPI.removeRecentComparison(pendingRemove.left, pendingRemove.right);
+    setRecents((prev) =>
+      prev.filter((x) => x.left !== pendingRemove.left || x.right !== pendingRemove.right)
+    );
+    setPendingRemove(null);
   }
 
   return (
     <div className="flex h-screen flex-col bg-[#1e1e1e]" role="main">
       {showAbout && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" role="dialog" aria-modal="true" aria-labelledby="about-title">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="about-title"
+        >
           <div className="mx-4 w-full max-w-md rounded-lg border border-[#3e3e42] bg-[#252526] p-6 shadow-2xl">
             <div className="mb-4 flex items-center gap-3">
               <Info size={20} className="shrink-0 text-[#007acc]" aria-hidden="true" />
               <div>
-                <h2 id="about-title" className="text-base font-semibold text-[#cccccc]">{t('about.title')}</h2>
-                <p className="text-xs text-[#858585]">{t('about.version', { version })}</p>
+                <h2 id="about-title" className="text-base font-semibold text-[#cccccc]">
+                  {t("about.title")}
+                </h2>
+                <p className="text-xs text-[#858585]">{t("about.version", { version })}</p>
               </div>
             </div>
             <div className="space-y-4 text-sm leading-relaxed text-[#aaaaaa]">
-              <p className="text-justify">{t('about.description')}</p>
-              <p className="text-justify">{t('about.origin')}</p>
+              <p className="text-justify">{t("about.description")}</p>
+              <p className="text-justify">{t("about.origin")}</p>
               <div className="flex items-start gap-2.5 rounded border border-[#3e3e42] bg-[#1e1e1e] px-3 py-2.5">
-                <span className="text-2xl leading-tight" aria-hidden="true">🚧</span>
-                <p className="text-justify text-xs leading-relaxed text-[#858585]">{t('about.activeDev')}</p>
+                <span className="text-2xl leading-tight" aria-hidden="true">
+                  🚧
+                </span>
+                <p className="text-justify text-xs leading-relaxed text-[#858585]">
+                  {t("about.activeDev")}
+                </p>
               </div>
             </div>
             <div className="mt-5 flex items-center justify-between">
               <button
                 className="text-xs text-[#007acc] hover:underline"
-                onClick={() => window.electronAPI.openExternal('https://github.com/wanderlp/mergemate')}
+                onClick={() =>
+                  window.electronAPI.openExternal("https://github.com/wanderlp/mergemate")
+                }
               >
-                {t('about.repo')}
+                {t("about.repo")}
               </button>
               <button
                 className="rounded px-3 py-1.5 text-sm text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
                 onClick={() => setShowAbout(false)}
                 autoFocus
               >
-                {t('about.close')}
+                {t("about.close")}
               </button>
             </div>
           </div>
@@ -124,11 +156,20 @@ export function StartupScreen(): React.JSX.Element {
       )}
 
       {pendingRemove && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" role="dialog" aria-modal="true">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          role="dialog"
+          aria-modal="true"
+        >
           <div className="mx-4 w-full max-w-sm rounded-lg border border-[#3e3e42] bg-[#252526] p-6 shadow-2xl">
-            <h2 className="mb-2 text-base font-semibold text-[#cccccc]">{t('startup.removeConfirmTitle')}</h2>
+            <h2 className="mb-2 text-base font-semibold text-[#cccccc]">
+              {t("startup.removeConfirmTitle")}
+            </h2>
             <p className="mb-6 text-sm text-[#aaaaaa]">
-              {t('startup.removeConfirmMessage', { left: basename(pendingRemove.left), right: basename(pendingRemove.right) })}
+              {t("startup.removeConfirmMessage", {
+                left: basename(pendingRemove.left),
+                right: basename(pendingRemove.right)
+              })}
             </p>
             <div className="flex justify-end gap-2">
               <button
@@ -136,13 +177,13 @@ export function StartupScreen(): React.JSX.Element {
                 onClick={() => setPendingRemove(null)}
                 autoFocus
               >
-                {t('startup.removeCancel')}
+                {t("startup.removeCancel")}
               </button>
               <button
                 className="rounded bg-[#c42b1c] px-3 py-1.5 text-sm text-white transition-colors hover:bg-[#d9362a]"
                 onClick={handleRemoveConfirm}
               >
-                {t('startup.removeConfirm')}
+                {t("startup.removeConfirm")}
               </button>
             </div>
           </div>
@@ -158,24 +199,24 @@ export function StartupScreen(): React.JSX.Element {
             <MergeMateLogo size={140} />
             <div className="text-center">
               <div className="text-2xl font-bold tracking-wide text-[#cccccc]">MergeMate</div>
-              <div className="text-xs text-[#858585]">{t('startup.subtitle')}</div>
+              <div className="text-xs text-[#858585]">{t("startup.subtitle")}</div>
             </div>
           </div>
 
           {/* Sección: Comenzar */}
-          <SectionHeader label={t('startup.sectionStart')} />
+          <SectionHeader label={t("startup.sectionStart")} />
 
           <ActionButton
             icon={<Clipboard size={18} aria-hidden="true" />}
-            label={t('startup.blankComparison')}
-            description={t('startup.blankComparisonDesc')}
+            label={t("startup.blankComparison")}
+            description={t("startup.blankComparisonDesc")}
             onClick={handleOpenBlank}
           />
 
           <ActionButton
             icon={<FileText size={18} aria-hidden="true" />}
-            label={t('startup.compareFiles')}
-            description={t('startup.compareFilesDesc')}
+            label={t("startup.compareFiles")}
+            description={t("startup.compareFilesDesc")}
             onClick={handleOpenFiles}
           />
           {fileError && (
@@ -186,11 +227,10 @@ export function StartupScreen(): React.JSX.Element {
 
           <ActionButton
             icon={<FolderOpen size={18} aria-hidden="true" />}
-            label={t('startup.compareFolders')}
-            description={t('startup.compareFoldersDesc')}
+            label={t("startup.compareFolders")}
+            description={t("startup.compareFoldersDesc")}
             onClick={handleOpenMain}
           />
-
 
           <div className="mt-auto flex justify-center pt-8">
             <button
@@ -198,7 +238,7 @@ export function StartupScreen(): React.JSX.Element {
               onClick={() => setShowAbout(true)}
             >
               <Info size={13} aria-hidden="true" />
-              {t('about.title')} · v{version}
+              {t("about.title")} · v{version}
             </button>
           </div>
         </div>
@@ -208,33 +248,53 @@ export function StartupScreen(): React.JSX.Element {
 
         {/* Panel derecho ─ recientes */}
         <div className="flex min-w-0 flex-1 flex-col overflow-y-auto px-8 py-10">
-          <SectionHeader label={t('startup.sectionRecent')} />
+          <SectionHeader label={t("startup.sectionRecent")} />
 
           {recents.length === 0 ? (
             <div className="mt-4 flex flex-col items-center gap-3 py-8 text-center text-[#858585]">
               <Clock size={32} aria-hidden="true" className="opacity-40" />
-              <p className="text-sm">{t('startup.noRecent')}</p>
-              <p className="text-xs text-[#555555]">{t('startup.noRecentDesc')}</p>
+              <p className="text-sm">{t("startup.noRecent")}</p>
+              <p className="text-xs text-[#555555]">{t("startup.noRecentDesc")}</p>
             </div>
           ) : (
-            <ul className="mt-2 flex flex-col gap-0.5" role="list" aria-label={t('startup.sectionRecent')}>
+            <ul
+              className="mt-2 flex flex-col gap-0.5"
+              role="list"
+              aria-label={t("startup.sectionRecent")}
+            >
               {recents.map((r, i) => (
                 <li key={i} className="group/item relative">
                   <button
                     className="group flex w-full items-start gap-3 rounded px-3 py-2.5 text-left transition-colors hover:bg-[#2a2d2e] focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-[#007acc]"
                     onClick={() => handleOpenRecent(r)}
-                    aria-label={t('startup.openAriaLabel', { left: basename(r.left), right: basename(r.right) })}
+                    aria-label={t("startup.openAriaLabel", {
+                      left: basename(r.left),
+                      right: basename(r.right)
+                    })}
                   >
-                    {r.mode === 'files'
-                      ? <FileText size={16} className="mt-0.5 shrink-0 text-[#007acc]" aria-hidden="true" />
-                      : <FolderOpen size={16} className="mt-0.5 shrink-0 text-[#007acc]" aria-hidden="true" />
-                    }
+                    {r.mode === "files" ? (
+                      <FileText
+                        size={16}
+                        className="mt-0.5 shrink-0 text-[#007acc]"
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <FolderOpen
+                        size={16}
+                        className="mt-0.5 shrink-0 text-[#007acc]"
+                        aria-hidden="true"
+                      />
+                    )}
                     <div className="min-w-0 flex-1 pr-6">
                       <div className="flex items-center gap-2">
                         <span className="truncate text-sm font-medium text-[#cccccc]">
                           {basename(r.left)}
                         </span>
-                        <ArrowRight size={12} className="shrink-0 text-[#555555]" aria-hidden="true" />
+                        <ArrowRight
+                          size={12}
+                          className="shrink-0 text-[#555555]"
+                          aria-hidden="true"
+                        />
                         <span className="truncate text-sm font-medium text-[#cccccc]">
                           {basename(r.right)}
                         </span>
@@ -247,7 +307,10 @@ export function StartupScreen(): React.JSX.Element {
                   <button
                     className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-[#555555] opacity-0 transition-opacity hover:bg-[#3e3e42] hover:text-[#cccccc] group-hover/item:opacity-100"
                     onClick={(e) => handleRemoveClick(e, r)}
-                    aria-label={t('startup.removeAriaLabel', { left: basename(r.left), right: basename(r.right) })}
+                    aria-label={t("startup.removeAriaLabel", {
+                      left: basename(r.left),
+                      right: basename(r.right)
+                    })}
                     tabIndex={-1}
                   >
                     <X size={13} aria-hidden="true" />
@@ -259,28 +322,42 @@ export function StartupScreen(): React.JSX.Element {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 // ── Sub-componentes internos ──────────────────────────────────────────────────
 
-function SectionHeader({ label, className = '' }: { label: string; className?: string }): React.JSX.Element {
+function SectionHeader({
+  label,
+  className = ""
+}: {
+  label: string;
+  className?: string;
+}): React.JSX.Element {
   return (
-    <h2 className={`mb-3 text-[11px] font-semibold uppercase tracking-widest text-[#858585] ${className}`}>
+    <h2
+      className={`mb-3 text-[11px] font-semibold uppercase tracking-widest text-[#858585] ${className}`}
+    >
       {label}
     </h2>
-  )
+  );
 }
 
 interface ActionButtonProps {
-  icon: React.ReactNode
-  label: string
-  description: string
-  onClick?: () => void
-  disabled?: boolean
+  icon: React.ReactNode;
+  label: string;
+  description: string;
+  onClick?: () => void;
+  disabled?: boolean;
 }
 
-function ActionButton({ icon, label, description, onClick, disabled = false }: ActionButtonProps): React.JSX.Element {
+function ActionButton({
+  icon,
+  label,
+  description,
+  onClick,
+  disabled = false
+}: ActionButtonProps): React.JSX.Element {
   return (
     <button
       className="mb-1 flex w-full items-center gap-3 rounded px-3 py-2.5 text-left transition-colors
@@ -296,5 +373,5 @@ function ActionButton({ icon, label, description, onClick, disabled = false }: A
         <div className="text-xs text-[#858585]">{description}</div>
       </div>
     </button>
-  )
+  );
 }

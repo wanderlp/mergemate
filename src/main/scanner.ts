@@ -1,75 +1,97 @@
-import * as fs from 'fs'
-import * as path from 'path'
-import { classifyFiles } from './classifier'
-import type { FileEntry, ScanResult, ScanStats } from '../types'
+import * as fs from "fs";
+import * as path from "path";
+import { classifyFiles } from "./classifier";
+import type { FileEntry, ScanResult, ScanStats } from "../types";
 
 const IGNORE_DIRS = new Set([
-  'node_modules', '.git', '__pycache__', 'dist', 'build',
-  '.next', 'out', 'target', '.gradle', '.idea', '.vscode',
+  "node_modules",
+  ".git",
+  "__pycache__",
+  "dist",
+  "build",
+  ".next",
+  "out",
+  "target",
+  ".gradle",
+  ".idea",
+  ".vscode",
   // Carpetas del sistema Windows
-  '$RECYCLE.BIN', 'System Volume Information', 'Recovery',
+  "$RECYCLE.BIN",
+  "System Volume Information",
+  "Recovery",
   // Carpetas del sistema macOS
-  '.Spotlight-V100', '.Trashes', '.fseventsd',
+  ".Spotlight-V100",
+  ".Trashes",
+  ".fseventsd",
   // Carpetas del sistema Linux
-  '.Trash-1000', '.cache'
-])
+  ".Trash-1000",
+  ".cache"
+]);
 
 // Archivos de sistema exactos (nombre completo, insensible a mayúsculas)
 const IGNORE_FILES_EXACT = new Set([
   // Windows
-  'thumbs.db', 'ehthumbs.db', 'ehthumbs_vista.db', 'desktop.ini',
-  'ntuser.dat', 'ntuser.ini', 'pagefile.sys', 'hiberfil.sys', 'swapfile.sys',
+  "thumbs.db",
+  "ehthumbs.db",
+  "ehthumbs_vista.db",
+  "desktop.ini",
+  "ntuser.dat",
+  "ntuser.ini",
+  "pagefile.sys",
+  "hiberfil.sys",
+  "swapfile.sys",
   // macOS
-  '.ds_store', '.localized',
+  ".ds_store",
+  ".localized",
   // Linux / KDE
-  '.directory',
-])
+  ".directory"
+]);
 
 // Extensiones o patrones de archivos de sistema
 const IGNORE_EXTENSIONS = new Set([
-  '.lnk',   // accesos directos de Windows
-  '.url',   // accesos directos de internet de Windows
-])
+  ".lnk", // accesos directos de Windows
+  ".url" // accesos directos de internet de Windows
+]);
 
 function shouldIgnore(name: string, isDirectory: boolean): boolean {
-  if (isDirectory && IGNORE_DIRS.has(name)) return true
-  if (name.endsWith('.bak')) return true
+  if (isDirectory && IGNORE_DIRS.has(name)) return true;
+  if (name.endsWith(".bak")) return true;
 
   if (!isDirectory) {
-    if (IGNORE_FILES_EXACT.has(name.toLowerCase())) return true
-    if (IGNORE_EXTENSIONS.has(path.extname(name).toLowerCase())) return true
+    if (IGNORE_FILES_EXACT.has(name.toLowerCase())) return true;
+    if (IGNORE_EXTENSIONS.has(path.extname(name).toLowerCase())) return true;
     // Patrones: archivos temporales de editores y OS
-    if (name.endsWith('~')) return true          // backups de Vim/Emacs
-    if (name.startsWith('._')) return true        // resource forks de macOS
-    if (/^\.fuse_hidden/.test(name)) return true  // FUSE (Linux)
-    if (/^\.nfs/.test(name)) return true          // NFS lock files (Linux)
-    if (/^\.Trash-/.test(name)) return true       // papelera de Linux
+    if (name.endsWith("~")) return true; // backups de Vim/Emacs
+    if (name.startsWith("._")) return true; // resource forks de macOS
+    if (/^\.fuse_hidden/.test(name)) return true; // FUSE (Linux)
+    if (/^\.nfs/.test(name)) return true; // NFS lock files (Linux)
+    if (/^\.Trash-/.test(name)) return true; // papelera de Linux
   }
 
-  return false
+  return false;
 }
 
 function collectPaths(dir: string, base: string, result: Map<string, string>): void {
-  let entries: fs.Dirent[]
+  let entries: fs.Dirent[];
   try {
-    entries = fs.readdirSync(dir, { withFileTypes: true })
+    entries = fs.readdirSync(dir, { withFileTypes: true });
   } catch {
-    return
+    return;
   }
   for (const entry of entries) {
     // Symlinks no se siguen para evitar ciclos infinitos y ELOOP
     if (entry.isSymbolicLink()) {
-      console.debug(`[scanner] skipping symlink: ${path.join(base, entry.name)}`)
-      continue
+      console.debug(`[scanner] skipping symlink: ${path.join(base, entry.name)}`);
+      continue;
     }
-    if (shouldIgnore(entry.name, entry.isDirectory())) continue
-    const rel = path.join(base, entry.name).replace(/\\/g, '/')
-    const full = path.join(dir, entry.name)
+    if (shouldIgnore(entry.name, entry.isDirectory())) continue;
+    const rel = path.join(base, entry.name).replace(/\\/g, "/");
+    const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      result.set(rel + '/', full)
-      collectPaths(full, rel, result)
+      result.set(rel + "/", full);
+      collectPaths(full, rel, result);
     } else {
-      result.set(rel, full)
+      result.set(rel, full);
     }
   }
 }
@@ -80,60 +102,83 @@ function buildTree(
   rightMap: Map<string, string>,
   onProgress: (file: string) => void
 ): { entries: FileEntry[]; stats: ScanStats } {
-  const stats: ScanStats = { identical: 0, different: 0, commentsOnly: 0, leftOnly: 0, rightOnly: 0, total: 0 }
+  const stats: ScanStats = {
+    identical: 0,
+    different: 0,
+    commentsOnly: 0,
+    leftOnly: 0,
+    rightOnly: 0,
+    total: 0
+  };
 
   // Build flat list of all unique relative paths (files only, no dir keys here)
-  const filePaths = Array.from(allPaths).filter((p) => !p.endsWith('/'))
+  const filePaths = Array.from(allPaths).filter((p) => !p.endsWith("/"));
 
   // Build directory structure
-  const dirMap = new Map<string, FileEntry>()
-  const rootEntries: FileEntry[] = []
+  const dirMap = new Map<string, FileEntry>();
+  const rootEntries: FileEntry[] = [];
 
   function getOrCreateDir(relDir: string): FileEntry {
-    if (dirMap.has(relDir)) return dirMap.get(relDir)!
-    const parts = relDir.split('/').filter(Boolean)
-    const name = parts[parts.length - 1]
+    if (dirMap.has(relDir)) return dirMap.get(relDir)!;
+    const parts = relDir.split("/").filter(Boolean);
+    const name = parts[parts.length - 1];
     const entry: FileEntry = {
       relativePath: relDir,
-      leftPath: leftMap.get(relDir + '/') ?? null,
-      rightPath: rightMap.get(relDir + '/') ?? null,
-      status: 'identical',
+      leftPath: leftMap.get(relDir + "/") ?? null,
+      rightPath: rightMap.get(relDir + "/") ?? null,
+      status: "identical",
       isDirectory: true,
       children: [],
       name,
-      extension: '',
+      extension: "",
       leftSize: null,
       rightSize: null
-    }
-    dirMap.set(relDir, entry)
-    const parentDir = parts.slice(0, -1).join('/')
-    if (parentDir === '') {
-      rootEntries.push(entry)
+    };
+    dirMap.set(relDir, entry);
+    const parentDir = parts.slice(0, -1).join("/");
+    if (parentDir === "") {
+      rootEntries.push(entry);
     } else {
-      const parent = getOrCreateDir(parentDir)
-      parent.children!.push(entry)
+      const parent = getOrCreateDir(parentDir);
+      parent.children!.push(entry);
     }
-    return entry
+    return entry;
   }
 
   for (const rel of filePaths) {
-    onProgress(rel)
-    const ext = path.extname(rel).replace('.', '').toLowerCase()
-    const leftPath = leftMap.get(rel) ?? null
-    const rightPath = rightMap.get(rel) ?? null
-    const status = classifyFiles(leftPath, rightPath, ext)
+    onProgress(rel);
+    const ext = path.extname(rel).replace(".", "").toLowerCase();
+    const leftPath = leftMap.get(rel) ?? null;
+    const rightPath = rightMap.get(rel) ?? null;
+    const status = classifyFiles(leftPath, rightPath, ext);
 
-    stats.total++
-    if (status === 'identical') stats.identical++
-    else if (status === 'different') stats.different++
-    else if (status === 'comments-only') stats.commentsOnly++
-    else if (status === 'left-only') stats.leftOnly++
-    else if (status === 'right-only') stats.rightOnly++
+    stats.total++;
+    if (status === "identical") stats.identical++;
+    else if (status === "different") stats.different++;
+    else if (status === "comments-only") stats.commentsOnly++;
+    else if (status === "left-only") stats.leftOnly++;
+    else if (status === "right-only") stats.rightOnly++;
 
-    const parts = rel.split('/')
-    const name = parts[parts.length - 1]
-    const leftSize = leftPath ? (() => { try { return fs.statSync(leftPath).size } catch { return null } })() : null
-    const rightSize = rightPath ? (() => { try { return fs.statSync(rightPath).size } catch { return null } })() : null
+    const parts = rel.split("/");
+    const name = parts[parts.length - 1];
+    const leftSize = leftPath
+      ? (() => {
+          try {
+            return fs.statSync(leftPath).size;
+          } catch {
+            return null;
+          }
+        })()
+      : null;
+    const rightSize = rightPath
+      ? (() => {
+          try {
+            return fs.statSync(rightPath).size;
+          } catch {
+            return null;
+          }
+        })()
+      : null;
     const fileEntry: FileEntry = {
       relativePath: rel,
       leftPath,
@@ -144,88 +189,96 @@ function buildTree(
       extension: ext,
       leftSize,
       rightSize
-    }
+    };
 
     if (parts.length === 1) {
-      rootEntries.push(fileEntry)
+      rootEntries.push(fileEntry);
     } else {
-      const parentDir = parts.slice(0, -1).join('/')
-      const parent = getOrCreateDir(parentDir)
-      parent.children!.push(fileEntry)
+      const parentDir = parts.slice(0, -1).join("/");
+      const parent = getOrCreateDir(parentDir);
+      parent.children!.push(fileEntry);
     }
   }
 
   // Sort: dirs first, then files, alphabetically
   function sortEntries(entries: FileEntry[]): void {
     entries.sort((a, b) => {
-      if (a.isDirectory && !b.isDirectory) return -1
-      if (!a.isDirectory && b.isDirectory) return 1
-      return a.name.localeCompare(b.name)
-    })
+      if (a.isDirectory && !b.isDirectory) return -1;
+      if (!a.isDirectory && b.isDirectory) return 1;
+      return a.name.localeCompare(b.name);
+    });
     for (const e of entries) {
-      if (e.children) sortEntries(e.children)
+      if (e.children) sortEntries(e.children);
     }
   }
-  sortEntries(rootEntries)
+  sortEntries(rootEntries);
 
   // Compute folder status: the most prevalent status among all descendant files
   function countDescendantStatuses(entry: FileEntry, counts: Record<string, number>): void {
-    if (!entry.children) return
+    if (!entry.children) return;
     for (const child of entry.children) {
       if (child.isDirectory) {
-        countDescendantStatuses(child, counts)
+        countDescendantStatuses(child, counts);
       } else {
-        counts[child.status] = (counts[child.status] ?? 0) + 1
+        counts[child.status] = (counts[child.status] ?? 0) + 1;
       }
     }
   }
 
   function computeDirStatus(entry: FileEntry): void {
-    if (!entry.isDirectory || !entry.children) return
+    if (!entry.isDirectory || !entry.children) return;
     for (const child of entry.children) {
-      computeDirStatus(child)
+      computeDirStatus(child);
     }
-    const counts: Record<string, number> = {}
-    countDescendantStatuses(entry, counts)
+    const counts: Record<string, number> = {};
+    countDescendantStatuses(entry, counts);
     if (Object.keys(counts).length === 0) {
-      entry.status = 'identical'
-      return
+      entry.status = "identical";
+      return;
     }
     // Verde solo si TODOS los descendientes son idénticos
-    const total = Object.values(counts).reduce((a, b) => a + b, 0)
-    if ((counts['identical'] ?? 0) === total) {
-      entry.status = 'identical'
-      return
+    const total = Object.values(counts).reduce((a, b) => a + b, 0);
+    if ((counts["identical"] ?? 0) === total) {
+      entry.status = "identical";
+      return;
     }
     // De lo contrario, el color predominante excluyendo verde
-    const nonIdentical = Object.entries(counts).filter(([k]) => k !== 'identical')
-    const dominant = nonIdentical.sort((a, b) => b[1] - a[1])[0][0]
-    entry.status = dominant as FileEntry['status']
+    const nonIdentical = Object.entries(counts).filter(([k]) => k !== "identical");
+    const dominant = nonIdentical.sort((a, b) => b[1] - a[1])[0][0];
+    entry.status = dominant as FileEntry["status"];
   }
   for (const entry of rootEntries) {
-    computeDirStatus(entry)
+    computeDirStatus(entry);
   }
 
   // Calcular tamaños acumulados de carpetas
   function computeDirSizes(entry: FileEntry): void {
-    if (!entry.isDirectory || !entry.children) return
+    if (!entry.isDirectory || !entry.children) return;
     for (const child of entry.children) {
-      computeDirSizes(child)
+      computeDirSizes(child);
     }
-    let leftTotal = 0, rightTotal = 0
-    let hasLeft = false, hasRight = false
+    let leftTotal = 0,
+      rightTotal = 0;
+    let hasLeft = false,
+      hasRight = false;
     for (const child of entry.children) {
-      if (child.leftSize !== null) { leftTotal += child.leftSize; hasLeft = true }
-      if (child.rightSize !== null) { rightTotal += child.rightSize; hasRight = true }
+      if (child.leftSize !== null) {
+        leftTotal += child.leftSize;
+        hasLeft = true;
+      }
+      if (child.rightSize !== null) {
+        rightTotal += child.rightSize;
+        hasRight = true;
+      }
     }
-    entry.leftSize = hasLeft ? leftTotal : null
-    entry.rightSize = hasRight ? rightTotal : null
+    entry.leftSize = hasLeft ? leftTotal : null;
+    entry.rightSize = hasRight ? rightTotal : null;
   }
   for (const entry of rootEntries) {
-    computeDirSizes(entry)
+    computeDirSizes(entry);
   }
 
-  return { entries: rootEntries, stats }
+  return { entries: rootEntries, stats };
 }
 
 export function scanFolders(
@@ -233,20 +286,20 @@ export function scanFolders(
   rightFolder: string,
   onProgress: (percent: number, currentFile: string) => void
 ): ScanResult {
-  const leftMap = new Map<string, string>()
-  const rightMap = new Map<string, string>()
+  const leftMap = new Map<string, string>();
+  const rightMap = new Map<string, string>();
 
-  collectPaths(leftFolder, '', leftMap)
-  collectPaths(rightFolder, '', rightMap)
+  collectPaths(leftFolder, "", leftMap);
+  collectPaths(rightFolder, "", rightMap);
 
-  const allPaths = new Set([...leftMap.keys(), ...rightMap.keys()])
-  const total = Array.from(allPaths).filter((p) => !p.endsWith('/')).length
-  let processed = 0
+  const allPaths = new Set([...leftMap.keys(), ...rightMap.keys()]);
+  const total = Array.from(allPaths).filter((p) => !p.endsWith("/")).length;
+  let processed = 0;
 
   const { entries, stats } = buildTree(allPaths, leftMap, rightMap, (file) => {
-    processed++
-    onProgress(Math.round((processed / total) * 100), file)
-  })
+    processed++;
+    onProgress(Math.round((processed / total) * 100), file);
+  });
 
-  return { files: entries, stats }
+  return { files: entries, stats };
 }

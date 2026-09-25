@@ -49,12 +49,12 @@
 
 ### Navegación por teclado en el árbol
 
-| Tecla | Acción |
-|-------|--------|
-| `↑` / `↓` | Moverse entre filas |
-| `→` | Expandir carpeta (o ir al primer hijo si ya está expandida) |
-| `←` | Colapsar carpeta (o subir al directorio padre) |
-| `Enter` | Abrir archivo / expandir-colapsar carpeta |
+| Tecla     | Acción                                                      |
+| --------- | ----------------------------------------------------------- |
+| `↑` / `↓` | Moverse entre filas                                         |
+| `→`       | Expandir carpeta (o ir al primer hijo si ya está expandida) |
+| `←`       | Colapsar carpeta (o subir al directorio padre)              |
+| `Enter`   | Abrir archivo / expandir-colapsar carpeta                   |
 
 ### Directorios ignorados
 
@@ -135,12 +135,12 @@ Formatos soportados: `png`, `jpg`, `jpeg`, `gif`, `bmp`, `ico`, `tiff`, `tif`, `
 
 ## Atajos de teclado globales
 
-| Atajo | Acción |
-|-------|--------|
-| `Ctrl/Cmd + L` | Abrir carpeta izquierda |
-| `Ctrl/Cmd + R` | Abrir carpeta derecha |
-| `Ctrl/Cmd + F5` | Actualizar escaneo |
-| `Escape` | Volver a la vista de carpetas |
-| `Ctrl/Cmd + S` | Guardar archivo derecho en el visor de diferencias |
-| `Alt + ↑` | Bloque de diferencia anterior |
-| `Alt + ↓` | Siguiente bloque de diferencia |
+| Atajo           | Acción                                             |
+| --------------- | -------------------------------------------------- |
+| `Ctrl/Cmd + L`  | Abrir carpeta izquierda                            |
+| `Ctrl/Cmd + R`  | Abrir carpeta derecha                              |
+| `Ctrl/Cmd + F5` | Actualizar escaneo                                 |
+| `Escape`        | Volver a la vista de carpetas                      |
+| `Ctrl/Cmd + S`  | Guardar archivo derecho en el visor de diferencias |
+| `Alt + ↑`       | Bloque de diferencia anterior                      |
+| `Alt + ↓`       | Siguiente bloque de diferencia                     |

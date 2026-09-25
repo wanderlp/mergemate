@@ -30,12 +30,12 @@ npm run dev
 
 ## Compilar para distribución
 
-| Comando | Resultado |
-|---------|-----------|
-| `npm run dist:win` | `dist/MergeMate-Setup.exe` |
-| `npm run dist:mac` | `dist/MergeMate.dmg` |
-| `npm run dist:linux` | `dist/MergeMate.AppImage` |
-| `npm run dist` | Todas las plataformas |
+| Comando              | Resultado                  |
+| -------------------- | -------------------------- |
+| `npm run dist:win`   | `dist/MergeMate-Setup.exe` |
+| `npm run dist:mac`   | `dist/MergeMate.dmg`       |
+| `npm run dist:linux` | `dist/MergeMate.AppImage`  |
+| `npm run dist`       | Todas las plataformas      |
 
 ---
 
