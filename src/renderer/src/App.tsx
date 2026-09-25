@@ -107,7 +107,6 @@ export default function App(): React.JSX.Element {
     swapFolders,
     openLeft,
     openRight,
-    clear,
     patchFileStatus
   } = useFolderScan()
 
@@ -292,13 +291,6 @@ export default function App(): React.JSX.Element {
       setActiveTabId(showComparisonTab ? COMPARISON_TAB_ID : (remaining[0] ?? ''))
     }
   }, [activeTabId, openTabs, showComparisonTab])
-
-  const handleClear = useCallback(() => {
-    clear()
-    setOpenTabs(new Map())
-    setShowComparisonTab(false)
-    setActiveTabId('')
-  }, [clear])
 
   const saveSide = useCallback(async (
     pathKey: 'leftPath' | 'rightPath',

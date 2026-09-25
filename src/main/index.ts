@@ -318,7 +318,10 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle('window-maximize', (event) => {
     const win = BrowserWindow.fromWebContents(event.sender)
-    if (win) win.isMaximized() ? win.unmaximize() : win.maximize()
+    if (win) {
+      if (win.isMaximized()) win.unmaximize()
+      else win.maximize()
+    }
   })
 
   ipcMain.handle('window-close', (event) => {

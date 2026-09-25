@@ -43,7 +43,6 @@ import matlabIcon   from '@iconify/icons-devicon/matlab'
 import wasmIcon     from '@iconify/icons-devicon/wasm'
 import dockerIcon   from '@iconify/icons-devicon/docker'
 import gitIcon      from '@iconify/icons-devicon/git'
-import dotnetIcon   from '@iconify/icons-devicon/dotnetcore'
 import apiIcon      from '@iconify/icons-mdi/api'
 import viewGridIcon from '@iconify/icons-mdi/view-grid'
 

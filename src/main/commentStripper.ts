@@ -329,7 +329,7 @@ function stripLuaComments(source: string): string {
 }
 
 function stripRubyComments(source: string): string {
-  let stripped = source.replace(/^=begin[\s\S]*?^=end$/gm, '')
+  const stripped = source.replace(/^=begin[\s\S]*?^=end$/gm, '')
   let result = ''
   let i = 0
   const n = stripped.length
@@ -379,15 +379,15 @@ function stripRubyComments(source: string): string {
 export function normalize(source: string, ext: string): string {
   const style = getCommentStyle(ext)
 
-  let stripped: string
-  switch (style) {
-    case 'c_style':   stripped = stripCStyleComments(source); break
-    case 'python':    stripped = stripPythonComments(source); break
-    case 'sql_style': stripped = stripSqlComments(source); break
-    case 'lua_style': stripped = stripLuaComments(source); break
-    case 'ruby_style':stripped = stripRubyComments(source); break
-    default:          stripped = stripHashComments(source)
+  const strippers: Record<CommentStyle, (source: string) => string> = {
+    c_style: stripCStyleComments,
+    python: stripPythonComments,
+    sql_style: stripSqlComments,
+    lua_style: stripLuaComments,
+    ruby_style: stripRubyComments,
+    hash_style: stripHashComments
   }
+  const stripped = strippers[style](source)
 
   const lines = stripped.split('\n').map((l) => l.trimEnd())
 
