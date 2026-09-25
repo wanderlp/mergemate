@@ -7,12 +7,15 @@ const buttonVariants = cva(
   "inline-flex items-center justify-center gap-1.5 rounded text-sm font-normal transition-colors disabled:pointer-events-none disabled:opacity-40 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
   {
     variants: {
-      variant: {
-        default: "bg-[#3e3e42] text-[#cccccc] hover:bg-[#505050]",
-        primary: "bg-[#007acc] text-white hover:bg-[#1a88d4]",
-        ghost: "text-[#cccccc] hover:bg-[#2a2d2e]",
-        destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90"
-      },
+        variant: {
+          default:
+            "bg-[hsl(var(--secondary))] text-[hsl(var(--foreground))] hover:bg-[hsl(var(--secondary))]/80",
+          primary:
+            "bg-[hsl(var(--primary))] text-[hsl(var(--text-inverse))] hover:opacity-90",
+          ghost: "text-[hsl(var(--foreground))] hover:bg-[hsl(var(--accent))]",
+          destructive:
+            "bg-[hsl(var(--destructive))] text-[hsl(var(--destructive-foreground))] hover:opacity-90"
+        },
       size: {
         default: "px-3 py-1.5",
         sm: "px-2 py-1 text-xs",
