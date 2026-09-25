@@ -14,8 +14,8 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
   const { settings, updateSetting } = useAppSettings();
 
   return (
-    <div className="flex h-screen flex-col bg-[#1e1e1e]">
-      <header className="flex items-center gap-3 border-b border-[#3e3e42] bg-[#252526] px-4 py-2">
+      <div className="flex h-screen flex-col bg-[hsl(var(--surface-app))]">
+        <header className="flex items-center gap-3 border-b border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4 py-2">
         <Button
           onClick={onClose}
           aria-label={t("settings.back")}
@@ -25,7 +25,7 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
         >
           <ArrowLeft size={16} aria-hidden="true" />
         </Button>
-        <h1 className="text-base font-semibold text-[#cccccc]">{t("settings.title")}</h1>
+          <h1 className="text-base font-semibold">{t("settings.title")}</h1>
       </header>
 
       <main className="flex-1 overflow-y-auto px-6 py-6">
@@ -192,7 +192,7 @@ function ToggleField({
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-          checked ? "bg-[#007acc]" : "bg-[#3e3e42]"
+          checked ? "bg-[hsl(var(--primary))]" : "bg-[hsl(var(--secondary))]"
         }`}
       >
         <span
