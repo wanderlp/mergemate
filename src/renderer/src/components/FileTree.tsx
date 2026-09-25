@@ -7,6 +7,14 @@ import type { FileEntry, FileStatus } from '../types'
 
 const ALL_STATUSES: FileStatus[] = ['identical', 'different', 'comments-only', 'left-only', 'right-only']
 
+const STATUS_KEY: Record<FileStatus, string> = {
+  identical: 'identical',
+  different: 'different',
+  'comments-only': 'commentsOnly',
+  'left-only': 'leftOnly',
+  'right-only': 'rightOnly'
+}
+
 interface FlatEntry {
   entry: FileEntry
   depth: number
@@ -289,9 +297,9 @@ export function FileTree({
                 checked={statusFilters.has(status)}
                 onChange={() => toggleStatusFilter(status)}
                 className="h-3 w-3 cursor-pointer accent-[#007acc]"
-                aria-label={t(`fileRow.status.${status === 'comments-only' ? 'commentsOnly' : status.replace('-', '')}`)}
+                aria-label={t(`fileRow.status.${STATUS_KEY[status]}`)}
               />
-              <span>{t(`fileRow.status.${status === 'comments-only' ? 'commentsOnly' : status.replace('-', '')}`)}</span>
+              <span>{t(`fileRow.status.${STATUS_KEY[status]}`)}</span>
             </label>
           ))}
         </div>
