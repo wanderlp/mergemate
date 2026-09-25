@@ -1,6 +1,6 @@
 import React, { useRef, useCallback, useEffect } from 'react'
 import { DiffEditor, type DiffEditorProps } from '@monaco-editor/react'
-import { ChevronUp, ChevronDown, ArrowLeftRight, Save } from 'lucide-react'
+import { ChevronUp, ChevronDown, ArrowLeftRight, Save, Search } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { FileEntry } from '../types'
 import type * as monaco from 'monaco-editor'
@@ -71,6 +71,15 @@ export function DiffViewer({
     editor.getModifiedEditor().trigger('keyboard', action, null)
   }, [])
 
+  const openFind = useCallback(() => {
+    const editor = editorRef.current
+    if (!editor) return
+    const originalEditor = editor.getOriginalEditor()
+    const modifiedEditor = editor.getModifiedEditor()
+    const target = originalEditor.hasTextFocus() ? originalEditor : modifiedEditor
+    target.trigger('keyboard', 'actions.find', null)
+  }, [])
+
   const handleSaveLeft = useCallback(async () => {
     const editor = editorRef.current
     const content = editor?.getOriginalEditor().getValue() ?? leftContent
@@ -108,6 +117,9 @@ export function DiffViewer({
         } else if (modifiedEditor.hasTextFocus()) {
           void handleSaveRight()
         }
+      } else if ((e.ctrlKey || e.metaKey) && (e.key === 'f' || e.key === 'F')) {
+        e.preventDefault()
+        openFind()
       } else if (e.altKey && e.key === 'ArrowUp') {
         e.preventDefault()
         navigateDiff('prev')
@@ -118,7 +130,7 @@ export function DiffViewer({
     }
     window.addEventListener('keydown', handler)
     return () => window.removeEventListener('keydown', handler)
-  }, [handleSaveLeft, handleSaveRight, navigateDiff])
+  }, [handleSaveLeft, handleSaveRight, navigateDiff, openFind])
 
   const canCopyLeft = Boolean(file.leftPath)
   const canCopyRight = Boolean(file.rightPath)
@@ -146,6 +158,14 @@ export function DiffViewer({
           >
             <ChevronDown size={16} aria-hidden="true" />
             {t('diff.next')}
+          </Button>
+          <Button
+            onClick={openFind}
+            title={t('diff.findTooltip')}
+            aria-label={t('diff.findAriaLabel')}
+          >
+            <Search size={16} aria-hidden="true" />
+            {t('diff.find')}
           </Button>
         </div>
 
