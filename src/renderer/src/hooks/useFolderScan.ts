@@ -96,7 +96,7 @@ export function useFolderScan(): UseFolderScanReturn {
           throw err;
         }
       } finally {
-        if (!signal.aborted) {
+        if (scanAbortRef.current === controller) {
           setScanning(false);
           setProgress(null);
         }

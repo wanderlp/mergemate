@@ -129,13 +129,14 @@ function shouldIgnore(name: string, isDirectory: boolean): boolean {
   return false;
 }
 
-function collectPaths(
+async function collectPaths(
   dir: string,
   base: string,
   result: Map<string, string>,
   ignorePatterns: CompiledPattern[],
+  onProgress: (current: string) => void,
   signal?: AbortSignal
-): void {
+): Promise<void> {
   if (signal?.aborted) return;
   let entries: fs.Dirent[];
   try {
@@ -153,10 +154,11 @@ function collectPaths(
     if (shouldIgnore(entry.name, entry.isDirectory())) continue;
     const rel = path.join(base, entry.name).replace(/\\/g, "/");
     if (matchesIgnore(rel, entry.isDirectory(), ignorePatterns)) continue;
+    onProgress(rel);
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       result.set(rel + "/", full);
-      collectPaths(full, rel, result, ignorePatterns, signal);
+      await collectPaths(full, rel, result, ignorePatterns, onProgress, signal);
     } else {
       result.set(rel, full);
     }
@@ -213,12 +215,15 @@ async function buildTree(
     return entry;
   }
 
+  let lastYield = Date.now();
   for (let i = 0; i < filePaths.length; i++) {
     if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
     const rel = filePaths[i];
     onProgress(rel);
-    if (i > 0 && i % 50 === 0) {
+    const elapsed = Date.now() - lastYield;
+    if (i > 0 && (i % 50 === 0 || elapsed > 50)) {
       await new Promise<void>((resolve) => setImmediate(resolve));
+      lastYield = Date.now();
     }
     const ext = path.extname(rel).replace(".", "").toLowerCase();
     const leftPath = leftMap.get(rel) ?? null;
@@ -368,8 +373,8 @@ export async function scanFolders(
     ...loadIgnorePatterns(rightFolder)
   ];
 
-  collectPaths(leftFolder, "", leftMap, ignorePatterns, signal);
-  collectPaths(rightFolder, "", rightMap, ignorePatterns, signal);
+  await collectPaths(leftFolder, "", leftMap, ignorePatterns, onProgress, signal);
+  await collectPaths(rightFolder, "", rightMap, ignorePatterns, onProgress, signal);
 
   if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
 
