@@ -108,6 +108,52 @@ function createStartupWindow(): void {
   }
 }
 
+const SAFE_EXTERNAL_PROTOCOLS = new Set(["https:", "http:", "mailto:"]);
+
+function safeOpenExternal(url: string): boolean {
+  try {
+    const parsed = new URL(url);
+    if (!SAFE_EXTERNAL_PROTOCOLS.has(parsed.protocol)) {
+      console.error(`[main] openExternal blocked: protocol ${parsed.protocol}`);
+      return false;
+    }
+    shell.openExternal(url);
+    return true;
+  } catch (err) {
+    console.error(`[main] openExternal blocked: invalid URL ${url}`, err);
+    return false;
+  }
+}
+
+function safeWriteFile(filePath: string, content: string): void {
+  const tmp = filePath + ".tmp";
+  fs.writeFileSync(tmp, content, "utf-8");
+  fs.renameSync(tmp, filePath);
+}
+
+function safeCopyFileWithBak(src: string, dest: string): void {
+  const bak = dest + ".bak";
+  if (fs.existsSync(dest)) {
+    try {
+      fs.copyFileSync(dest, bak);
+    } catch (err) {
+      throw new Error(`Failed to create backup at ${bak}: ${err}`);
+    }
+  }
+  try {
+    fs.copyFileSync(src, dest);
+  } catch (err) {
+    if (fs.existsSync(bak)) {
+      try {
+        fs.copyFileSync(bak, dest);
+      } catch (restoreErr) {
+        throw new Error(`Copy failed and restore from ${bak} also failed: ${err} | ${restoreErr}`);
+      }
+    }
+    throw err;
+  }
+}
+
 function createMainWindow(): void {
   const savedState = store.get("windowState") ?? null;
 
@@ -165,7 +211,7 @@ function createMainWindow(): void {
   });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url);
+    safeOpenExternal(details.url);
     return { action: "deny" };
   });
 
@@ -308,12 +354,11 @@ function registerIpcHandlers(): void {
   );
 
   ipcMain.handle("write-file", async (_event, filePath: string, content: string) => {
-    fs.writeFileSync(filePath, content, "utf-8");
+    safeWriteFile(filePath, content);
   });
 
   ipcMain.handle("copy-file-with-bak", async (_event, src: string, dest: string) => {
-    if (fs.existsSync(dest)) fs.copyFileSync(dest, dest + ".bak");
-    fs.copyFileSync(src, dest);
+    safeCopyFileWithBak(src, dest);
   });
 
   ipcMain.handle("show-folder-dialog", async (event) => {
@@ -340,7 +385,9 @@ function registerIpcHandlers(): void {
   );
 
   ipcMain.handle("open-external", (_event, url: string) => {
-    shell.openExternal(url);
+    if (!safeOpenExternal(url)) {
+      throw new Error(`Protocol not allowed for openExternal`);
+    }
   });
 
   // ── Export ───────────────────────────────────────────────────────────────
@@ -367,7 +414,7 @@ function registerIpcHandlers(): void {
         : format === "json"
           ? serializeJson(result)
           : serializeMarkdown(result);
-    fs.writeFileSync(saveResult.filePath, content, "utf-8");
+    safeWriteFile(saveResult.filePath, content);
     return { canceled: false, filePath: saveResult.filePath };
   });
 
