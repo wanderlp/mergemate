@@ -162,9 +162,9 @@ export function DiffViewer({
   const canCopyRight = Boolean(file.rightPath);
 
   return (
-    <div className="flex h-full flex-col bg-[#1e1e1e]">
-      <div className="flex items-center gap-2 border-b border-[#3e3e42] bg-[#252526] px-3 py-2">
-        <div className="flex-1 truncate text-sm text-[#cccccc]">
+      <div className="flex h-full flex-col bg-[hsl(var(--surface-app))]">
+        <div className="flex items-center gap-2 border-b border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-2">
+          <div className="flex-1 truncate text-sm text-[hsl(var(--foreground))]">
           {file.relativePath.startsWith("__") ? file.name : file.relativePath}
         </div>
 
