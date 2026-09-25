@@ -27,7 +27,7 @@ export function ProgressBar({ progress, onCancel }: ProgressBarProps): React.JSX
       transition={{ duration }}
     >
       <motion.div
-        className="w-96 rounded-lg bg-[#252526] p-6 shadow-2xl"
+        className="text-foreground w-96 rounded-lg bg-[hsl(var(--card))] p-6 shadow-2xl"
         initial={{
           opacity: 0,
           scale: shouldReduceMotion ? 1 : 0.95,
@@ -37,12 +37,12 @@ export function ProgressBar({ progress, onCancel }: ProgressBarProps): React.JSX
         exit={{ opacity: 0, scale: shouldReduceMotion ? 1 : 0.95, y: shouldReduceMotion ? 0 : -8 }}
         transition={{ duration, ease: "easeOut" }}
       >
-        <div className="mb-3 text-base font-medium text-[#cccccc]">{t("progress.title")}</div>
+        <div className="mb-3 text-base font-medium">{t("progress.title")}</div>
         <Progress value={progress.percent} className="mb-2" />
-        <div className="truncate text-sm text-[#aaaaaa]">
+        <div className="text-muted-foreground truncate text-sm">
           {progress.currentFile || t("progress.starting")}
         </div>
-        <div className="mt-1 text-right text-sm text-[#aaaaaa]">{progress.percent}%</div>
+        <div className="text-muted-foreground mt-1 text-right text-sm">{progress.percent}%</div>
         <Button onClick={onCancel} variant="ghost" size="sm" className="mt-3 w-full">
           {t("progress.cancel")}
         </Button>
