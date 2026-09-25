@@ -2,6 +2,16 @@
 export default {
   darkMode: ["class"],
   content: ["./src/renderer/src/**/*.{js,ts,jsx,tsx}", "./src/renderer/index.html"],
+  safelist: [
+    "bg-surface-app",
+    "bg-surface-toolbar",
+    "bg-surface-content",
+    "bg-card",
+    "text-foreground",
+    "text-muted-foreground",
+    "text-text-muted",
+    "text-text-faint"
+  ],
   theme: {
     extend: {
       colors: {
