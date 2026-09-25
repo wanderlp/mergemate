@@ -6,6 +6,7 @@ import type { FileEntry } from '../types'
 import type { ImageDims } from './StatusBar'
 import { Button } from './ui/button'
 import { Separator } from './ui/separator'
+import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip'
 
 interface ImageViewerProps {
   file: FileEntry
@@ -256,18 +257,33 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
 
           <Separator orientation="vertical" className="mx-1" />
 
-          <Button size="icon" onClick={handleZoomOut} disabled={zoom <= 0.25} title={t('image.zoomOut')} aria-label={t('image.zoomOut')}>
-            <ZoomOut size={14} aria-hidden="true" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button size="icon" onClick={handleZoomOut} disabled={zoom <= 0.25} aria-label={t('image.zoomOut')}>
+                <ZoomOut size={14} aria-hidden="true" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('image.zoomOut')}</TooltipContent>
+          </Tooltip>
           <span className="w-12 text-center text-xs text-[#aaaaaa]">
             {Math.round(zoom * 100)}%
           </span>
-          <Button size="icon" onClick={handleZoomIn} disabled={zoom >= 4} title={t('image.zoomIn')} aria-label={t('image.zoomIn')}>
-            <ZoomIn size={14} aria-hidden="true" />
-          </Button>
-          <Button size="icon" onClick={handleReset} title={t('image.zoomReset')} aria-label={t('image.zoomReset')}>
-            <RotateCcw size={14} aria-hidden="true" />
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button size="icon" onClick={handleZoomIn} disabled={zoom >= 4} aria-label={t('image.zoomIn')}>
+                <ZoomIn size={14} aria-hidden="true" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('image.zoomIn')}</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button size="icon" onClick={handleReset} aria-label={t('image.zoomReset')}>
+                <RotateCcw size={14} aria-hidden="true" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('image.zoomReset')}</TooltipContent>
+          </Tooltip>
         </div>
       </div>
 
