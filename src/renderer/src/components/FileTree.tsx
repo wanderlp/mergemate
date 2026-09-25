@@ -268,7 +268,7 @@ export function FileTree({
 
   if (entries.length === 0) {
     return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-2 text-[#858585]">
+      <div className="text-text-muted flex flex-1 flex-col items-center justify-center gap-2">
         <div className="text-sm">{t("fileTree.emptyState")}</div>
       </div>
     );
@@ -277,12 +277,12 @@ export function FileTree({
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
       {/* Filtros */}
-      <div className="flex flex-col gap-2 border-b border-[#3e3e42] bg-[#252526] px-3 py-2">
+      <div className="flex flex-col gap-2 border-b border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-2">
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
             <Search
               size={13}
-              className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-[#858585]"
+              className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-[hsl(var(--text-muted))]"
               aria-hidden="true"
             />
             <input
@@ -292,7 +292,7 @@ export function FileTree({
               onChange={(e) => setSearchInput(e.target.value)}
               placeholder={t("fileTree.searchPlaceholder")}
               aria-label={t("fileTree.searchPlaceholder")}
-              className="w-full rounded bg-[#1e1e1e] py-1 pl-7 pr-2 text-xs text-[#cccccc] placeholder-[#555] focus:outline-none focus:ring-1 focus:ring-[#007acc]"
+              className="w-full rounded bg-[hsl(var(--surface-app))] py-1 pl-7 pr-2 text-xs text-[hsl(var(--foreground))] placeholder:opacity-60 focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
             />
           </div>
           {isFiltering && (
@@ -301,7 +301,7 @@ export function FileTree({
                 <button
                   type="button"
                   onClick={clearFilters}
-                  className="flex items-center gap-1 rounded px-2 py-1 text-xs text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
+                  className="flex items-center gap-1 rounded px-2 py-1 text-xs text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
                   aria-label={t("fileTree.clearFilters")}
                 >
                   <X size={12} aria-hidden="true" />
@@ -316,7 +316,7 @@ export function FileTree({
           {ALL_STATUSES.map((status) => (
             <label
               key={status}
-              className="flex cursor-pointer items-center gap-1.5 text-xs text-[#aaaaaa]"
+              className="text-muted-foreground flex cursor-pointer items-center gap-1.5 text-xs"
             >
               <input
                 type="checkbox"
@@ -335,7 +335,7 @@ export function FileTree({
       </div>
 
       {/* Header */}
-      <div className="flex border-b border-[#3e3e42] bg-[#252526] text-xs font-semibold text-[#858585]">
+      <div className="text-text-muted flex border-b border-[hsl(var(--border))] bg-[hsl(var(--card))] text-xs font-semibold">
         <div className="w-1 flex-shrink-0" />
         <div className="flex-1 py-2 pl-2">CARPETA IZQUIERDA</div>
         <div className="w-40 flex-shrink-0 py-2 text-center">TAMAÑO</div>
@@ -353,7 +353,7 @@ export function FileTree({
         tabIndex={0}
       >
         {visible.length === 0 && isFiltering ? (
-          <div className="flex flex-1 items-center justify-center py-8 text-sm text-[#858585]">
+          <div className="text-text-muted flex flex-1 items-center justify-center py-8 text-sm">
             {t("fileTree.noMatches")}
           </div>
         ) : (
