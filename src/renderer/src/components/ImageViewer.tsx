@@ -126,9 +126,18 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
   const handleWheel = useCallback((e: WheelEvent) => {
     if (!e.cancelable) return
     e.preventDefault()
-    const delta = e.deltaY < 0 ? 0.15 : -0.15
-    setZoom((z) => Math.min(4, Math.max(0.25, parseFloat((z + delta).toFixed(2)))))
-  }, [])
+
+    // Ctrl+wheel = pinch zoom (Mac); Shift+wheel o scroll horizontal = pan; resto = zoom
+    const isHorizontalIntent = e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)
+    const isZoomIntent = e.ctrlKey || !isHorizontalIntent
+
+    if (isZoomIntent) {
+      const delta = e.deltaY < 0 ? 0.15 : -0.15
+      setZoom((z) => Math.min(4, Math.max(0.25, parseFloat((z + delta).toFixed(2)))))
+    } else if (zoom > 1) {
+      setPan((p) => ({ x: p.x - e.deltaX, y: p.y - e.deltaY }))
+    }
+  }, [zoom])
 
   useEffect(() => {
     const el = sliderContainerRef.current

@@ -21,6 +21,7 @@ function basename(p: string): string {
 
 function timeAgo(ts: number, t: TFunction): string {
   const diff = Date.now() - ts
+  if (diff < 0)   return t('startup.timeAgo.justNow')
   const mins = Math.floor(diff / 60_000)
   if (mins < 1)   return t('startup.timeAgo.justNow')
   if (mins < 60)  return t('startup.timeAgo.minutes', { count: mins })

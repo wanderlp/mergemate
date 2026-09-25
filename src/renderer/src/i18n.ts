@@ -7,6 +7,11 @@ import de from './locales/de.json'
 import fr from './locales/fr.json'
 import pt from './locales/pt.json'
 
+function syncHtmlLang(lng: string | undefined): void {
+  const short = (lng ?? 'es').split('-')[0] ?? 'es'
+  document.documentElement.lang = short
+}
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -30,5 +35,8 @@ i18n
       escapeValue: false
     }
   })
+
+syncHtmlLang(i18n.language)
+i18n.on('languageChanged', syncHtmlLang)
 
 export default i18n

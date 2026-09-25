@@ -162,6 +162,14 @@ function registerIpcHandlers(): void {
       ) ? 'files' : 'folders'
 
       if (effectiveMode === 'files') {
+        const assertFile = (p: string, side: 'left' | 'right'): void => {
+          if (!fs.existsSync(p) || !fs.statSync(p).isFile()) {
+            console.error(`[startup-open-main] invalid file path for ${side}: ${p}`)
+            throw new Error(`Invalid file path for ${side}: ${p}`)
+          }
+        }
+        assertFile(left, 'left')
+        assertFile(right, 'right')
         pendingFiles = { left, right }
       } else {
         pendingFolders = { left, right }
