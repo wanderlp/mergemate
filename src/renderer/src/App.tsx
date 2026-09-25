@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence } from "framer-motion";
-import { TooltipProvider } from "./components/ui/tooltip";
+import { AppProviders } from "./AppProviders";
 import { COMPARISON_TAB_ID, BLANK_TAB_ID } from "./constants";
 import { MergeMateLogo } from "./components/MergeMateLogo";
 import { TitleBar } from "./components/TitleBar";
@@ -21,7 +21,7 @@ import type { StatusInfo, ImageDims } from "./components/StatusBar";
 import { TabBar } from "./components/TabBar";
 import type { TabItem } from "./components/TabBar";
 import { useFolderScan } from "./hooks/useFolderScan";
-import { useAppSettings, SettingsProvider } from "./hooks/useAppSettings";
+import { useAppSettings } from "./hooks/useAppSettings";
 import { useGlobalShortcuts } from "./hooks/useGlobalShortcuts";
 import { computeDiffStats } from "./utils/diffStats";
 import { Button } from "./components/ui/button";
@@ -595,8 +595,7 @@ export default function App(): React.JSX.Element {
   })();
 
   return (
-    <SettingsProvider>
-      <TooltipProvider delayDuration={400}>
+    <AppProviders>
       <div className="flex h-screen flex-col bg-[hsl(var(--surface-app))]">
         {showCloseDialog && (
           <CloseConfirmDialog
@@ -746,7 +745,6 @@ export default function App(): React.JSX.Element {
           onStatusFilterChange={setStatusFilter}
         />
       </div>
-      </TooltipProvider>
-    </SettingsProvider>
+    </AppProviders>
   );
 }
