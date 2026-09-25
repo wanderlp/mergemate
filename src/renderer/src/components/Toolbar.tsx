@@ -29,6 +29,39 @@ export function Toolbar({
 }: ToolbarProps): React.JSX.Element {
   const { t } = useTranslation()
   const [missingFolders, setMissingFolders] = useState<string[]>([])
+  const [dragOver, setDragOver] = useState<'left' | 'right' | null>(null)
+  const [dropAnnouncement, setDropAnnouncement] = useState('')
+
+  async function handleDrop(side: 'left' | 'right', e: React.DragEvent<HTMLInputElement>): Promise<void> {
+    e.preventDefault()
+    setDragOver(null)
+    const files = Array.from(e.dataTransfer.files)
+    if (files.length === 0) return
+
+    for (const file of files) {
+      const path = window.electronAPI.getPathForFile(file)
+      if (!path) continue
+      const isDir = await window.electronAPI.folderExists(path)
+      if (isDir) {
+        if (side === 'left') onChangeLeft(path)
+        else onChangeRight(path)
+        const basename = path.split(/[\\/]/).pop() ?? path
+        setDropAnnouncement(t('toolbar.dropAnnouncement', { side: t(side === 'left' ? 'toolbar.sideLeft' : 'toolbar.sideRight'), folder: basename }))
+        return
+      }
+    }
+    setDropAnnouncement(t('toolbar.dropInvalid'))
+  }
+
+  function handleDragOver(side: 'left' | 'right', e: React.DragEvent<HTMLInputElement>): void {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'copy'
+    setDragOver(side)
+  }
+
+  function handleDragLeave(): void {
+    setDragOver(null)
+  }
 
   async function handleCompare(): Promise<void> {
     if (!leftFolder || !rightFolder) return
@@ -117,10 +150,13 @@ export function Toolbar({
         </Button>
 
         <input
-          className="flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa] placeholder-[#555] focus:outline-none focus:ring-1 focus:ring-[#007acc]"
+          className={`flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa] placeholder-[#555] focus:outline-none focus:ring-1 focus:ring-[#007acc] ${dragOver === 'left' ? 'ring-2 ring-[#007acc]' : ''}`}
           value={leftFolder}
           onChange={(e) => onChangeLeft(e.target.value)}
           onKeyDown={handleKeyDown}
+          onDragOver={(e) => handleDragOver('left', e)}
+          onDragLeave={handleDragLeave}
+          onDrop={(e) => void handleDrop('left', e)}
           placeholder={t('toolbar.noFolder')}
           aria-label={leftFolder ? t('toolbar.changeLeft') : t('toolbar.openLeft')}
           disabled={scanning}
@@ -138,10 +174,13 @@ export function Toolbar({
         </Button>
 
         <input
-          className="flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa] placeholder-[#555] focus:outline-none focus:ring-1 focus:ring-[#007acc]"
+          className={`flex-1 truncate rounded bg-[#1e1e1e] px-3 py-2 text-sm text-[#aaaaaa] placeholder-[#555] focus:outline-none focus:ring-1 focus:ring-[#007acc] ${dragOver === 'right' ? 'ring-2 ring-[#007acc]' : ''}`}
           value={rightFolder}
           onChange={(e) => onChangeRight(e.target.value)}
           onKeyDown={handleKeyDown}
+          onDragOver={(e) => handleDragOver('right', e)}
+          onDragLeave={handleDragLeave}
+          onDrop={(e) => void handleDrop('right', e)}
           placeholder={t('toolbar.noFolder')}
           aria-label={rightFolder ? t('toolbar.changeRight') : t('toolbar.openRight')}
           disabled={scanning}
@@ -168,6 +207,10 @@ export function Toolbar({
           <GitCompareArrows size={16} aria-hidden="true" />
           {t('toolbar.compare')}
         </Button>
+      </div>
+
+      <div role="status" aria-live="polite" className="sr-only">
+        {dropAnnouncement}
       </div>
     </>
   )
