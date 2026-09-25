@@ -144,6 +144,7 @@ async function collectPaths(
   } catch {
     return;
   }
+  let lastYield = Date.now();
   for (const entry of entries) {
     if (signal?.aborted) return;
     // Symlinks no se siguen para evitar ciclos infinitos y ELOOP
@@ -158,9 +159,16 @@ async function collectPaths(
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
       result.set(rel + "/", full);
+      await new Promise<void>((resolve) => setImmediate(resolve));
+      lastYield = Date.now();
+      if (signal?.aborted) return;
       await collectPaths(full, rel, result, ignorePatterns, onProgress, signal);
     } else {
       result.set(rel, full);
+    }
+    if (Date.now() - lastYield > 50) {
+      await new Promise<void>((resolve) => setImmediate(resolve));
+      lastYield = Date.now();
     }
   }
 }
@@ -228,7 +236,7 @@ async function buildTree(
     const ext = path.extname(rel).replace(".", "").toLowerCase();
     const leftPath = leftMap.get(rel) ?? null;
     const rightPath = rightMap.get(rel) ?? null;
-    const status = classifyFiles(leftPath, rightPath, ext);
+    const status = await classifyFiles(leftPath, rightPath, ext);
 
     stats.total++;
     if (status === "identical") stats.identical++;
