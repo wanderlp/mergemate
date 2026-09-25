@@ -32,6 +32,26 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
         <div className="mx-auto max-w-2xl space-y-8">
           <fieldset className="space-y-3">
             <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[#858585]">
+              {t("settings.sectionAppearance")}
+            </legend>
+
+            <Field label={t("settings.theme")}>
+              <select
+                id="settings-theme"
+                value={settings.theme}
+                onChange={(e) =>
+                  updateSetting("theme", e.target.value as "dark" | "light")
+                }
+                className="rounded bg-[#1e1e1e] px-2 py-1.5 text-sm text-[#cccccc] focus:outline-none focus:ring-1 focus:ring-[#007acc]"
+              >
+                <option value="dark">{t("settings.themeDark")}</option>
+                <option value="light">{t("settings.themeLight")}</option>
+              </select>
+            </Field>
+          </fieldset>
+
+          <fieldset className="space-y-3">
+            <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[#858585]">
               {t("settings.sectionDiff")}
             </legend>
 

@@ -83,6 +83,10 @@
   "settings": {
     "title": "Paramètres",
     "back": "Retour",
+    "sectionAppearance": "Apparence",
+    "theme": "Thème",
+    "themeDark": "Sombre",
+    "themeLight": "Clair",
     "sectionDiff": "Différences",
     "diffAlgorithm": "Algorithme de diff",
     "diffAlgorithmHint": "Advanced est plus précis mais plus lent. Myers est classique. Experimental teste de nouvelles méthodes.",

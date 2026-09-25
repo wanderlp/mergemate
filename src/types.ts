@@ -86,6 +86,7 @@ export interface ElectronAPI {
 }
 
 export interface AppSettings {
+  theme: "dark" | "light";
   diffViewMode: "side-by-side" | "inline";
   diffAlgorithm: "advanced" | "Myers" | "experimental";
   minimapEnabled: boolean;

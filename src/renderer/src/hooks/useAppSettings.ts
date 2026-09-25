@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from "react";
 import type { AppSettings } from "../types";
 
 const DEFAULT_SETTINGS: AppSettings = {
+  theme: "dark",
   diffViewMode: "side-by-side",
   diffAlgorithm: "advanced",
   minimapEnabled: true,
@@ -29,6 +30,10 @@ export function useAppSettings(): UseAppSettingsReturn {
       })
       .catch(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    document.documentElement.setAttribute("data-theme", settings.theme);
+  }, [settings.theme]);
 
   const updateSetting = useCallback(
     <K extends keyof AppSettings>(key: K, value: AppSettings[K]): void => {

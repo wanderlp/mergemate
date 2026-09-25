@@ -25,6 +25,58 @@
     --input: 240 3% 25%;
     --ring: 206 100% 40%;
     --radius: 0.25rem;
+
+    /* Surface colors used directly by the app */
+    --surface-app: 0 0% 12%; /* #1e1e1e */
+    --surface-toolbar: 240 1% 15%; /* #252526 */
+    --surface-input: 0 0% 12%; /* #1e1e1e */
+    --surface-accent: 195 4% 18%; /* #2a2d2e */
+    --text-primary: 0 0% 80%; /* #cccccc */
+    --text-secondary: 0 0% 67%; /* #aaaaaa */
+    --text-muted: 0 0% 52%; /* #858585 */
+    --text-faint: 0 0% 43%; /* #6e6e6e */
+    --text-inverse: 0 0% 100%;
+    --scrollbar-track: 0 0% 12%;
+    --scrollbar-thumb: 0 0% 26%;
+    --scrollbar-thumb-hover: 0 0% 33%;
+    --folder-icon: 38 67% 56%; /* #e8c27a */
+  }
+
+  [data-theme="light"] {
+    --background: 0 0% 100%; /* #ffffff */
+    --foreground: 0 0% 12%; /* #1e1e1e */
+    --card: 0 0% 98%; /* #fafafa */
+    --card-foreground: 0 0% 12%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 12%;
+    --primary: 206 100% 40%; /* #007acc */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 90%; /* #e6e6e6 */
+    --secondary-foreground: 0 0% 12%;
+    --muted: 0 0% 90%;
+    --muted-foreground: 0 0% 40%; /* #666666 */
+    --accent: 0 0% 95%; /* #f2f2f2 */
+    --accent-foreground: 0 0% 12%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 85%; /* #d9d9d9 */
+    --input: 0 0% 90%;
+    --ring: 206 100% 40%;
+
+    /* Light surface colors */
+    --surface-app: 0 0% 100%; /* #ffffff */
+    --surface-toolbar: 0 0% 98%; /* #fafafa */
+    --surface-input: 0 0% 100%;
+    --surface-accent: 0 0% 95%; /* #f2f2f2 */
+    --text-primary: 0 0% 12%; /* #1e1e1e */
+    --text-secondary: 0 0% 30%; /* #4d4d4d */
+    --text-muted: 0 0% 45%; /* #737373 */
+    --text-faint: 0 0% 60%; /* #999999 */
+    --text-inverse: 0 0% 100%;
+    --scrollbar-track: 0 0% 98%;
+    --scrollbar-thumb: 0 0% 80%;
+    --scrollbar-thumb-hover: 0 0% 65%;
+    --folder-icon: 38 67% 40%; /* darker amber for light bg */
   }
 }
 
@@ -40,8 +92,8 @@ body,
   height: 100%;
   width: 100%;
   overflow: hidden;
-  background-color: #1e1e1e;
-  color: #cccccc;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, sans-serif;
   font-size: 15px;
 }
@@ -51,12 +103,12 @@ body,
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #1e1e1e;
+  background-color: hsl(var(--scrollbar-track));
 }
 ::-webkit-scrollbar-thumb {
-  background: #424242;
+  background-color: hsl(var(--scrollbar-thumb));
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background-color: hsl(var(--scrollbar-thumb-hover));
 }

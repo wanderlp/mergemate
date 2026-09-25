@@ -20,6 +20,7 @@ interface StoreSchema {
   recentComparisons: RecentComparison[];
   windowState: WindowState | null;
   appSettings: {
+    theme: "dark" | "light";
     diffViewMode: "side-by-side" | "inline";
     diffAlgorithm: "advanced" | "Myers" | "experimental";
     minimapEnabled: boolean;
@@ -30,6 +31,7 @@ interface StoreSchema {
 }
 
 const DEFAULT_SETTINGS: StoreSchema["appSettings"] = {
+  theme: "dark",
   diffViewMode: "side-by-side",
   diffAlgorithm: "advanced",
   minimapEnabled: true,

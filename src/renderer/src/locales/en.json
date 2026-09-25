@@ -83,6 +83,10 @@
   "settings": {
     "title": "Settings",
     "back": "Back",
+    "sectionAppearance": "Appearance",
+    "theme": "Theme",
+    "themeDark": "Dark",
+    "themeLight": "Light",
     "sectionDiff": "Differences",
     "diffAlgorithm": "Diff algorithm",
     "diffAlgorithmHint": "Advanced is more accurate but slower. Myers is classic. Experimental tries new methods.",
