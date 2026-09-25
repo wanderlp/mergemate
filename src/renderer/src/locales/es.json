@@ -14,7 +14,11 @@
     "restore": "Restaurar",
     "close": "Cerrar",
     "ariaLabel": "Barra de título",
-    "switchLanguage": "Seleccionar idioma"
+    "switchLanguage": "Seleccionar idioma",
+    "themeLight": "Cambiar a tema claro",
+    "themeDark": "Cambiar a tema oscuro",
+    "themeLightTooltip": "Cambiar a tema claro",
+    "themeDarkTooltip": "Cambiar a tema oscuro"
   },
   "toolbar": {
     "openLeft": "Seleccionar carpeta izquierda",

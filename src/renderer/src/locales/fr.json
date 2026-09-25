@@ -14,7 +14,11 @@
     "restore": "Restaurer",
     "close": "Fermer",
     "ariaLabel": "Barre de titre",
-    "switchLanguage": "Choisir la langue"
+    "switchLanguage": "Choisir la langue",
+    "themeLight": "Passer au thème clair",
+    "themeDark": "Passer au thème sombre",
+    "themeLightTooltip": "Passer au thème clair",
+    "themeDarkTooltip": "Passer au thème sombre"
   },
   "toolbar": {
     "openLeft": "Sélectionner le dossier gauche",

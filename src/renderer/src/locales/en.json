@@ -14,7 +14,11 @@
     "restore": "Restore",
     "close": "Close",
     "ariaLabel": "Title bar",
-    "switchLanguage": "Select language"
+    "switchLanguage": "Select language",
+    "themeLight": "Switch to light theme",
+    "themeDark": "Switch to dark theme",
+    "themeLightTooltip": "Switch to light theme",
+    "themeDarkTooltip": "Switch to dark theme"
   },
   "toolbar": {
     "openLeft": "Select left folder",

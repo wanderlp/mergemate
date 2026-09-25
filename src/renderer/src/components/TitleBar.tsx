@@ -1,7 +1,9 @@
 import React, { useId, useState, useEffect } from "react";
-import { Minus, X, Settings as SettingsIcon } from "lucide-react";
+import { Minus, X, Settings as SettingsIcon, Sun, Moon } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { LANGUAGES } from "../i18n";
+import { useAppSettings } from "../hooks/useAppSettings";
+import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 
 export function AppIcon({ size = 24 }: { size?: number }): React.JSX.Element {
   const uid = useId().replace(/:/g, "");
@@ -77,7 +79,7 @@ function RestoreIcon(): React.JSX.Element {
         height="8"
         stroke="currentColor"
         strokeWidth="1.2"
-        fill="#252526"
+        fill="currentColor"
       />
     </svg>
   );
@@ -93,6 +95,7 @@ interface TitleBarProps {
 export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Element {
   const { t, i18n } = useTranslation();
   const [isMaximized, setIsMaximized] = useState(false);
+  const { settings, updateSetting } = useAppSettings();
 
   useEffect(() => {
     window.electronAPI.isMaximized().then(setIsMaximized);
@@ -103,12 +106,14 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
     <div
       role="banner"
       aria-label={t("titleBar.ariaLabel")}
-      className="flex shrink-0 select-none items-center border-b border-[#3e3e42] bg-[#252526]"
+      className="flex shrink-0 select-none items-center border-b bg-[hsl(var(--border))] bg-[hsl(var(--card))]"
       style={{ height: 40, ...DRAG }}
     >
       <div className="flex items-center gap-2.5 px-3">
         <AppIcon size={24} />
-        <span className="text-sm font-semibold tracking-wide text-[#cccccc]">MergeMate</span>
+        <span className="text-sm font-semibold tracking-wide text-[hsl(var(--foreground))]">
+          MergeMate
+        </span>
       </div>
 
       <div className="ml-auto flex h-full items-center" style={NO_DRAG}>
@@ -118,19 +123,53 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
           onChange={(e) => i18n.changeLanguage(e.target.value)}
           aria-label={t("titleBar.switchLanguage")}
           tabIndex={-1}
-          className="h-full cursor-pointer bg-transparent px-2 text-sm text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc] focus:outline-none"
+          className="h-full cursor-pointer bg-transparent px-2 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))] focus:outline-none"
           style={{ border: "none" }}
         >
           {LANGUAGES.map((l) => (
             <option
               key={l.code}
               value={l.code}
-              style={{ backgroundColor: "#2d2d2d", color: "#cccccc" }}
+              style={{ backgroundColor: "hsl(var(--popover))", color: "hsl(var(--foreground))" }}
             >
               {l.label}
             </option>
           ))}
         </select>
+
+        {/* Toggle de tema claro/oscuro */}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              onClick={() =>
+                updateSetting(
+                  "theme",
+                  settings.theme === "dark" ? "light" : "dark"
+                )
+              }
+              aria-label={
+                settings.theme === "dark"
+                  ? t("titleBar.themeLight")
+                  : t("titleBar.themeDark")
+              }
+              aria-pressed={settings.theme === "light"}
+              tabIndex={-1}
+              className="flex h-full items-center px-2 text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))] focus:outline-none"
+            >
+              {settings.theme === "dark" ? (
+                <Sun size={14} aria-hidden="true" />
+              ) : (
+                <Moon size={14} aria-hidden="true" />
+              )}
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {settings.theme === "dark"
+              ? t("titleBar.themeLightTooltip")
+              : t("titleBar.themeDarkTooltip")}
+          </TooltipContent>
+        </Tooltip>
 
         {/* Botón de configuración */}
         <button
@@ -141,13 +180,13 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
           aria-label={t("settings.title")}
           title={t("settings.title")}
           tabIndex={-1}
-          className="flex h-full items-center px-2 text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc] focus:outline-none"
+          className="flex h-full items-center px-2 text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))] focus:outline-none"
         >
           <SettingsIcon size={14} aria-hidden="true" />
         </button>
 
         <button
-          className="flex h-full w-[46px] items-center justify-center text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
+          className="flex h-full w-[46px] items-center justify-center text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
           onClick={() => window.electronAPI.minimizeWindow()}
           aria-label={t("titleBar.minimize")}
           tabIndex={-1}
@@ -157,7 +196,7 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
 
         {showMaximize && (
           <button
-            className="flex h-full w-[46px] items-center justify-center text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
+            className="flex h-full w-[46px] items-center justify-center text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
             onClick={() => window.electronAPI.maximizeWindow()}
             aria-label={isMaximized ? t("titleBar.restore") : t("titleBar.maximize")}
             tabIndex={-1}
@@ -167,7 +206,7 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
         )}
 
         <button
-          className="flex h-full w-[46px] items-center justify-center text-[#aaaaaa] transition-colors hover:bg-[#e81123] hover:text-white"
+          className="flex h-full w-[46px] items-center justify-center text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--destructive))] hover:text-[hsl(var(--text-inverse))]"
           onClick={() => window.electronAPI.closeWindow()}
           aria-label={t("titleBar.close")}
           tabIndex={-1}
