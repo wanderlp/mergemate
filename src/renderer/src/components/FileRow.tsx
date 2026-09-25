@@ -120,7 +120,6 @@ export function FileRow({
       onFocus={() => onFocusPath?.(entry.relativePath)}
       aria-label={`${entry.name} — ${label}`}
       aria-expanded={entry.isDirectory ? expanded : undefined}
-      title={label}
     >
       {/* Color indicator */}
       <div className="w-1.5 self-stretch flex-shrink-0" style={{ backgroundColor: color }} />
