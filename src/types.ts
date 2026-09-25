@@ -81,10 +81,17 @@ export interface ElectronAPI {
   openExternal: (url: string) => Promise<void>;
   getPathForFile: (file: File) => string;
   // App settings
-  getAppSettings: () => Promise<{ diffViewMode: "side-by-side" | "inline" }>;
-  setAppSettings: (
-    partial: Partial<{ diffViewMode: "side-by-side" | "inline" }>
-  ) => Promise<{ diffViewMode: "side-by-side" | "inline" }>;
+  getAppSettings: () => Promise<AppSettings>;
+  setAppSettings: (partial: Partial<AppSettings>) => Promise<AppSettings>;
+}
+
+export interface AppSettings {
+  diffViewMode: "side-by-side" | "inline";
+  diffAlgorithm: "advanced" | "Myers" | "experimental";
+  minimapEnabled: boolean;
+  fontSize: number;
+  ignoreWhitespace: boolean;
+  defaultViewMode: "folders" | "files" | "blank";
 }
 
 declare global {

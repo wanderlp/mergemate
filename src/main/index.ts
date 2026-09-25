@@ -21,11 +21,21 @@ interface StoreSchema {
   windowState: WindowState | null;
   appSettings: {
     diffViewMode: "side-by-side" | "inline";
+    diffAlgorithm: "advanced" | "Myers" | "experimental";
+    minimapEnabled: boolean;
+    fontSize: number;
+    ignoreWhitespace: boolean;
+    defaultViewMode: "folders" | "files" | "blank";
   };
 }
 
 const DEFAULT_SETTINGS: StoreSchema["appSettings"] = {
-  diffViewMode: "side-by-side"
+  diffViewMode: "side-by-side",
+  diffAlgorithm: "advanced",
+  minimapEnabled: true,
+  fontSize: 15,
+  ignoreWhitespace: false,
+  defaultViewMode: "folders"
 };
 
 const store = new Store<StoreSchema>({
