@@ -31,7 +31,7 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
       <main className="flex-1 overflow-y-auto px-6 py-6">
         <div className="mx-auto max-w-2xl space-y-8">
           <fieldset className="space-y-3">
-            <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[#858585]">
+            <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[hsl(var(--text-muted))]">
               {t("settings.sectionAppearance")}
             </legend>
 
@@ -42,7 +42,7 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
                 onChange={(e) =>
                   updateSetting("theme", e.target.value as "dark" | "light")
                 }
-                className="rounded bg-[#1e1e1e] px-2 py-1.5 text-sm text-[#cccccc] focus:outline-none focus:ring-1 focus:ring-[#007acc]"
+                className="rounded bg-[hsl(var(--surface-app))] px-2 py-1.5 text-sm text-[hsl(var(--foreground))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
               >
                 <option value="dark">{t("settings.themeDark")}</option>
                 <option value="light">{t("settings.themeLight")}</option>
@@ -51,7 +51,7 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
           </fieldset>
 
           <fieldset className="space-y-3">
-            <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[#858585]">
+            <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[hsl(var(--text-muted))]">
               {t("settings.sectionDiff")}
             </legend>
 
@@ -68,7 +68,7 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
                     e.target.value as "advanced" | "Myers" | "experimental"
                   )
                 }
-                className="rounded bg-[#1e1e1e] px-2 py-1.5 text-sm text-[#cccccc] focus:outline-none focus:ring-1 focus:ring-[#007acc]"
+                className="rounded bg-[hsl(var(--surface-app))] px-2 py-1.5 text-sm text-[hsl(var(--foreground))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
               >
                 <option value="advanced">Advanced</option>
                 <option value="Myers">Myers</option>
@@ -95,7 +95,7 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
                   const v = Number(e.target.value);
                   if (v >= 12 && v <= 22) updateSetting("fontSize", v);
                 }}
-                className="w-20 rounded bg-[#1e1e1e] px-2 py-1.5 text-sm text-[#cccccc] focus:outline-none focus:ring-1 focus:ring-[#007acc]"
+                className="w-20 rounded bg-[hsl(var(--surface-app))] px-2 py-1.5 text-sm text-[hsl(var(--foreground))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
               />
             </Field>
 
@@ -109,7 +109,7 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
           </fieldset>
 
           <fieldset className="space-y-3">
-            <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[#858585]">
+            <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[hsl(var(--text-muted))]">
               {t("settings.sectionStartup")}
             </legend>
 
@@ -123,7 +123,7 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
                     e.target.value as "folders" | "files" | "blank"
                   )
                 }
-                className="rounded bg-[#1e1e1e] px-2 py-1.5 text-sm text-[#cccccc] focus:outline-none focus:ring-1 focus:ring-[#007acc]"
+                className="rounded bg-[hsl(var(--surface-app))] px-2 py-1.5 text-sm text-[hsl(var(--foreground))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
               >
                 <option value="folders">{t("settings.defaultViewModeFolders")}</option>
                 <option value="files">{t("settings.defaultViewModeFiles")}</option>
@@ -133,13 +133,13 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
           </fieldset>
 
           <fieldset className="space-y-3">
-            <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[#858585]">
+            <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[hsl(var(--text-muted))]">
               {t("settings.sectionLanguage")}
             </legend>
 
-            <div className="rounded border border-[#3e3e42] bg-[#252526] px-4 py-3 text-sm text-[#aaaaaa]">
+            <div className="rounded border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4 py-3 text-sm text-[hsl(var(--muted-foreground))]">
               {t("settings.languageNote")}
-              <span className="ml-2 inline-flex items-center gap-2 rounded bg-[#1e1e1e] px-2 py-0.5 font-mono text-xs text-[#cccccc]">
+              <span className="ml-2 inline-flex items-center gap-2 rounded bg-[hsl(var(--surface-app))] px-2 py-0.5 font-mono text-xs text-[hsl(var(--foreground))]">
                 {LANGUAGES.find((l) => l.code === i18n.resolvedLanguage)?.label ?? i18n.resolvedLanguage}
               </span>
             </div>
@@ -162,8 +162,8 @@ function Field({
   return (
     <div className="flex items-center justify-between gap-4">
       <label className="flex-1">
-        <div className="text-sm text-[#cccccc]">{label}</div>
-        {hint && <div className="mt-0.5 text-xs text-[#858585]">{hint}</div>}
+        <div className="text-sm text-[hsl(var(--foreground))]">{label}</div>
+        {hint && <div className="mt-0.5 text-xs text-[hsl(var(--text-muted))]">{hint}</div>}
       </label>
       <div>{children}</div>
     </div>

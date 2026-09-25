@@ -161,11 +161,11 @@ function CloseConfirmDialog({
       aria-modal="true"
       aria-labelledby="close-dialog-title"
     >
-      <div className="mx-4 w-full max-w-sm rounded-lg border border-[#3e3e42] bg-[#252526] p-6 shadow-2xl">
-        <h2 id="close-dialog-title" className="mb-2 text-base font-semibold text-[#cccccc]">
+      <div className="mx-4 w-full max-w-sm rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-2xl">
+        <h2 id="close-dialog-title" className="mb-2 text-base font-semibold text-[hsl(var(--foreground))]">
           {t("closeDialog.title")}
         </h2>
-        <p className="mb-6 text-sm text-[#aaaaaa]">{t("closeDialog.message")}</p>
+        <p className="mb-6 text-sm text-[hsl(var(--muted-foreground))]">{t("closeDialog.message")}</p>
         <div className="flex justify-end gap-2">
           <Button ref={cancelRef} variant="ghost" onClick={onCancel}>
             {t("closeDialog.cancel")}
@@ -596,7 +596,7 @@ export default function App(): React.JSX.Element {
 
   return (
     <TooltipProvider delayDuration={400}>
-      <div className="flex h-screen flex-col bg-[#1e1e1e]">
+      <div className="flex h-screen flex-col bg-[hsl(var(--surface-app))]">
         {showCloseDialog && (
           <CloseConfirmDialog
             onConfirm={() => window.electronAPI.confirmClose()}
@@ -632,15 +632,15 @@ export default function App(): React.JSX.Element {
           {/* Sin tabs: pantalla de bienvenida */}
           {noTabs && (
             <div
-              className="flex flex-1 flex-col items-center justify-center gap-5 text-[#858585]"
+              className="flex flex-1 flex-col items-center justify-center gap-5 text-[hsl(var(--text-muted))]"
               role="main"
               aria-label={t("welcome.ariaLabel")}
             >
               <MergeMateLogo size={160} />
-              <div className="text-3xl font-bold tracking-wide text-[#cccccc]">MergeMate</div>
+              <div className="text-3xl font-bold tracking-wide text-[hsl(var(--foreground))]">MergeMate</div>
               <div className="text-sm">{t("welcome.description")}</div>
               <ul
-                className="mt-1 flex list-none gap-4 text-sm text-[#aaaaaa]"
+                className="mt-1 flex list-none gap-4 text-sm text-[hsl(var(--muted-foreground))]"
                 aria-label={t("welcome.ariaLabel")}
               >
                 <li>{t("welcome.shortcutLeft")}</li>
@@ -688,14 +688,14 @@ export default function App(): React.JSX.Element {
             >
               {tab.loading ? (
                 <div
-                  className="flex flex-1 items-center justify-center text-[#858585]"
+                  className="flex flex-1 items-center justify-center text-[hsl(var(--text-muted))]"
                   role="status"
                   aria-live="polite"
                 >
                   {t("diff.loading")}
                 </div>
               ) : tab.isImage ? (
-                <Suspense fallback={<div className="flex flex-1 items-center justify-center text-[#858585]">{t("diff.loading")}</div>}>
+                <Suspense fallback={<div className="flex flex-1 items-center justify-center text-[hsl(var(--text-muted))]">{t("diff.loading")}</div>}>
                   <ImageViewer
                     file={tab.file}
                     onDimsLoaded={(l, r) => handleImageDimsLoaded(id, l, r)}
@@ -703,13 +703,13 @@ export default function App(): React.JSX.Element {
                 </Suspense>
               ) : tab.unsupported ? (
                 <div
-                  className="flex flex-1 flex-col items-center justify-center gap-3 text-[#858585]"
+                  className="flex flex-1 flex-col items-center justify-center gap-3 text-[hsl(var(--text-muted))]"
                   role="alert"
                 >
                   <div className="text-5xl" aria-hidden="true">
                     🚫
                   </div>
-                  <div className="text-lg font-semibold text-[#cccccc]">
+                  <div className="text-lg font-semibold text-[hsl(var(--foreground))]">
                     {t("diff.unsupportedTitle")}
                   </div>
                   <div className="text-sm">
@@ -717,7 +717,7 @@ export default function App(): React.JSX.Element {
                   </div>
                 </div>
               ) : (
-                <Suspense fallback={<div className="flex flex-1 items-center justify-center text-[#858585]">{t("diff.loading")}</div>}>
+                <Suspense fallback={<div className="flex flex-1 items-center justify-center text-[hsl(var(--text-muted))]">{t("diff.loading")}</div>}>
                   <DiffViewer
                     file={tab.file}
                     leftContent={tab.leftContent}

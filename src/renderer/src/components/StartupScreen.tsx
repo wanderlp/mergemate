@@ -181,7 +181,7 @@ export function StartupScreen(): React.JSX.Element {
                 {t("startup.removeCancel")}
               </button>
               <button
-                className="rounded bg-[#c42b1c] px-3 py-1.5 text-sm text-white transition-colors hover:bg-[#d9362a]"
+                className="rounded bg-[hsl(var(--destructive))] px-3 py-1.5 text-sm text-[hsl(var(--text-inverse))] transition-colors hover:opacity-90"
                 onClick={handleRemoveConfirm}
               >
                 {t("startup.removeConfirm")}
@@ -245,7 +245,7 @@ export function StartupScreen(): React.JSX.Element {
         </div>
 
         {/* Separador vertical */}
-        <div className="w-px shrink-0 bg-[#3e3e42]" aria-hidden="true" />
+        <div className="w-px shrink-0 bg-[hsl(var(--border))]" aria-hidden="true" />
 
         {/* Panel derecho ─ recientes */}
         <div className="flex min-w-0 flex-1 flex-col overflow-y-auto px-8 py-10">
