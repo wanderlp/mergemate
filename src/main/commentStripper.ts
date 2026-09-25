@@ -35,7 +35,7 @@ function getCommentStyle(ext: string): CommentStyle {
 
 function canStartRegex(prev: string): boolean {
   if (prev === '') return true
-  return /[=([,!?;{}&|+*^~<>:%]/.test(prev)
+  return /[=([,!?;{}&|^~<>:*]/.test(prev)
 }
 
 function stripCStyleComments(source: string): string {
@@ -43,6 +43,7 @@ function stripCStyleComments(source: string): string {
   let i = 0
   const n = source.length
   let lastSig = ''
+  let pendingNewline = false
   type State = 'code' | 'line' | 'block' | 'dstr' | 'sstr' | 'tpl' | 're'
   let state: State = 'code'
 
@@ -56,6 +57,7 @@ function stripCStyleComments(source: string): string {
         i++
         state = 'code'
         lastSig = c
+        pendingNewline = false
       } else {
         i++
       }
@@ -133,33 +135,43 @@ function stripCStyleComments(source: string): string {
         i++
       }
     } else {
-      if (c === '/' && c2 === '/') {
+      if (c === '\n') {
+        pendingNewline = true
+        i++
+      } else if (c === '/' && c2 === '/') {
+        pendingNewline = false
         i += 2
         state = 'line'
       } else if (c === '/' && c2 === '*') {
+        pendingNewline = false
         i += 2
         state = 'block'
       } else if (c === '"') {
+        if (pendingNewline) { result += '\n'; pendingNewline = false }
         result += c
         i++
         state = 'dstr'
         lastSig = c
       } else if (c === "'") {
+        if (pendingNewline) { result += '\n'; pendingNewline = false }
         result += c
         i++
         state = 'sstr'
         lastSig = c
       } else if (c === '`') {
+        if (pendingNewline) { result += '\n'; pendingNewline = false }
         result += c
         i++
         state = 'tpl'
         lastSig = c
       } else if (c === '/' && canStartRegex(lastSig)) {
+        if (pendingNewline) { result += '\n'; pendingNewline = false }
         result += c
         i++
         state = 're'
         lastSig = c
       } else {
+        if (pendingNewline) { result += '\n'; pendingNewline = false }
         result += c
         if (!/\s/.test(c)) lastSig = c
         i++
@@ -167,6 +179,8 @@ function stripCStyleComments(source: string): string {
     }
   }
 
+  if (pendingNewline) result += '\n'
+  if (state === 'line') result += '\n'
   return result
 }
 
@@ -182,20 +196,183 @@ function stripHashComments(source: string): string {
 }
 
 function stripSqlComments(source: string): string {
-  let result = source.replace(/\/\*[\s\S]*?\*\//g, '')
-  result = result.replace(/--[^\n]*/g, '')
+  let result = ''
+  let i = 0
+  const n = source.length
+  type State = 'code' | 'line' | 'block' | 'sstr'
+  let state: State = 'code'
+
+  while (i < n) {
+    const c = source[i]
+    const c2 = i + 1 < n ? source[i + 1] : ''
+
+    if (state === 'line') {
+      if (c === '\n') { result += c; i++; state = 'code' }
+      else { i++ }
+    } else if (state === 'block') {
+      if (c === '*' && c2 === '/') { i += 2; state = 'code' }
+      else { i++ }
+    } else if (state === 'sstr') {
+      result += c
+      if (c === "'" && c2 === "'") {
+        result += c2
+        i += 2
+      } else if (c === "'") {
+        i++
+        state = 'code'
+      } else if (c === '\\' && i + 1 < n) {
+        result += c2
+        i += 2
+      } else {
+        i++
+      }
+    } else {
+      if (c === '-' && c2 === '-') {
+        i += 2
+        state = 'line'
+      } else if (c === '/' && c2 === '*') {
+        i += 2
+        state = 'block'
+      } else if (c === "'") {
+        result += c
+        i++
+        state = 'sstr'
+      } else {
+        result += c
+        i++
+      }
+    }
+  }
   return result
 }
 
 function stripLuaComments(source: string): string {
-  let result = source.replace(/--\[(=*)\[[\s\S]*?\]\1\]/g, '')
-  result = result.replace(/--[^\n]*/g, '')
+  let result = ''
+  let i = 0
+  const n = source.length
+  type State = 'code' | 'line' | 'block' | 'sstr' | 'dstr'
+  let state: State = 'code'
+  const blockStack: string[] = []
+
+  while (i < n) {
+    const c = source[i]
+    const c2 = i + 1 < n ? source[i + 1] : ''
+
+    if (state === 'line') {
+      if (c === '\n') { result += c; i++; state = 'code' }
+      else { i++ }
+    } else if (state === 'block') {
+      const top = blockStack[blockStack.length - 1]
+      if (top !== undefined && source.startsWith(top, i)) {
+        i += top.length
+        blockStack.pop()
+        if (blockStack.length === 0) state = 'code'
+        continue
+      }
+      if (c === '[' && c2 === '[') {
+        let level = 0
+        let j = i + 1
+        while (j < n && source[j] === '=') { level++; j++ }
+        if (j < n && source[j] === '[') {
+          blockStack.push(']' + '='.repeat(level) + ']')
+          i = j + 1
+          continue
+        }
+      }
+      i++
+    } else if (state === 'sstr' || state === 'dstr') {
+      result += c
+      const close = state === 'sstr' ? "'" : '"'
+      if (c === '\\' && i + 1 < n) {
+        result += c2
+        i += 2
+      } else if (c === close) {
+        i++
+        state = 'code'
+      } else if (c === '\n') {
+        i++
+        state = 'code'
+      } else {
+        i++
+      }
+    } else {
+      if (c === '-' && c2 === '-') {
+        const c3 = i + 2 < n ? source[i + 2] : ''
+        if (c3 === '[') {
+          let level = 0
+          let j = i + 3
+          while (j < n && source[j] === '=') { level++; j++ }
+          if (j < n && source[j] === '[') {
+            blockStack.push(']' + '='.repeat(level) + ']')
+            i = j + 1
+            state = 'block'
+            continue
+          }
+        }
+        i += 2
+        state = 'line'
+      } else if (c === "'") {
+        result += c
+        i++
+        state = 'sstr'
+      } else if (c === '"') {
+        result += c
+        i++
+        state = 'dstr'
+      } else {
+        result += c
+        i++
+      }
+    }
+  }
   return result
 }
 
 function stripRubyComments(source: string): string {
-  let result = source.replace(/^=begin[\s\S]*?^=end$/gm, '')
-  result = result.replace(/#[^\n]*/g, '')
+  let stripped = source.replace(/^=begin[\s\S]*?^=end$/gm, '')
+  let result = ''
+  let i = 0
+  const n = stripped.length
+  type State = 'code' | 'line' | 'dstr' | 'sstr'
+  let state: State = 'code'
+
+  while (i < n) {
+    const c = stripped[i]
+    const c2 = i + 1 < n ? stripped[i + 1] : ''
+
+    if (state === 'line') {
+      if (c === '\n') { result += c; i++; state = 'code' }
+      else { i++ }
+    } else if (state === 'dstr' || state === 'sstr') {
+      result += c
+      const close = state === 'dstr' ? '"' : "'"
+      if (c === '\\' && i + 1 < n) {
+        result += c2
+        i += 2
+      } else if (c === close) {
+        i++
+        state = 'code'
+      } else {
+        i++
+      }
+    } else {
+      if (c === '#') {
+        i++
+        state = 'line'
+      } else if (c === '"') {
+        result += c
+        i++
+        state = 'dstr'
+      } else if (c === "'") {
+        result += c
+        i++
+        state = 'sstr'
+      } else {
+        result += c
+        i++
+      }
+    }
+  }
   return result
 }
 
