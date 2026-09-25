@@ -16,6 +16,7 @@ import type { StatusInfo, ImageDims } from "./components/StatusBar";
 import { TabBar } from "./components/TabBar";
 import type { TabItem } from "./components/TabBar";
 import { useFolderScan } from "./hooks/useFolderScan";
+import { useAppSettings } from "./hooks/useAppSettings";
 import { computeDiffStats } from "./utils/diffStats";
 import { Button } from "./components/ui/button";
 import type { FileEntry } from "./types";
@@ -193,19 +194,11 @@ export default function App(): React.JSX.Element {
   const [openTabs, setOpenTabs] = useState<Map<string, DiffTabData>>(new Map());
   const [activeTabId, setActiveTabId] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<FileStatus | null>(null);
-  const [diffViewMode, setDiffViewMode] = useState<"side-by-side" | "inline">("side-by-side");
-
-  useEffect(() => {
-    window.electronAPI.getAppSettings().then((s) => setDiffViewMode(s.diffViewMode));
-  }, []);
+  const { settings, updateSetting } = useAppSettings();
 
   const toggleDiffViewMode = useCallback(() => {
-    setDiffViewMode((prev) => {
-      const next: "side-by-side" | "inline" = prev === "side-by-side" ? "inline" : "side-by-side";
-      void window.electronAPI.setAppSettings({ diffViewMode: next });
-      return next;
-    });
-  }, []);
+    updateSetting("diffViewMode", settings.diffViewMode === "side-by-side" ? "inline" : "side-by-side");
+  }, [settings.diffViewMode, updateSetting]);
   const [showComparisonTab, setShowComparisonTab] = useState(false);
   const [showCloseDialog, setShowCloseDialog] = useState(false);
   const [scanVersion, setScanVersion] = useState(0);
@@ -709,7 +702,7 @@ export default function App(): React.JSX.Element {
                   onSaveRight={saveRight}
                   onCopyToLeft={copyToLeft}
                   onCopyToRight={copyToRight}
-                  diffViewMode={diffViewMode}
+                  diffViewMode={settings.diffViewMode}
                   onToggleDiffViewMode={toggleDiffViewMode}
                 />
               )}
