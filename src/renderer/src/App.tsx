@@ -21,7 +21,7 @@ import type { StatusInfo, ImageDims } from "./components/StatusBar";
 import { TabBar } from "./components/TabBar";
 import type { TabItem } from "./components/TabBar";
 import { useFolderScan } from "./hooks/useFolderScan";
-import { useAppSettings } from "./hooks/useAppSettings";
+import { useAppSettings, SettingsProvider } from "./hooks/useAppSettings";
 import { useGlobalShortcuts } from "./hooks/useGlobalShortcuts";
 import { computeDiffStats } from "./utils/diffStats";
 import { Button } from "./components/ui/button";
@@ -595,7 +595,8 @@ export default function App(): React.JSX.Element {
   })();
 
   return (
-    <TooltipProvider delayDuration={400}>
+    <SettingsProvider>
+      <TooltipProvider delayDuration={400}>
       <div className="flex h-screen flex-col bg-[hsl(var(--surface-app))]">
         {showCloseDialog && (
           <CloseConfirmDialog
@@ -745,6 +746,7 @@ export default function App(): React.JSX.Element {
           onStatusFilterChange={setStatusFilter}
         />
       </div>
-    </TooltipProvider>
+      </TooltipProvider>
+    </SettingsProvider>
   );
 }
