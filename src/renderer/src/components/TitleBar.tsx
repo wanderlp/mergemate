@@ -1,14 +1,7 @@
 import React, { useId, useState, useEffect } from "react";
-import { Minus, X } from "lucide-react";
+import { Minus, X, Settings as SettingsIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-
-const LANGUAGES = [
-  { code: "es", label: "ES — Español" },
-  { code: "en", label: "EN — English" },
-  { code: "pt", label: "PT — Português" },
-  { code: "de", label: "DE — Deutsch" },
-  { code: "fr", label: "FR — Français" }
-];
+import { LANGUAGES } from "../i18n";
 
 export function AppIcon({ size = 24 }: { size?: number }): React.JSX.Element {
   const uid = useId().replace(/:/g, "");
@@ -138,6 +131,20 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
             </option>
           ))}
         </select>
+
+        {/* Botón de configuración */}
+        <button
+          type="button"
+          onClick={() => {
+            window.location.hash = "settings";
+          }}
+          aria-label={t("settings.title")}
+          title={t("settings.title")}
+          tabIndex={-1}
+          className="flex h-full items-center px-2 text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc] focus:outline-none"
+        >
+          <SettingsIcon size={14} aria-hidden="true" />
+        </button>
 
         <button
           className="flex h-full w-[46px] items-center justify-center text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"

@@ -80,6 +80,25 @@
     "shortcutRight": "Ctrl+R — Open right",
     "shortcutRefresh": "Ctrl+F5 — Refresh"
   },
+  "settings": {
+    "title": "Settings",
+    "back": "Back",
+    "sectionDiff": "Differences",
+    "diffAlgorithm": "Diff algorithm",
+    "diffAlgorithmHint": "Advanced is more accurate but slower. Myers is classic. Experimental tries new methods.",
+    "minimapEnabled": "Show minimap",
+    "minimapEnabledHint": "Visual summary of the file on the right margin",
+    "fontSize": "Font size",
+    "ignoreWhitespace": "Ignore whitespace",
+    "ignoreWhitespaceHint": "Treat whitespace-only changes as identical",
+    "sectionStartup": "Startup",
+    "defaultViewMode": "Default open mode",
+    "defaultViewModeFolders": "Compare 2 folders",
+    "defaultViewModeFiles": "Compare 2 files",
+    "defaultViewModeBlank": "Free editor",
+    "sectionLanguage": "Language",
+    "languageNote": "Change language from the selector in the title bar. Current language:"
+  },
   "closeDialog": {
     "title": "Close comparison?",
     "message": "Unsaved changes will be lost and you'll return to the start screen.",

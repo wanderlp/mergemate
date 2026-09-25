@@ -39,4 +39,12 @@ i18n
 syncHtmlLang(i18n.language);
 i18n.on("languageChanged", syncHtmlLang);
 
+export const LANGUAGES: Array<{ code: string; label: string }> = [
+  { code: "es", label: "ES — Español" },
+  { code: "en", label: "EN — English" },
+  { code: "pt", label: "PT — Português" },
+  { code: "de", label: "DE — Deutsch" },
+  { code: "fr", label: "FR — Français" }
+];
+
 export default i18n;

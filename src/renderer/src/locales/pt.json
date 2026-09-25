@@ -80,6 +80,25 @@
     "shortcutRight": "Ctrl+R — Abrir direita",
     "shortcutRefresh": "Ctrl+F5 — Atualizar"
   },
+  "settings": {
+    "title": "Configurações",
+    "back": "Voltar",
+    "sectionDiff": "Diferenças",
+    "diffAlgorithm": "Algoritmo de diff",
+    "diffAlgorithmHint": "Advanced é mais preciso mas mais lento. Myers é clássico. Experimental testa novos métodos.",
+    "minimapEnabled": "Mostrar minimapa",
+    "minimapEnabledHint": "Resumo visual do arquivo na margem direita",
+    "fontSize": "Tamanho da fonte",
+    "ignoreWhitespace": "Ignorar espaços",
+    "ignoreWhitespaceHint": "Trata mudanças só de espaços como idênticas",
+    "sectionStartup": "Inicialização",
+    "defaultViewMode": "Modo de abertura padrão",
+    "defaultViewModeFolders": "Comparar 2 pastas",
+    "defaultViewModeFiles": "Comparar 2 arquivos",
+    "defaultViewModeBlank": "Editor livre",
+    "sectionLanguage": "Idioma",
+    "languageNote": "Mude o idioma pelo seletor na barra de título. Idioma atual:"
+  },
   "closeDialog": {
     "title": "Fechar a comparação?",
     "message": "As alterações não salvas serão perdidas e você voltará à tela inicial.",
