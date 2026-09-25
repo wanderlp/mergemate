@@ -58,7 +58,7 @@
 
 ### Directorios ignorados
 
-`node_modules`, `.git`, `__pycache__`, `dist`, `build`, `.next`, `out`, `target`, `.gradle`, `.idea`, `.vscode`, `*.bak`
+`node_modules`, `.git`, `__pycache__`, `dist`, `build`, `.next`, `out`, `target`, `.gradle`, `.idea`, `.vscode`, `*.bak`. Los **symlinks no se siguen** (se ignoran antes de cualquier recursión) para prevenir ciclos infinitos y `ELOOP`.
 
 ---
 
