@@ -43,10 +43,20 @@ export function useFolderScan(): UseFolderScanReturn {
 
   useEffect(() => {
     window.electronAPI.getPendingFolders().then((pending) => {
-      if (pending?.left) setLeftFolder(pending.left);
-      if (pending?.right) setRightFolder(pending.right);
-      if (pending?.left && pending?.right) {
-        autoScanRef.current = true;
+      if (pending?.left || pending?.right) {
+        if (pending?.left) setLeftFolder(pending.left);
+        if (pending?.right) setRightFolder(pending.right);
+        if (pending?.left && pending?.right) {
+          autoScanRef.current = true;
+        }
+      } else {
+        void window.electronAPI.getLastSession().then((session) => {
+          if (session.leftFolder) setLeftFolder(session.leftFolder);
+          if (session.rightFolder) setRightFolder(session.rightFolder);
+          if (session.leftFolder && session.rightFolder) {
+            autoScanRef.current = true;
+          }
+        });
       }
     });
 
@@ -103,6 +113,13 @@ export function useFolderScan(): UseFolderScanReturn {
       scan();
     }
   }, [leftFolder, rightFolder, scan]);
+
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      void window.electronAPI.setLastSession({ leftFolder, rightFolder });
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [leftFolder, rightFolder]);
 
   const openLeft = useCallback(async () => {
     const folder = await window.electronAPI.showFolderDialog();

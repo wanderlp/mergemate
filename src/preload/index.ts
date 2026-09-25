@@ -78,7 +78,10 @@ const api: ElectronAPI = {
   getPathForFile: (file: File) => webUtils.getPathForFile(file),
 
   getAppSettings: () => ipcRenderer.invoke("app-settings-get"),
-  setAppSettings: (partial) => ipcRenderer.invoke("app-settings-set", partial)
+  setAppSettings: (partial) => ipcRenderer.invoke("app-settings-set", partial),
+
+  getLastSession: () => ipcRenderer.invoke("session-get"),
+  setLastSession: (partial) => ipcRenderer.invoke("session-save", partial)
 };
 
 contextBridge.exposeInMainWorld("electronAPI", api);

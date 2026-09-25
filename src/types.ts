@@ -83,6 +83,13 @@ export interface ElectronAPI {
   // App settings
   getAppSettings: () => Promise<AppSettings>;
   setAppSettings: (partial: Partial<AppSettings>) => Promise<AppSettings>;
+  getLastSession: () => Promise<LastSession>;
+  setLastSession: (partial: Partial<LastSession>) => Promise<LastSession>;
+}
+
+export interface LastSession {
+  leftFolder: string;
+  rightFolder: string;
 }
 
 export interface AppSettings {

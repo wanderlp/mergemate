@@ -28,6 +28,10 @@ interface StoreSchema {
     ignoreWhitespace: boolean;
     defaultViewMode: "folders" | "files" | "blank";
   };
+  lastSession: {
+    leftFolder: string;
+    rightFolder: string;
+  };
 }
 
 const DEFAULT_SETTINGS: StoreSchema["appSettings"] = {
@@ -40,9 +44,15 @@ const DEFAULT_SETTINGS: StoreSchema["appSettings"] = {
   defaultViewMode: "folders"
 };
 
+const DEFAULT_LAST_SESSION: StoreSchema["lastSession"] = {
+  leftFolder: "",
+  rightFolder: ""
+};
+
 const store = new Store<StoreSchema>({
   defaults: {
-    appSettings: DEFAULT_SETTINGS
+    appSettings: DEFAULT_SETTINGS,
+    lastSession: DEFAULT_LAST_SESSION
   }
 });
 
@@ -332,6 +342,15 @@ function registerIpcHandlers(): void {
     const current = store.get("appSettings") ?? DEFAULT_SETTINGS;
     const next = { ...current, ...partial };
     store.set("appSettings", next);
+    return next;
+  });
+
+  ipcMain.handle("session-get", () => store.get("lastSession") ?? DEFAULT_LAST_SESSION);
+
+  ipcMain.handle("session-save", (_event, partial: Partial<StoreSchema["lastSession"]>) => {
+    const current = store.get("lastSession") ?? DEFAULT_LAST_SESSION;
+    const next = { ...current, ...partial };
+    store.set("lastSession", next);
     return next;
   });
 
