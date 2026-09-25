@@ -386,9 +386,8 @@ function setupAutoUpdater(): void {
       });
   });
 
-  // Errores silenciosos (sin internet, rate limit de GitHub, etc.)
-  autoUpdater.on("error", () => {
-    /* ignorar */
+  autoUpdater.on("error", (err) => {
+    console.error("[MergeMate updater]", err);
   });
 
   autoUpdater.checkForUpdates();

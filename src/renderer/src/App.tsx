@@ -17,6 +17,7 @@ import { TabBar } from "./components/TabBar";
 import type { TabItem } from "./components/TabBar";
 import { useFolderScan } from "./hooks/useFolderScan";
 import { useAppSettings } from "./hooks/useAppSettings";
+import { useGlobalShortcuts } from "./hooks/useGlobalShortcuts";
 import { computeDiffStats } from "./utils/diffStats";
 import { Button } from "./components/ui/button";
 import type { FileEntry } from "./types";
@@ -336,26 +337,22 @@ export default function App(): React.JSX.Element {
     };
   }, []);
 
-  // Keyboard shortcuts globales
-  useEffect(() => {
-    const handler = (e: KeyboardEvent): void => {
-      const ctrl = e.ctrlKey || e.metaKey;
-      if (ctrl && e.key === "l") {
-        e.preventDefault();
-        openLeft();
-      } else if (ctrl && e.shiftKey && (e.key === "r" || e.key === "R")) {
-        e.preventDefault();
-        void swapFolders();
-      } else if (ctrl && e.key === "F5") {
-        e.preventDefault();
-        scan();
-      } else if (e.key === "Escape" && activeTabId !== COMPARISON_TAB_ID && showComparisonTab) {
+  useGlobalShortcuts({
+    openLeft: () => {
+      void openLeft();
+    },
+    swapFolders: () => {
+      void swapFolders();
+    },
+    scan: () => {
+      void scan();
+    },
+    closeTab: () => {
+      if (activeTabId !== COMPARISON_TAB_ID && showComparisonTab) {
         setActiveTabId(COMPARISON_TAB_ID);
       }
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [openLeft, swapFolders, scan, activeTabId, showComparisonTab]);
+    }
+  });
 
   const handleFileOpen = useCallback(
     async (file: FileEntry) => {

@@ -39,8 +39,13 @@ export function useFolderScan(): UseFolderScanReturn {
   const [leftFolder, setLeftFolder] = useState("");
   const [rightFolder, setRightFolder] = useState("");
   const autoScanRef = useRef(false);
+  const scanAbortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    return () => {
+      scanAbortRef.current?.abort();
+    };
+  }, []);
     // Leer carpetas pendientes (seleccionadas desde la startup screen)
     window.electronAPI.getPendingFolders().then((pending) => {
       if (pending?.left) setLeftFolder(pending.left);
@@ -58,19 +63,29 @@ export function useFolderScan(): UseFolderScanReturn {
 
   const scan = useCallback(
     async (leftOverride?: string, rightOverride?: string) => {
+      scanAbortRef.current?.abort();
+      const controller = new AbortController();
+      scanAbortRef.current = controller;
+      const signal = controller.signal;
+
       const left = leftOverride ?? leftFolder;
       const right = rightOverride ?? rightFolder;
       if (!left || !right) return;
       setScanning(true);
       setProgress({ percent: 0, currentFile: "" });
       try {
+        if (signal.aborted) return;
         await window.electronAPI.saveRecentComparison(left, right);
+        if (signal.aborted) return;
         const result = await window.electronAPI.scanFolder(left, right);
+        if (signal.aborted) return;
         setScanResult(result);
         setScanCount((c) => c + 1);
       } finally {
-        setScanning(false);
-        setProgress(null);
+        if (!signal.aborted) {
+          setScanning(false);
+          setProgress(null);
+        }
       }
     },
     [leftFolder, rightFolder]
