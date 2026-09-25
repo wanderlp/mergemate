@@ -20,6 +20,10 @@ interface DiffViewerProps {
   onCopyToRight: (content: string) => Promise<boolean>;
   diffViewMode: DiffViewMode;
   onToggleDiffViewMode: () => void;
+  diffAlgorithm: "advanced" | "Myers" | "experimental";
+  minimapEnabled: boolean;
+  fontSize: number;
+  ignoreWhitespace: boolean;
 }
 
 const LANGUAGE_MAP: Record<string, string> = {
@@ -68,7 +72,11 @@ export function DiffViewer({
   onCopyToLeft,
   onCopyToRight,
   diffViewMode,
-  onToggleDiffViewMode
+  onToggleDiffViewMode,
+  diffAlgorithm,
+  minimapEnabled,
+  fontSize,
+  ignoreWhitespace
 }: DiffViewerProps): React.JSX.Element {
   const { t } = useTranslation();
   const editorRef = useRef<monaco.editor.IStandaloneDiffEditor | null>(null);
@@ -276,12 +284,13 @@ export function DiffViewer({
             readOnly: false,
             renderSideBySide: diffViewMode === "side-by-side",
             scrollBeyondLastLine: false,
-            minimap: { enabled: true },
-            fontSize: 15,
+            minimap: { enabled: minimapEnabled },
+            fontSize,
             lineNumbers: "on",
             scrollbar: { vertical: "auto", horizontal: "auto" },
             stickyScroll: { enabled: false },
-            diffAlgorithm: "advanced",
+            diffAlgorithm,
+            ignoreTrimWhitespace: ignoreWhitespace,
             originalEditable: true
           }}
           onMount={handleEditorDidMount}

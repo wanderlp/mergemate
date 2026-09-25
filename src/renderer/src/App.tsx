@@ -702,8 +702,12 @@ export default function App(): React.JSX.Element {
                   onSaveRight={saveRight}
                   onCopyToLeft={copyToLeft}
                   onCopyToRight={copyToRight}
-                  diffViewMode={settings.diffViewMode}
-                  onToggleDiffViewMode={toggleDiffViewMode}
+                diffViewMode={settings.diffViewMode}
+                onToggleDiffViewMode={toggleDiffViewMode}
+                diffAlgorithm={settings.diffAlgorithm}
+                minimapEnabled={settings.minimapEnabled}
+                fontSize={settings.fontSize}
+                ignoreWhitespace={settings.ignoreWhitespace}
                 />
               )}
             </div>
