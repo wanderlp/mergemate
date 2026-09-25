@@ -203,6 +203,17 @@ export default function App(): React.JSX.Element {
     return window.electronAPI.onCloseRequested(() => setShowCloseDialog(true))
   }, [])
 
+  // Previene que Chromium navegue a file:// al soltar fuera de los inputs del Toolbar
+  useEffect(() => {
+    const stop = (e: DragEvent): void => { e.preventDefault() }
+    window.addEventListener('dragover', stop)
+    window.addEventListener('drop', stop)
+    return () => {
+      window.removeEventListener('dragover', stop)
+      window.removeEventListener('drop', stop)
+    }
+  }, [])
+
   // Keyboard shortcuts globales
   useEffect(() => {
     const handler = (e: KeyboardEvent): void => {
