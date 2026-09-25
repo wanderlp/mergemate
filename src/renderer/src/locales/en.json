@@ -153,6 +153,7 @@
     "slider": "Slider",
     "left": "Left only",
     "right": "Right only",
+    "diff": "Diff",
     "identical": "Identical images",
     "zoomOut": "Zoom out",
     "zoomIn": "Zoom in",
@@ -161,7 +162,12 @@
     "leftLabel": "Left",
     "rightLabel": "Right",
     "compareAriaLabel": "Image comparison: {{path}}. Use mouse wheel to zoom and drag to navigate.",
-    "panelAriaLabel": "{{label}}. Use mouse wheel to zoom and drag to navigate."
+    "panelAriaLabel": "{{label}}. Use mouse wheel to zoom and drag to navigate.",
+    "diffAriaLabel": "Diff overlay: different pixels shown in magenta",
+    "diffTooLarge": "Image too large for diff calculation (>4K)",
+    "threshold": "Threshold",
+    "overlayOn": "Overlay on original",
+    "overlayOff": "Differences only"
   },
   "tabBar": {
     "ariaLabel": "Open files",

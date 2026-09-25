@@ -149,10 +149,11 @@
     "filterByRightOnly": "Filtrer par droit seul ({{count}})"
   },
   "image": {
-    "sidebyside": "Côte à côte",
+    "sidebyside": "Côté à côte",
     "slider": "Curseur",
     "left": "Gauche seul.",
     "right": "Droit seul.",
+    "diff": "Diff",
     "identical": "Images identiques",
     "zoomOut": "Dézoomer",
     "zoomIn": "Zoomer",
@@ -161,7 +162,12 @@
     "leftLabel": "Gauche",
     "rightLabel": "Droit",
     "compareAriaLabel": "Comparaison d'image : {{path}}. Utilisez la molette pour zoomer et faites glisser pour naviguer.",
-    "panelAriaLabel": "{{label}}. Utilisez la molette pour zoomer et faites glisser pour naviguer."
+    "panelAriaLabel": "{{label}}. Utilisez la molette pour zoomer et faites glisser pour naviguer.",
+    "diffAriaLabel": "Overlay de différences : pixels différents en magenta",
+    "diffTooLarge": "Image trop grande pour le calcul de diff (>4K)",
+    "threshold": "Seuil",
+    "overlayOn": "Surimpression sur l'original",
+    "overlayOff": "Différences uniquement"
   },
   "tabBar": {
     "ariaLabel": "Fichiers ouverts",

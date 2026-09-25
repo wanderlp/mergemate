@@ -153,6 +153,7 @@
     "slider": "Schieberegler",
     "left": "Nur links",
     "right": "Nur rechts",
+    "diff": "Diff",
     "identical": "Identische Bilder",
     "zoomOut": "Verkleinern",
     "zoomIn": "Vergrößern",
@@ -161,7 +162,12 @@
     "leftLabel": "Links",
     "rightLabel": "Rechts",
     "compareAriaLabel": "Bildvergleich: {{path}}. Mausrad zum Zoomen, ziehen zum Navigieren.",
-    "panelAriaLabel": "{{label}}. Mausrad zum Zoomen, ziehen zum Navigieren."
+    "panelAriaLabel": "{{label}}. Mausrad zum Zoomen, ziehen zum Navigieren.",
+    "diffAriaLabel": "Diff-Overlay: unterschiedliche Pixel in Magenta",
+    "diffTooLarge": "Bild zu groß für Diff-Berechnung (>4K)",
+    "threshold": "Schwelle",
+    "overlayOn": "Auf Original überlagern",
+    "overlayOff": "Nur Unterschiede"
   },
   "tabBar": {
     "ariaLabel": "Geöffnete Dateien",

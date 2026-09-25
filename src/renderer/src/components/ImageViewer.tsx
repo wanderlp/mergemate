@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { ReactCompareSlider, ReactCompareSliderImage } from 'react-compare-slider'
-import { ZoomIn, ZoomOut, RotateCcw } from 'lucide-react'
+import { ZoomIn, ZoomOut, RotateCcw, ScanLine } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import type { FileEntry } from '../types'
 import type { ImageDims } from './StatusBar'
@@ -29,7 +29,9 @@ function toDataUrl(base64: string, ext: string): string {
   return `data:${mime};base64,${base64}`
 }
 
-type ViewMode = 'slider' | 'sidebyside' | 'left' | 'right'
+type ViewMode = 'slider' | 'sidebyside' | 'left' | 'right' | 'diff'
+
+const MAX_DIFF_PIXELS = 3840 * 2160
 
 function getImageDims(url: string): Promise<ImageDims> {
   return new Promise((resolve, reject) => {
@@ -47,6 +49,10 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
   const [leftUrl,  setLeftUrl]  = useState<string | null>(null)
   const [rightUrl, setRightUrl] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
+  const [diffThreshold, setDiffThreshold] = useState(30)
+  const [diffOverlay, setDiffOverlay] = useState(false)
+  const [diffTooLarge, setDiffTooLarge] = useState(false)
+  const diffCanvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     setLoading(true)
@@ -150,7 +156,81 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
   function handleZoomOut(): void { setZoom((z) => Math.max(z - 0.25, 0.25)) }
   function handleReset():   void { setZoom(1); setPan({ x: 0, y: 0 }) }
 
-  const modes: ViewMode[] = ['sidebyside', 'slider', 'left', 'right']
+  useEffect(() => {
+    if (effectiveMode !== 'diff' || !leftUrl || !rightUrl) return
+    let cancelled = false
+    const canvas = diffCanvasRef.current
+    if (!canvas) return
+
+    const compute = async (): Promise<void> => {
+      const leftImg = new Image()
+      const rightImg = new Image()
+      await Promise.all([
+        new Promise<void>((r) => { leftImg.onload = () => r(); leftImg.onerror = () => r(); leftImg.src = leftUrl }),
+        new Promise<void>((r) => { rightImg.onload = () => r(); rightImg.onerror = () => r(); rightImg.src = rightUrl }),
+      ])
+      if (cancelled) return
+
+      const w = Math.min(leftImg.naturalWidth, rightImg.naturalWidth)
+      const h = Math.min(leftImg.naturalHeight, rightImg.naturalHeight)
+      if (w * h > MAX_DIFF_PIXELS) {
+        setDiffTooLarge(true)
+        return
+      }
+      setDiffTooLarge(false)
+
+      const ctx = canvas.getContext('2d')
+      if (!ctx) return
+      canvas.width = w
+      canvas.height = h
+
+      ctx.drawImage(leftImg, 0, 0, w, h)
+      const leftData = ctx.getImageData(0, 0, w, h)
+      ctx.clearRect(0, 0, w, h)
+      ctx.drawImage(rightImg, 0, 0, w, h)
+      const rightData = ctx.getImageData(0, 0, w, h)
+
+      const out = ctx.createImageData(w, h)
+      for (let i = 0; i < leftData.data.length; i += 4) {
+        const dr = Math.abs(leftData.data[i] - rightData.data[i])
+        const dg = Math.abs(leftData.data[i + 1] - rightData.data[i + 1])
+        const db = Math.abs(leftData.data[i + 2] - rightData.data[i + 2])
+        const isDiff = Math.max(dr, dg, db) > diffThreshold
+        if (isDiff) {
+          if (diffOverlay) {
+            out.data[i] = Math.round((leftData.data[i] + 255) / 2)
+            out.data[i + 1] = Math.round(leftData.data[i + 1] / 2)
+            out.data[i + 2] = Math.round((leftData.data[i + 2] + 255) / 2)
+          } else {
+            out.data[i] = 255
+            out.data[i + 1] = 0
+            out.data[i + 2] = 255
+          }
+          out.data[i + 3] = 255
+        } else {
+          if (diffOverlay) {
+            out.data[i] = leftData.data[i]
+            out.data[i + 1] = leftData.data[i + 1]
+            out.data[i + 2] = leftData.data[i + 2]
+            out.data[i + 3] = 255
+          } else {
+            out.data[i + 3] = 0
+          }
+        }
+      }
+      if (!cancelled) ctx.putImageData(out, 0, 0)
+    }
+
+    const raf = requestAnimationFrame(() => { void compute() })
+    return () => {
+      cancelled = true
+      cancelAnimationFrame(raf)
+    }
+  }, [effectiveMode, leftUrl, rightUrl, diffThreshold, diffOverlay])
+
+  const modes: ViewMode[] = (bothExist && !isIdentical)
+    ? ['sidebyside', 'slider', 'diff', 'left', 'right']
+    : ['sidebyside', 'slider', 'left', 'right']
 
   return (
     <div className="flex h-full flex-col bg-[#1e1e1e]">
@@ -220,6 +300,44 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
               itemOne={<ReactCompareSliderImage src={leftUrl}  alt={t('image.leftLabel')}  style={{ objectFit: 'contain' }} />}
               itemTwo={<ReactCompareSliderImage src={rightUrl} alt={t('image.rightLabel')} style={{ objectFit: 'contain' }} />}
             />
+          </div>
+        </div>
+      ) : effectiveMode === 'diff' && leftUrl && rightUrl ? (
+        <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-[#181818] p-6">
+          {diffTooLarge ? (
+            <div className="text-sm text-[#858585]">{t('image.diffTooLarge')}</div>
+          ) : (
+            <div className="flex flex-1 items-center justify-center" style={{ transform: `scale(${zoom})`, transformOrigin: 'center center' }}>
+              <canvas ref={diffCanvasRef} className="max-w-full max-h-full rounded" style={{ objectFit: 'contain' }} aria-label={t('image.diffAriaLabel')} />
+            </div>
+          )}
+          <div className="mt-3 flex items-center gap-4 rounded border border-[#3e3e42] bg-[#252526] px-4 py-2 text-xs text-[#cccccc]">
+            <label className="flex items-center gap-2">
+              <span>{t('image.threshold')}</span>
+              <input
+                type="range"
+                min={0}
+                max={255}
+                value={diffThreshold}
+                onChange={(e) => setDiffThreshold(Number(e.target.value))}
+                aria-label={t('image.threshold')}
+                aria-valuemin={0}
+                aria-valuemax={255}
+                aria-valuenow={diffThreshold}
+                className="accent-[#007acc]"
+              />
+              <span className="w-8 text-right tabular-nums">{diffThreshold}</span>
+            </label>
+            <Separator orientation="vertical" className="mx-1" />
+            <button
+              type="button"
+              onClick={() => setDiffOverlay((v) => !v)}
+              aria-pressed={diffOverlay}
+              className={`flex items-center gap-1.5 rounded px-2 py-1 transition-colors ${diffOverlay ? 'bg-[#007acc]' : 'hover:bg-[#3e3e42]'}`}
+            >
+              <ScanLine size={12} aria-hidden="true" />
+              {diffOverlay ? t('image.overlayOn') : t('image.overlayOff')}
+            </button>
           </div>
         </div>
       ) : (

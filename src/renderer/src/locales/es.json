@@ -153,6 +153,7 @@
     "slider": "Slider",
     "left": "Solo izquierda",
     "right": "Solo derecha",
+    "diff": "Diff",
     "identical": "Imágenes idénticas",
     "zoomOut": "Alejar",
     "zoomIn": "Acercar",
@@ -161,7 +162,12 @@
     "leftLabel": "Izquierda",
     "rightLabel": "Derecha",
     "compareAriaLabel": "Comparación de imagen: {{path}}. Usa la rueda del ratón para hacer zoom y arrastra para navegar.",
-    "panelAriaLabel": "{{label}}. Usa la rueda del ratón para hacer zoom y arrastra para navegar."
+    "panelAriaLabel": "{{label}}. Usa la rueda del ratón para hacer zoom y arrastra para navegar.",
+    "diffAriaLabel": "Overlay de diferencias: píxeles diferentes en magenta",
+    "diffTooLarge": "Imagen demasiado grande para calcular diff (>4K)",
+    "threshold": "Umbral",
+    "overlayOn": "Sobre original",
+    "overlayOff": "Solo diferencias"
   },
   "tabBar": {
     "ariaLabel": "Archivos abiertos",
