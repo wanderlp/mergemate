@@ -274,9 +274,9 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
       : ["sidebyside", "slider", "left", "right"];
 
   return (
-    <div className="flex h-full flex-col bg-[#1e1e1e]">
-      <div className="flex items-center gap-2 border-b border-[#3e3e42] bg-[#252526] px-3 py-2">
-        <span className="truncate text-sm text-[#cccccc]">{file.relativePath}</span>
+      <div className="flex h-full flex-col bg-[hsl(var(--surface-app))]">
+        <div className="flex items-center gap-2 border-b border-[hsl(var(--border))] bg-[hsl(var(--card))] px-3 py-2">
+          <span className="truncate text-sm text-[hsl(var(--foreground))]">{file.relativePath}</span>
 
         <div className="ml-auto flex items-center gap-1">
           {bothExist &&
@@ -313,7 +313,7 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
             </TooltipTrigger>
             <TooltipContent>{t("image.zoomOut")}</TooltipContent>
           </Tooltip>
-          <span className="w-12 text-center text-xs text-[#aaaaaa]">{Math.round(zoom * 100)}%</span>
+          <span className="w-12 text-center text-xs text-[hsl(var(--muted-foreground))]">{Math.round(zoom * 100)}%</span>
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
@@ -339,15 +339,15 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
       </div>
 
       {loading ? (
-        <div className="flex flex-1 items-center justify-center bg-[#181818]">
-          <span className="text-sm text-[#858585]">{t("image.loading")}</span>
+        <div className="flex flex-1 items-center justify-center bg-[hsl(var(--surface-content))]">
+          <span className="text-sm text-[hsl(var(--text-muted))]">{t("image.loading")}</span>
         </div>
       ) : effectiveMode === "slider" && leftUrl && rightUrl ? (
         <div
           ref={sliderContainerRef}
           role="img"
           aria-label={t("image.compareAriaLabel", { path: file.relativePath })}
-          className="relative flex flex-1 items-center justify-center overflow-hidden bg-[#181818] p-12"
+          className="relative flex flex-1 items-center justify-center overflow-hidden bg-[hsl(var(--surface-content))] p-12"
           style={{ cursor: zoom > 1 ? (isDragging ? "grabbing" : "grab") : "default" }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
@@ -384,7 +384,7 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
           </div>
         </div>
       ) : effectiveMode === "diff" && leftUrl && rightUrl ? (
-        <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-[#181818] p-6">
+        <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-[hsl(var(--surface-content))] p-6">
           {diffTooLarge ? (
             <div className="text-sm text-[#858585]">{t("image.diffTooLarge")}</div>
           ) : (
@@ -400,7 +400,7 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
               />
             </div>
           )}
-          <div className="mt-3 flex items-center gap-4 rounded border border-[#3e3e42] bg-[#252526] px-4 py-2 text-xs text-[#cccccc]">
+          <div className="mt-3 flex items-center gap-4 rounded border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4 py-2 text-xs text-[hsl(var(--foreground))]">
             <label className="flex items-center gap-2">
               <span>{t("image.threshold")}</span>
               <input
@@ -422,7 +422,7 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
               type="button"
               onClick={() => setDiffOverlay((v) => !v)}
               aria-pressed={diffOverlay}
-              className={`flex items-center gap-1.5 rounded px-2 py-1 transition-colors ${diffOverlay ? "bg-[#007acc]" : "hover:bg-[#3e3e42]"}`}
+              className={`flex items-center gap-1.5 rounded px-2 py-1 transition-colors ${diffOverlay ? "bg-[hsl(var(--primary))]" : "hover:bg-[hsl(var(--secondary))]"}`}
             >
               <ScanLine size={12} aria-hidden="true" />
               {diffOverlay ? t("image.overlayOn") : t("image.overlayOff")}
@@ -430,7 +430,7 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
           </div>
         </div>
       ) : (
-        <div className="flex flex-1 overflow-hidden bg-[#181818]">
+        <div className="flex flex-1 overflow-hidden bg-[hsl(var(--surface-content))]">
           {(effectiveMode === "sidebyside" || effectiveMode === "left") && leftUrl && (
             <ImagePanel
               url={leftUrl}
@@ -529,7 +529,7 @@ function ImagePanel({
         />
       </div>
       {label && (
-        <div className="flex-shrink-0 py-1.5 text-center text-xs font-semibold uppercase tracking-wider text-[#858585]">
+        <div className="flex-shrink-0 py-1.5 text-center text-xs font-semibold uppercase tracking-wider text-[hsl(var(--text-muted))]">
           {label}
         </div>
       )}
