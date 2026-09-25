@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
 import { FileTypeIcon } from './FileTypeIcon'
 import { COMPARISON_TAB_ID, BLANK_TAB_ID } from '../constants'
+import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip'
 
 export interface TabItem {
   id: string
@@ -92,16 +93,20 @@ export function TabBar({ tabs, activeTabId, onSelectTab, onCloseTab }: TabBarPro
               {icon}
               <span className="flex-1 truncate">{tab.label}</span>
               {isCloseable && (
-                <button
-                  className="ml-1 flex-shrink-0 rounded p-0.5 opacity-0 transition-opacity hover:bg-[#5a5a5a] group-hover:opacity-100"
-                  style={{ opacity: isActive ? 1 : undefined }}
-                  onClick={(e) => { e.stopPropagation(); onCloseTab(tab.id) }}
-                  title={t('tabBar.closeTab', { label: tab.label })}
-                  aria-label={t('tabBar.closeTab', { label: tab.label })}
-                  tabIndex={-1}
-                >
-                  <X size={12} />
-                </button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      className="ml-1 flex-shrink-0 rounded p-0.5 opacity-0 transition-opacity hover:bg-[#5a5a5a] group-hover:opacity-100"
+                      style={{ opacity: isActive ? 1 : undefined }}
+                      onClick={(e) => { e.stopPropagation(); onCloseTab(tab.id) }}
+                      aria-label={t('tabBar.closeTab', { label: tab.label })}
+                      tabIndex={-1}
+                    >
+                      <X size={12} />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>{t('tabBar.closeTab', { label: tab.label })}</TooltipContent>
+                </Tooltip>
               )}
             </motion.div>
           )
