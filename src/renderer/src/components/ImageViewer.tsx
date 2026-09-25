@@ -386,7 +386,7 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
       ) : effectiveMode === "diff" && leftUrl && rightUrl ? (
         <div className="relative flex flex-1 flex-col items-center justify-center overflow-hidden bg-[hsl(var(--surface-content))] p-6">
           {diffTooLarge ? (
-            <div className="text-sm text-[#858585]">{t("image.diffTooLarge")}</div>
+            <div className="text-sm text-[hsl(var(--text-muted))]">{t("image.diffTooLarge")}</div>
           ) : (
             <div
               className="flex flex-1 items-center justify-center"
