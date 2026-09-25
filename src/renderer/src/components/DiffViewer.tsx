@@ -6,6 +6,7 @@ import type { FileEntry } from '../types'
 import type * as monaco from 'monaco-editor'
 import { Button } from './ui/button'
 import { Separator } from './ui/separator'
+import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip'
 
 export type DiffViewMode = 'side-by-side' | 'inline'
 
@@ -152,82 +153,114 @@ export function DiffViewer({
         </div>
 
         <div className="flex items-center gap-1">
-          <Button
-            onClick={onToggleDiffViewMode}
-            title={t('diff.viewModeTooltip')}
-            aria-label={t('diff.viewModeAriaLabel')}
-            aria-pressed={diffViewMode === 'inline'}
-          >
-            {diffViewMode === 'side-by-side'
-              ? <Columns2 size={16} aria-hidden="true" />
-              : <Rows size={16} aria-hidden="true" />}
-            {t(`diff.viewMode.${diffViewMode}`)}
-          </Button>
-          <Button
-            onClick={() => navigateDiff('prev')}
-            title={t('diff.prevTooltip')}
-            aria-label={t('diff.prevAriaLabel')}
-          >
-            <ChevronUp size={16} aria-hidden="true" />
-            {t('diff.prev')}
-          </Button>
-          <Button
-            onClick={() => navigateDiff('next')}
-            title={t('diff.nextTooltip')}
-            aria-label={t('diff.nextAriaLabel')}
-          >
-            <ChevronDown size={16} aria-hidden="true" />
-            {t('diff.next')}
-          </Button>
-          <Button
-            onClick={openFind}
-            title={t('diff.findTooltip')}
-            aria-label={t('diff.findAriaLabel')}
-          >
-            <Search size={16} aria-hidden="true" />
-            {t('diff.find')}
-          </Button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={onToggleDiffViewMode}
+                aria-label={t('diff.viewModeAriaLabel')}
+                aria-pressed={diffViewMode === 'inline'}
+              >
+                {diffViewMode === 'side-by-side'
+                  ? <Columns2 size={16} aria-hidden="true" />
+                  : <Rows size={16} aria-hidden="true" />}
+                {t(`diff.viewMode.${diffViewMode}`)}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('diff.viewModeTooltip')}</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => navigateDiff('prev')}
+                aria-label={t('diff.prevAriaLabel')}
+              >
+                <ChevronUp size={16} aria-hidden="true" />
+                {t('diff.prev')}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('diff.prevTooltip')}</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => navigateDiff('next')}
+                aria-label={t('diff.nextAriaLabel')}
+              >
+                <ChevronDown size={16} aria-hidden="true" />
+                {t('diff.next')}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('diff.nextTooltip')}</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={openFind}
+                aria-label={t('diff.findAriaLabel')}
+              >
+                <Search size={16} aria-hidden="true" />
+                {t('diff.find')}
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t('diff.findTooltip')}</TooltipContent>
+          </Tooltip>
         </div>
 
         <Separator orientation="vertical" className="mx-1" />
 
-        <Button
-          onClick={handleCopyToLeft}
-          disabled={!canCopyLeft || !canCopyRight}
-          title={t('diff.copyToLeftTooltip')}
-          aria-label={t('diff.copyToLeftAriaLabel')}
-        >
-          <ArrowLeftRight size={16} aria-hidden="true" />{t('diff.copyToLeft')}
-        </Button>
-        <Button
-          onClick={handleCopyToRight}
-          disabled={!canCopyLeft || !canCopyRight}
-          title={t('diff.copyToRightTooltip')}
-          aria-label={t('diff.copyToRightAriaLabel')}
-        >
-          {t('diff.copyToRight')}<ArrowLeftRight size={16} aria-hidden="true" />
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={handleCopyToLeft}
+              disabled={!canCopyLeft || !canCopyRight}
+              aria-label={t('diff.copyToLeftAriaLabel')}
+            >
+              <ArrowLeftRight size={16} aria-hidden="true" />{t('diff.copyToLeft')}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{t('diff.copyToLeftTooltip')}</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={handleCopyToRight}
+              disabled={!canCopyLeft || !canCopyRight}
+              aria-label={t('diff.copyToRightAriaLabel')}
+            >
+              {t('diff.copyToRight')}<ArrowLeftRight size={16} aria-hidden="true" />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{t('diff.copyToRightTooltip')}</TooltipContent>
+        </Tooltip>
 
         <Separator orientation="vertical" className="mx-1" />
 
-        <Button
-          onClick={handleSaveLeft}
-          disabled={!canCopyLeft}
-          title={t('diff.saveLeftTooltip')}
-          aria-label={t('diff.saveLeftAriaLabel')}
-        >
-          <Save size={16} aria-hidden="true" />
-          {t('diff.saveLeft')}
-        </Button>
-        <Button
-          onClick={handleSaveRight}
-          disabled={!canCopyRight}
-          title={t('diff.saveRightTooltip')}
-          aria-label={t('diff.saveRightAriaLabel')}
-        >
-          <Save size={16} aria-hidden="true" />
-          {t('diff.saveRight')}
-        </Button>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={handleSaveLeft}
+              disabled={!canCopyLeft}
+              aria-label={t('diff.saveLeftAriaLabel')}
+            >
+              <Save size={16} aria-hidden="true" />
+              {t('diff.saveLeft')}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{t('diff.saveLeftTooltip')}</TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              onClick={handleSaveRight}
+              disabled={!canCopyRight}
+              aria-label={t('diff.saveRightAriaLabel')}
+            >
+              <Save size={16} aria-hidden="true" />
+              {t('diff.saveRight')}
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>{t('diff.saveRightTooltip')}</TooltipContent>
+        </Tooltip>
       </div>
 
       <div className="flex-1 overflow-hidden">
