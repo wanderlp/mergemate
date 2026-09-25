@@ -1,4 +1,4 @@
-import { contextBridge, ipcRenderer } from 'electron'
+import { contextBridge, ipcRenderer, webUtils } from 'electron'
 import type { ElectronAPI, ScanProgress } from '../types'
 
 const api: ElectronAPI = {
@@ -84,7 +84,9 @@ const api: ElectronAPI = {
   folderExists: (path) => ipcRenderer.invoke('folder-exists', path),
   classifyFiles: (leftPath, rightPath, ext) => ipcRenderer.invoke('classify-files', leftPath, rightPath, ext),
 
-  openExternal: (url) => ipcRenderer.invoke('open-external', url)
+  openExternal: (url) => ipcRenderer.invoke('open-external', url),
+
+  getPathForFile: (file: File) => webUtils.getPathForFile(file)
 }
 
 contextBridge.exposeInMainWorld('electronAPI', api)

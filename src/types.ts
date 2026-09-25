@@ -71,6 +71,7 @@ export interface ElectronAPI {
   onCloseRequested: (callback: () => void) => () => void
   confirmClose: () => Promise<void>
   openExternal: (url: string) => Promise<void>
+  getPathForFile: (file: File) => string
 }
 
 declare global {
