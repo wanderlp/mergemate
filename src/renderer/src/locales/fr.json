@@ -38,7 +38,13 @@
     "folderNotFoundMessage_one": "Le dossier suivant n'existe pas :",
     "folderNotFoundMessage_other": "Les dossiers suivants n'existent pas :",
     "folderNotFoundContinue": "Continuer quand même",
-    "folderNotFoundCancel": "Annuler"
+    "folderNotFoundCancel": "Annuler",
+    "exportCsvTooltip": "Exporter le résultat en CSV",
+    "exportCsvAriaLabel": "Exporter en CSV",
+    "exportJsonTooltip": "Exporter le résultat en JSON",
+    "exportJsonAriaLabel": "Exporter en JSON",
+    "exportMarkdownTooltip": "Exporter le résultat en Markdown",
+    "exportMarkdownAriaLabel": "Exporter en Markdown"
   },
   "startup": {
     "subtitle": "Comparer et fusionner des dossiers",

@@ -76,6 +76,8 @@ const api: ElectronAPI = {
 
   openExternal: (url) => ipcRenderer.invoke("open-external", url),
 
+  exportScan: (format, result) => ipcRenderer.invoke("export-scan", format, result),
+
   getPathForFile: (file: File) => webUtils.getPathForFile(file),
 
   getAppSettings: () => ipcRenderer.invoke("app-settings-get"),

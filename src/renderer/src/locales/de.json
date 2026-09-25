@@ -38,7 +38,13 @@
     "folderNotFoundMessage_one": "Der folgende Ordner existiert nicht:",
     "folderNotFoundMessage_other": "Die folgenden Ordner existieren nicht:",
     "folderNotFoundContinue": "Trotzdem fortfahren",
-    "folderNotFoundCancel": "Abbrechen"
+    "folderNotFoundCancel": "Abbrechen",
+    "exportCsvTooltip": "Ergebnis als CSV exportieren",
+    "exportCsvAriaLabel": "Als CSV exportieren",
+    "exportJsonTooltip": "Ergebnis als JSON exportieren",
+    "exportJsonAriaLabel": "Als JSON exportieren",
+    "exportMarkdownTooltip": "Ergebnis als Markdown exportieren",
+    "exportMarkdownAriaLabel": "Als Markdown exportieren"
   },
   "startup": {
     "subtitle": "Ordner vergleichen und zusammenführen",

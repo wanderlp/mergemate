@@ -6,7 +6,8 @@ import Store from "electron-store";
 import * as fs from "fs";
 import { scanFolders } from "./scanner";
 import { hashFile, classifyFiles } from "./classifier";
-import type { RecentComparison } from "../types";
+import type { RecentComparison, ScanResult } from "../types";
+import { serializeCsv, serializeJson, serializeMarkdown, type ExportFormat } from "./services/export.service";
 
 interface WindowState {
   x: number | undefined;
@@ -340,6 +341,34 @@ function registerIpcHandlers(): void {
 
   ipcMain.handle("open-external", (_event, url: string) => {
     shell.openExternal(url);
+  });
+
+  // ── Export ───────────────────────────────────────────────────────────────
+
+  ipcMain.handle("export-scan", async (event, format: ExportFormat, result: ScanResult) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const ext = format === "csv" ? "csv" : format === "json" ? "json" : "md";
+    const defaultName = `mergemate-${new Date().toISOString().slice(0, 10)}.${ext}`;
+    const saveResult = await dialog.showSaveDialog(win ?? mainWindow!, {
+      title: "Exportar resultado",
+      defaultPath: defaultName,
+      filters: [
+        format === "csv"
+          ? { name: "CSV", extensions: ["csv"] }
+          : format === "json"
+            ? { name: "JSON", extensions: ["json"] }
+            : { name: "Markdown", extensions: ["md"] }
+      ]
+    });
+    if (saveResult.canceled || !saveResult.filePath) return { canceled: true };
+    const content =
+      format === "csv"
+        ? serializeCsv(result)
+        : format === "json"
+          ? serializeJson(result)
+          : serializeMarkdown(result);
+    fs.writeFileSync(saveResult.filePath, content, "utf-8");
+    return { canceled: false, filePath: saveResult.filePath };
   });
 
   // ── App settings ──────────────────────────────────────────────────────────

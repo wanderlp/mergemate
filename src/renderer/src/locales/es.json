@@ -38,7 +38,13 @@
     "folderNotFoundMessage_one": "La siguiente carpeta no existe:",
     "folderNotFoundMessage_other": "Las siguientes carpetas no existen:",
     "folderNotFoundContinue": "Continuar de todos modos",
-    "folderNotFoundCancel": "Cancelar"
+    "folderNotFoundCancel": "Cancelar",
+    "exportCsvTooltip": "Exportar resultado a CSV",
+    "exportCsvAriaLabel": "Exportar a CSV",
+    "exportJsonTooltip": "Exportar resultado a JSON",
+    "exportJsonAriaLabel": "Exportar a JSON",
+    "exportMarkdownTooltip": "Exportar resultado a Markdown",
+    "exportMarkdownAriaLabel": "Exportar a Markdown"
   },
   "startup": {
     "subtitle": "Compara y fusiona carpetas",

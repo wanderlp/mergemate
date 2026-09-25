@@ -38,7 +38,13 @@
     "folderNotFoundMessage_one": "A seguinte pasta não existe:",
     "folderNotFoundMessage_other": "As seguintes pastas não existem:",
     "folderNotFoundContinue": "Continuar mesmo assim",
-    "folderNotFoundCancel": "Cancelar"
+    "folderNotFoundCancel": "Cancelar",
+    "exportCsvTooltip": "Exportar resultado para CSV",
+    "exportCsvAriaLabel": "Exportar para CSV",
+    "exportJsonTooltip": "Exportar resultado para JSON",
+    "exportJsonAriaLabel": "Exportar para JSON",
+    "exportMarkdownTooltip": "Exportar resultado para Markdown",
+    "exportMarkdownAriaLabel": "Exportar para Markdown"
   },
   "startup": {
     "subtitle": "Compare e mescle pastas",

@@ -364,6 +364,14 @@ export default function App(): React.JSX.Element {
     }
   });
 
+  const handleExport = useCallback(
+    async (format: "csv" | "json" | "markdown") => {
+      if (!scanResult) return;
+      await window.electronAPI.exportScan(format, scanResult);
+    },
+    [scanResult]
+  );
+
   const handleFileOpen = useCallback(
     async (file: FileEntry) => {
       const id = file.relativePath;
@@ -616,6 +624,7 @@ export default function App(): React.JSX.Element {
               onChangeRight={setRightFolder}
               onRefresh={scan}
               onSwap={swapFolders}
+              onExport={handleExport}
               scanning={scanning}
             />
           )}

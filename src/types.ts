@@ -80,6 +80,7 @@ export interface ElectronAPI {
   onCloseRequested: (callback: () => void) => () => void;
   confirmClose: () => Promise<void>;
   openExternal: (url: string) => Promise<void>;
+  exportScan: (format: "csv" | "json" | "markdown", result: ScanResult) => Promise<{ canceled: boolean; filePath?: string }>;
   getPathForFile: (file: File) => string;
   // App settings
   getAppSettings: () => Promise<AppSettings>;

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { FolderOpen, GitCompareArrows, ArrowLeftRight } from "lucide-react";
+import { FolderOpen, GitCompareArrows, ArrowLeftRight, Download } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
@@ -14,6 +14,7 @@ interface ToolbarProps {
   onChangeRight: (path: string) => void;
   onRefresh: () => void;
   onSwap: () => void;
+  onExport: (format: "csv" | "json" | "markdown") => void;
   scanning: boolean;
 }
 
@@ -26,6 +27,7 @@ export function Toolbar({
   onChangeRight,
   onRefresh,
   onSwap,
+  onExport,
   scanning
 }: ToolbarProps): React.JSX.Element {
   const { t } = useTranslation();
@@ -222,6 +224,48 @@ export function Toolbar({
         </Tooltip>
 
         <Separator orientation="vertical" className="mx-1" />
+
+        <div className="flex items-center gap-1">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => onExport("csv")}
+                disabled={scanning}
+                aria-label={t("toolbar.exportCsvAriaLabel")}
+                size="icon"
+              >
+                <Download size={14} aria-hidden="true" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t("toolbar.exportCsvTooltip")}</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => onExport("json")}
+                disabled={scanning}
+                aria-label={t("toolbar.exportJsonAriaLabel")}
+                size="icon"
+              >
+                <Download size={14} aria-hidden="true" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t("toolbar.exportJsonTooltip")}</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                onClick={() => onExport("markdown")}
+                disabled={scanning}
+                aria-label={t("toolbar.exportMarkdownAriaLabel")}
+                size="icon"
+              >
+                <Download size={14} aria-hidden="true" />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>{t("toolbar.exportMarkdownTooltip")}</TooltipContent>
+          </Tooltip>
+        </div>
 
         <Tooltip>
           <TooltipTrigger asChild>
