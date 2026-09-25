@@ -1,8 +1,23 @@
-import React, { useState, useCallback, useRef, useEffect } from 'react'
+import React, { useState, useCallback, useRef, useEffect, useMemo } from 'react'
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { Search, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { FileRow } from './FileRow'
-import type { FileEntry } from '../types'
+import type { FileEntry, FileStatus } from '../types'
+
+const ALL_STATUSES: FileStatus[] = ['identical', 'different', 'comments-only', 'left-only', 'right-only']
+
+interface FlatEntry {
+  entry: FileEntry
+  depth: number
+}
+
+function matchesFilters(entry: FileEntry, query: string, statusFilters: Set<FileStatus>): boolean {
+  if (entry.isDirectory) return true
+  if (statusFilters.size > 0 && !statusFilters.has(entry.status)) return false
+  if (query && !entry.relativePath.toLowerCase().includes(query)) return false
+  return true
+}
 
 interface FileTreeProps {
   entries: FileEntry[]
@@ -10,11 +25,6 @@ interface FileTreeProps {
   scanVersion: number
   onFileOpen: (file: FileEntry) => void
   onHover: (path: string) => void
-}
-
-interface FlatEntry {
-  entry: FileEntry
-  depth: number
 }
 
 function flattenVisible(entries: FileEntry[], expandedDirs: Set<string>, depth = 0): FlatEntry[] {
@@ -25,6 +35,27 @@ function flattenVisible(entries: FileEntry[], expandedDirs: Set<string>, depth =
       result.push(...flattenVisible(entry.children, expandedDirs, depth + 1))
     }
   }
+  return result
+}
+
+function collectMatchingDirs(entries: FileEntry[], query: string, statusFilters: Set<FileStatus>): Set<string> {
+  const result = new Set<string>()
+  function walk(list: FileEntry[]): boolean {
+    let anyMatch = false
+    for (const e of list) {
+      if (e.isDirectory && e.children) {
+        const childMatch = walk(e.children)
+        if (childMatch) {
+          result.add(e.relativePath)
+          anyMatch = true
+        }
+      } else if (matchesFilters(e, query, statusFilters)) {
+        anyMatch = true
+      }
+    }
+    return anyMatch
+  }
+  walk(entries)
   return result
 }
 
@@ -56,9 +87,63 @@ export function FileTree({
   const { t } = useTranslation()
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set())
   const [focusedPath, setFocusedPath] = useState<string | null>(null)
+  const [searchInput, setSearchInput] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [statusFilters, setStatusFilters] = useState<Set<FileStatus>>(new Set())
   const rowRefsMap = useRef<Map<string, HTMLDivElement>>(new Map())
   const containerRef = useRef<HTMLDivElement>(null)
   const keyboardNav = useRef(false)
+
+  const isFiltering = searchQuery.length > 0 || statusFilters.size > 0
+
+  useEffect(() => {
+    const handle = setTimeout(() => setSearchQuery(searchInput.toLowerCase()), 200)
+    return () => clearTimeout(handle)
+  }, [searchInput])
+
+  const matchingDirs = useMemo(
+    () => isFiltering ? collectMatchingDirs(entries, searchQuery, statusFilters) : new Set<string>(),
+    [entries, searchQuery, statusFilters, isFiltering]
+  )
+
+  const effectiveExpanded = useMemo(() => {
+    if (!isFiltering) return expandedDirs
+    return new Set([...expandedDirs, ...matchingDirs])
+  }, [expandedDirs, matchingDirs, isFiltering])
+
+  const filteredEntries = useMemo(() => {
+    if (!isFiltering) return entries
+    return entries.filter((e) => {
+      if (e.isDirectory) return matchingDirs.has(e.relativePath)
+      return matchesFilters(e, searchQuery, statusFilters)
+    })
+  }, [entries, searchQuery, statusFilters, isFiltering, matchingDirs])
+
+  const matchCount = useMemo(() => {
+    let n = 0
+    function walk(list: FileEntry[]): void {
+      for (const e of list) {
+        if (e.isDirectory && e.children) walk(e.children)
+        else if (matchesFilters(e, searchQuery, statusFilters)) n++
+      }
+    }
+    walk(entries)
+    return n
+  }, [entries, searchQuery, statusFilters])
+
+  function toggleStatusFilter(status: FileStatus): void {
+    setStatusFilters((prev) => {
+      const next = new Set(prev)
+      if (next.has(status)) next.delete(status)
+      else next.add(status)
+      return next
+    })
+  }
+
+  function clearFilters(): void {
+    setSearchInput('')
+    setStatusFilters(new Set())
+  }
 
   // scanKey cambia solo en re-escaneos completos (no en actualizaciones puntuales de fila)
   const scanKey = useRef(0)
@@ -101,7 +186,7 @@ export function FileTree({
   const shouldReduceMotion = useReducedMotion()
   const rowVariants = makeRowVariants(shouldReduceMotion ?? false)
 
-  const visible = flattenVisible(entries, expandedDirs)
+  const visible = flattenVisible(filteredEntries, effectiveExpanded)
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
     if (!['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Enter'].includes(e.key)) return
@@ -160,6 +245,53 @@ export function FileTree({
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
+      {/* Filtros */}
+      <div className="flex flex-col gap-2 border-b border-[#3e3e42] bg-[#252526] px-3 py-2">
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search size={13} className="pointer-events-none absolute left-2 top-1/2 -translate-y-1/2 text-[#858585]" aria-hidden="true" />
+            <input
+              type="text"
+              role="searchbox"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder={t('fileTree.searchPlaceholder')}
+              aria-label={t('fileTree.searchPlaceholder')}
+              className="w-full rounded bg-[#1e1e1e] py-1 pl-7 pr-2 text-xs text-[#cccccc] placeholder-[#555] focus:outline-none focus:ring-1 focus:ring-[#007acc]"
+            />
+          </div>
+          {isFiltering && (
+            <button
+              type="button"
+              onClick={clearFilters}
+              className="flex items-center gap-1 rounded px-2 py-1 text-xs text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
+              title={t('fileTree.clearFilters')}
+              aria-label={t('fileTree.clearFilters')}
+            >
+              <X size={12} aria-hidden="true" />
+              {t('fileTree.clear')}
+            </button>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          {ALL_STATUSES.map((status) => (
+            <label key={status} className="flex cursor-pointer items-center gap-1.5 text-xs text-[#aaaaaa]">
+              <input
+                type="checkbox"
+                checked={statusFilters.has(status)}
+                onChange={() => toggleStatusFilter(status)}
+                className="h-3 w-3 cursor-pointer accent-[#007acc]"
+                aria-label={t(`fileRow.status.${status === 'comments-only' ? 'commentsOnly' : status.replace('-', '')}`)}
+              />
+              <span>{t(`fileRow.status.${status === 'comments-only' ? 'commentsOnly' : status.replace('-', '')}`)}</span>
+            </label>
+          ))}
+        </div>
+        <div role="status" aria-live="polite" className="sr-only">
+          {isFiltering ? t('fileTree.matchCount', { shown: matchCount }) : ''}
+        </div>
+      </div>
+
       {/* Header */}
       <div className="flex border-b border-[#3e3e42] bg-[#252526] text-xs font-semibold text-[#858585]">
         <div className="w-1 flex-shrink-0" />
@@ -176,35 +308,42 @@ export function FileTree({
         onKeyDown={handleKeyDown}
         tabIndex={0}
       >
-        <AnimatePresence mode="popLayout" initial={true}>
-          {visible.map(({ entry, depth }, index) => (
-            <motion.div
-              key={`${scanKey.current}-${entry.relativePath}`}
-              custom={index}
-              variants={rowVariants}
-              initial="hidden"
-              animate="visible"
-              exit="exit"
-              layout={false}
-            >
-              <FileRow
-                entry={entry}
-                depth={depth}
-                expanded={expandedDirs.has(entry.relativePath)}
-                onToggle={() => handleToggle(entry.relativePath)}
-                onDoubleClick={() => !entry.isDirectory && onFileOpen(entry)}
-                onHover={onHover}
-                isFocused={focusedPath === entry.relativePath}
-                isOpen={openTabIds.has(entry.relativePath)}
-                onFocusPath={setFocusedPath}
-                refCallback={(el) => {
-                  if (el) rowRefsMap.current.set(entry.relativePath, el)
-                  else rowRefsMap.current.delete(entry.relativePath)
-                }}
-              />
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {visible.length === 0 && isFiltering ? (
+          <div className="flex flex-1 items-center justify-center py-8 text-sm text-[#858585]">
+            {t('fileTree.noMatches')}
+          </div>
+        ) : (
+          <AnimatePresence mode="popLayout" initial={true}>
+            {visible.map(({ entry, depth }, index) => (
+              <motion.div
+                key={`${scanKey.current}-${entry.relativePath}`}
+                custom={index}
+                variants={rowVariants}
+                initial="hidden"
+                animate="visible"
+                exit="exit"
+                layout={false}
+              >
+                <FileRow
+                  entry={entry}
+                  depth={depth}
+                  expanded={expandedDirs.has(entry.relativePath)}
+                  onToggle={() => handleToggle(entry.relativePath)}
+                  onDoubleClick={() => !entry.isDirectory && onFileOpen(entry)}
+                  onHover={onHover}
+                  isFocused={focusedPath === entry.relativePath}
+                  isOpen={openTabIds.has(entry.relativePath)}
+                  onFocusPath={setFocusedPath}
+                  refCallback={(el) => {
+                    if (el) rowRefsMap.current.set(entry.relativePath, el)
+                    else rowRefsMap.current.delete(entry.relativePath)
+                  }}
+                  highlight={isFiltering ? searchQuery : undefined}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        )}
       </div>
     </div>
   )

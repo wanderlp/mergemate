@@ -170,6 +170,11 @@
     }
   },
   "fileTree": {
-    "emptyState": "No se encontraron archivos en las carpetas seleccionadas"
+    "emptyState": "No se encontraron archivos en las carpetas seleccionadas",
+    "searchPlaceholder": "Buscar por nombre...",
+    "clearFilters": "Limpiar filtros",
+    "clear": "Limpiar",
+    "matchCount": "{{shown}} archivos mostrados",
+    "noMatches": "Sin coincidencias"
   }
 }

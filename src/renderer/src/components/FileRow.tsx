@@ -16,6 +16,7 @@ interface FileRowProps {
   isOpen?: boolean
   onFocusPath?: (path: string) => void
   refCallback?: (el: HTMLDivElement | null) => void
+  highlight?: string
 }
 
 const STATUS_COLORS: Record<FileStatus, string> = {
@@ -47,7 +48,8 @@ export function FileRow({
   isFocused,
   isOpen,
   onFocusPath,
-  refCallback
+  refCallback,
+  highlight
 }: FileRowProps): React.JSX.Element {
   const { t } = useTranslation()
   const color = STATUS_COLORS[entry.status]
@@ -58,6 +60,21 @@ export function FileRow({
   const rightExists = Boolean(entry.rightPath)
 
   const lastMouseDown = useRef(0)
+
+  function renderHighlightedName(name: string): React.ReactNode {
+    if (!highlight) return name
+    const lower = name.toLowerCase()
+    const query = highlight.toLowerCase()
+    const idx = lower.indexOf(query)
+    if (idx < 0) return name
+    return (
+      <>
+        {name.slice(0, idx)}
+        <mark className="bg-[#007acc] text-white">{name.slice(idx, idx + highlight.length)}</mark>
+        {name.slice(idx + highlight.length)}
+      </>
+    )
+  }
 
   const absentSideStyle: React.CSSProperties = {
     background: 'repeating-linear-gradient(135deg, transparent, transparent 4px, rgba(0,0,0,0.18) 4px, rgba(0,0,0,0.18) 8px)',
@@ -125,16 +142,16 @@ export function FileRow({
               {expanded
                 ? <FolderOpen size={16} className="flex-shrink-0 text-[#e8c27a]" />
                 : <Folder size={16} className="flex-shrink-0 text-[#e8c27a]" />}
-              <span className="truncate text-[#cccccc]">{entry.name}</span>
+              <span className="truncate text-[#cccccc]">{renderHighlightedName(entry.name)}</span>
             </>
           ) : (
             <>
               <FileTypeIcon extension={entry.extension} name={entry.name} />
-              <span className="truncate" style={fileNameStyle}>{entry.name}</span>
+              <span className="truncate" style={fileNameStyle}>{renderHighlightedName(entry.name)}</span>
             </>
           )
         ) : (
-          <span className="truncate text-[#6e6e6e]">—</span>
+          <span className="truncate text-[#6e6e6e">—</span>
         )}
       </div>
 
@@ -157,14 +174,14 @@ export function FileRow({
         {rightExists ? (
           entry.isDirectory ? (
             <>
-              <span className="truncate text-[#cccccc]">{entry.name}</span>
+              <span className="truncate text-[#cccccc]">{renderHighlightedName(entry.name)}</span>
               {expanded
                 ? <FolderOpen size={16} className="flex-shrink-0 text-[#e8c27a]" />
                 : <Folder size={16} className="flex-shrink-0 text-[#e8c27a]" />}
             </>
           ) : (
             <>
-              <span className="truncate" style={fileNameStyle}>{entry.name}</span>
+              <span className="truncate" style={fileNameStyle}>{renderHighlightedName(entry.name)}</span>
               <FileTypeIcon extension={entry.extension} name={entry.name} />
             </>
           )

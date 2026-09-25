@@ -170,6 +170,11 @@
     }
   },
   "fileTree": {
-    "emptyState": "No files were found in the selected folders"
+    "emptyState": "No files were found in the selected folders",
+    "searchPlaceholder": "Search by name...",
+    "clearFilters": "Clear filters",
+    "clear": "Clear",
+    "matchCount": "{{shown}} files shown",
+    "noMatches": "No matches"
   }
 }
