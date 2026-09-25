@@ -71,7 +71,7 @@ export function FileRow({
     return (
       <>
         {name.slice(0, idx)}
-        <mark className="bg-[#007acc] text-white">{name.slice(idx, idx + highlight.length)}</mark>
+        <mark className="bg-[hsl(var(--primary))] text-[hsl(var(--text-inverse))]">{name.slice(idx, idx + highlight.length)}</mark>
         {name.slice(idx + highlight.length)}
       </>
     );
@@ -114,7 +114,7 @@ export function FileRow({
       role="treeitem"
       aria-level={ariaLevel ?? depth + 1}
       tabIndex={0}
-      className="group flex cursor-pointer items-center border-b border-[#2a2d2e]/50 hover:bg-[#2a2d2e] focus:bg-[#2a2d2e] focus:outline-none transition-colors select-none"
+      className="group flex cursor-pointer items-center border-b border-[hsl(var(--accent))]/50 hover:bg-[hsl(var(--accent))] focus:bg-[hsl(var(--accent))] focus:outline-none transition-colors select-none"
       style={isFocused ? { backgroundColor: "#37373d" } : undefined}
       onMouseDown={handleMouseDown}
       onKeyDown={handleKeyDown}
@@ -139,16 +139,16 @@ export function FileRow({
           entry.isDirectory ? (
             <>
               {expanded ? (
-                <ChevronDown size={16} className="flex-shrink-0 text-[#aaaaaa]" />
+                <ChevronDown size={16} className="flex-shrink-0 text-[hsl(var(--muted-foreground))]" />
               ) : (
-                <ChevronRight size={16} className="flex-shrink-0 text-[#aaaaaa]" />
+                <ChevronRight size={16} className="flex-shrink-0 text-[hsl(var(--muted-foreground))]" />
               )}
               {expanded ? (
-                <FolderOpen size={16} className="flex-shrink-0 text-[#e8c27a]" />
+                <FolderOpen size={16} className="flex-shrink-0 text-[hsl(var(--folder-icon))]" />
               ) : (
-                <Folder size={16} className="flex-shrink-0 text-[#e8c27a]" />
+                <Folder size={16} className="flex-shrink-0 text-[hsl(var(--folder-icon))]" />
               )}
-              <span className="truncate text-[#cccccc]">{renderHighlightedName(entry.name)}</span>
+              <span className="truncate text-[hsl(var(--foreground))]">{renderHighlightedName(entry.name)}</span>
             </>
           ) : (
             <>
@@ -159,17 +159,17 @@ export function FileRow({
             </>
           )
         ) : (
-          <span className="truncate text-[#6e6e6e]">—</span>
+          <span className="truncate text-[hsl(var(--text-faint))]">—</span>
         )}
       </div>
 
       {/* Center: tamaños */}
-      <div className="w-40 flex-shrink-0 px-2 py-2 text-center text-xs text-[#aaaaaa]">
+      <div className="w-40 flex-shrink-0 px-2 py-2 text-center text-xs text-[hsl(var(--muted-foreground))]">
         {entry.leftSize === entry.rightSize && entry.leftSize !== null ? (
           formatSize(entry.leftSize)
         ) : (
           <span>
-            {formatSize(entry.leftSize)} <span className="text-[#6e6e6e]">/</span>{" "}
+            {formatSize(entry.leftSize)} <span className="text-[hsl(var(--text-faint))]">/</span>{" "}
             {formatSize(entry.rightSize)}
           </span>
         )}
@@ -186,11 +186,11 @@ export function FileRow({
         {rightExists ? (
           entry.isDirectory ? (
             <>
-              <span className="truncate text-[#cccccc]">{renderHighlightedName(entry.name)}</span>
+              <span className="truncate text-[hsl(var(--foreground))]">{renderHighlightedName(entry.name)}</span>
               {expanded ? (
-                <FolderOpen size={16} className="flex-shrink-0 text-[#e8c27a]" />
+                <FolderOpen size={16} className="flex-shrink-0 text-[hsl(var(--folder-icon))]" />
               ) : (
-                <Folder size={16} className="flex-shrink-0 text-[#e8c27a]" />
+                <Folder size={16} className="flex-shrink-0 text-[hsl(var(--folder-icon))]" />
               )}
             </>
           ) : (
@@ -202,7 +202,7 @@ export function FileRow({
             </>
           )
         ) : (
-          <span className="truncate text-[#6e6e6e]">—</span>
+          <span className="truncate text-[hsl(var(--text-faint))]">—</span>
         )}
       </div>
 
