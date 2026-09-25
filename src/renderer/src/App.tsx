@@ -8,8 +8,13 @@ import { TitleBar } from "./components/TitleBar";
 import { Toolbar } from "./components/Toolbar";
 import { FileTree } from "./components/FileTree";
 import type { FileStatus } from "./types";
-import { DiffViewer } from "./components/DiffViewer";
-import { ImageViewer } from "./components/ImageViewer";
+import { lazy, Suspense } from "react";
+const DiffViewer = lazy(() =>
+  import("./components/DiffViewer").then((m) => ({ default: m.DiffViewer }))
+);
+const ImageViewer = lazy(() =>
+  import("./components/ImageViewer").then((m) => ({ default: m.ImageViewer }))
+);
 import { ProgressBar } from "./components/ProgressBar";
 import { StatusBar } from "./components/StatusBar";
 import type { StatusInfo, ImageDims } from "./components/StatusBar";
@@ -671,10 +676,12 @@ export default function App(): React.JSX.Element {
                   {t("diff.loading")}
                 </div>
               ) : tab.isImage ? (
-                <ImageViewer
-                  file={tab.file}
-                  onDimsLoaded={(l, r) => handleImageDimsLoaded(id, l, r)}
-                />
+                <Suspense fallback={<div className="flex flex-1 items-center justify-center text-[#858585]">{t("diff.loading")}</div>}>
+                  <ImageViewer
+                    file={tab.file}
+                    onDimsLoaded={(l, r) => handleImageDimsLoaded(id, l, r)}
+                  />
+                </Suspense>
               ) : tab.unsupported ? (
                 <div
                   className="flex flex-1 flex-col items-center justify-center gap-3 text-[#858585]"
@@ -691,21 +698,23 @@ export default function App(): React.JSX.Element {
                   </div>
                 </div>
               ) : (
-                <DiffViewer
-                  file={tab.file}
-                  leftContent={tab.leftContent}
-                  rightContent={tab.rightContent}
-                  onSaveLeft={saveLeft}
-                  onSaveRight={saveRight}
-                  onCopyToLeft={copyToLeft}
-                  onCopyToRight={copyToRight}
-                diffViewMode={settings.diffViewMode}
-                onToggleDiffViewMode={toggleDiffViewMode}
-                diffAlgorithm={settings.diffAlgorithm}
-                minimapEnabled={settings.minimapEnabled}
-                fontSize={settings.fontSize}
-                ignoreWhitespace={settings.ignoreWhitespace}
-                />
+                <Suspense fallback={<div className="flex flex-1 items-center justify-center text-[#858585]">{t("diff.loading")}</div>}>
+                  <DiffViewer
+                    file={tab.file}
+                    leftContent={tab.leftContent}
+                    rightContent={tab.rightContent}
+                    onSaveLeft={saveLeft}
+                    onSaveRight={saveRight}
+                    onCopyToLeft={copyToLeft}
+                    onCopyToRight={copyToRight}
+                    diffViewMode={settings.diffViewMode}
+                    onToggleDiffViewMode={toggleDiffViewMode}
+                    diffAlgorithm={settings.diffAlgorithm}
+                    minimapEnabled={settings.minimapEnabled}
+                    fontSize={settings.fontSize}
+                    ignoreWhitespace={settings.ignoreWhitespace}
+                  />
+                </Suspense>
               )}
             </div>
           ))}

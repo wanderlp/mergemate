@@ -42,11 +42,6 @@ export function useFolderScan(): UseFolderScanReturn {
   const scanAbortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
-    return () => {
-      scanAbortRef.current?.abort();
-    };
-  }, []);
-    // Leer carpetas pendientes (seleccionadas desde la startup screen)
     window.electronAPI.getPendingFolders().then((pending) => {
       if (pending?.left) setLeftFolder(pending.left);
       if (pending?.right) setRightFolder(pending.right);
@@ -58,7 +53,10 @@ export function useFolderScan(): UseFolderScanReturn {
     const unsubscribe = window.electronAPI.onScanProgress((p) => {
       setProgress(p);
     });
-    return unsubscribe;
+    return () => {
+      unsubscribe();
+      scanAbortRef.current?.abort();
+    };
   }, []);
 
   const scan = useCallback(
