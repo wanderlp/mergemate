@@ -28,7 +28,6 @@
     "@electron-toolkit/utils": "^4.0.0",
     "@iconify/icons-devicon": "^1.2.17",
     "@iconify/icons-mdi": "^1.2.48",
-    "@iconify/icons-vscode-icons": "^1.2.29",
     "@iconify/react": "^6.0.2",
     "@monaco-editor/react": "^4.6.0",
     "@radix-ui/react-dialog": "^1.1.15",
@@ -49,7 +48,6 @@
     "react": "^18.3.1",
     "react-compare-slider": "^3.1.0",
     "react-dom": "^18.3.1",
-    "react-file-icon": "^1.6.0",
     "react-i18next": "^16.5.8",
     "tailwind-merge": "^3.5.0",
     "tailwindcss-animate": "^1.0.7"
