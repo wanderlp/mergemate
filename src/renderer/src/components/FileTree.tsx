@@ -4,6 +4,7 @@ import { Search, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { FileRow } from './FileRow'
 import type { FileEntry, FileStatus } from '../types'
+import { Tooltip, TooltipTrigger, TooltipContent } from './ui/tooltip'
 
 const ALL_STATUSES: FileStatus[] = ['identical', 'different', 'comments-only', 'left-only', 'right-only']
 
@@ -277,16 +278,20 @@ export function FileTree({
             />
           </div>
           {isFiltering && (
-            <button
-              type="button"
-              onClick={clearFilters}
-              className="flex items-center gap-1 rounded px-2 py-1 text-xs text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
-              title={t('fileTree.clearFilters')}
-              aria-label={t('fileTree.clearFilters')}
-            >
-              <X size={12} aria-hidden="true" />
-              {t('fileTree.clear')}
-            </button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={clearFilters}
+                  className="flex items-center gap-1 rounded px-2 py-1 text-xs text-[#aaaaaa] transition-colors hover:bg-[#3e3e42] hover:text-[#cccccc]"
+                  aria-label={t('fileTree.clearFilters')}
+                >
+                  <X size={12} aria-hidden="true" />
+                  {t('fileTree.clear')}
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>{t('fileTree.clearFilters')}</TooltipContent>
+            </Tooltip>
           )}
         </div>
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
