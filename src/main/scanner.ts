@@ -57,6 +57,11 @@ function collectPaths(dir: string, base: string, result: Map<string, string>): v
     return
   }
   for (const entry of entries) {
+    // Symlinks no se siguen para evitar ciclos infinitos y ELOOP
+    if (entry.isSymbolicLink()) {
+      console.debug(`[scanner] skipping symlink: ${path.join(base, entry.name)}`)
+      continue
+    }
     if (shouldIgnore(entry.name, entry.isDirectory())) continue
     const rel = path.join(base, entry.name).replace(/\\/g, '/')
     const full = path.join(dir, entry.name)
