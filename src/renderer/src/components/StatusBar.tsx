@@ -96,7 +96,7 @@ export function StatusBar({
   }
 
   return (
-    <div className="flex h-8 items-center gap-3 border-t border-[#3e3e42] bg-[#007acc] px-3 text-sm text-white overflow-hidden">
+      <div className="text-text-inverse flex h-8 items-center gap-3 overflow-hidden border-t border-[hsl(var(--border))] bg-[hsl(var(--primary))] px-3 text-sm">
       {info.kind === "comparison" && (
         <>
           <Stat
