@@ -123,7 +123,7 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
           onChange={(e) => i18n.changeLanguage(e.target.value)}
           aria-label={t("titleBar.switchLanguage")}
           tabIndex={-1}
-          className="h-full cursor-pointer bg-transparent px-2 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))] focus:outline-none"
+          className="h-full cursor-pointer bg-transparent px-2 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))] focus:outline-none [field-sizing:content]"
           style={{ border: "none" }}
         >
           {LANGUAGES.map((l) => (
