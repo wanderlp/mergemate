@@ -49,6 +49,16 @@ export default {
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))"
+        },
+        surface: {
+          app: "hsl(var(--surface-app))",
+          toolbar: "hsl(var(--surface-toolbar))",
+          content: "hsl(var(--surface-content))"
+        },
+        text: {
+          muted: "hsl(var(--text-muted))",
+          faint: "hsl(var(--text-faint))",
+          inverse: "hsl(var(--text-inverse))"
         }
       },
       borderRadius: {

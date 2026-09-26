@@ -111,7 +111,8 @@
     "defaultViewModeFiles": "Comparar 2 arquivos",
     "defaultViewModeBlank": "Editor livre",
     "sectionLanguage": "Idioma",
-    "languageNote": "Mude o idioma pelo seletor na barra de título. Idioma atual:"
+    "languageNote": "Mude o idioma pelo seletor na barra de título. Idioma atual:",
+    "loading": "Carregando…"
   },
   "closeDialog": {
     "title": "Fechar a comparação?",

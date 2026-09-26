@@ -1,4 +1,5 @@
-import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useEffect, useLayoutEffect, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import type { AppSettings } from "../types";
 
 const DEFAULT_SETTINGS: AppSettings = {
@@ -20,6 +21,7 @@ export interface UseAppSettingsReturn {
 const SettingsContext = createContext<UseAppSettingsReturn | null>(null);
 
 export function SettingsProvider({ children }: { children: ReactNode }): React.JSX.Element {
+  const { t } = useTranslation();
   const [settings, setSettings] = useState<AppSettings | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -33,7 +35,7 @@ export function SettingsProvider({ children }: { children: ReactNode }): React.J
       .catch(() => setLoading(false));
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (settings) {
       document.documentElement.setAttribute("data-theme", settings.theme);
     }
@@ -58,7 +60,7 @@ export function SettingsProvider({ children }: { children: ReactNode }): React.J
         role="status"
         aria-live="polite"
       >
-        Cargando…
+        {t("settings.loading")}
       </div>
     );
   }

@@ -111,7 +111,8 @@
     "defaultViewModeFiles": "2 Dateien vergleichen",
     "defaultViewModeBlank": "Freier Editor",
     "sectionLanguage": "Sprache",
-    "languageNote": "Sprache über den Selektor in der Titelleiste wechseln. Aktuelle Sprache:"
+    "languageNote": "Sprache über den Selektor in der Titelleiste wechseln. Aktuelle Sprache:",
+    "loading": "Wird geladen…"
   },
   "closeDialog": {
     "title": "Vergleich schließen?",
