@@ -3,6 +3,7 @@ import path from 'path';
 
 let app: ElectronApplication;
 let page: Page;
+const pageErrors: string[] = [];
 
 test.beforeAll(async () => {
   app = await electron.launch({
@@ -10,7 +11,12 @@ test.beforeAll(async () => {
     timeout: 30000,
   });
   page = await app.firstWindow();
+  page.on('pageerror', (e) => pageErrors.push(e.message));
   await page.waitForLoadState('domcontentloaded');
+});
+
+test.afterEach(() => {
+  expect(pageErrors, `page errors: ${pageErrors.join('; ')}`).toEqual([]);
 });
 
 test.afterAll(async () => {
@@ -18,15 +24,9 @@ test.afterAll(async () => {
 });
 
 test.describe('#13 Settings panel', () => {
-  test('app boots sin errores', async () => {
-    const errors: string[] = [];
-    page.on('pageerror', (e) => errors.push(e.message));
-    await page.waitForTimeout(500);
-    expect(errors).toEqual([]);
-  });
 
   test('botón de engranaje en TitleBar navega a Settings', async () => {
-    await page.getByRole('button', { name: /configuraci[oó]n|settings\.title|settings/i }).first().click();
+    await page.getByRole('button', { name: /configuraci[oó]n|settings/i }).first().click();
     await page.waitForTimeout(500);
     const h1 = page.locator('h1').first();
     await expect(h1).toBeVisible();
@@ -63,7 +63,7 @@ test.describe('#13 Settings panel', () => {
 
   test('App no se desmonta al navegar a Settings y volver', async () => {
     const bodyBefore = await page.evaluate(() => document.body.innerHTML.length);
-    await page.getByRole('button', { name: /configuraci[oó]n|settings\.title|settings/i }).first().click();
+    await page.getByRole('button', { name: /configuraci[oó]n|settings/i }).first().click();
     await page.waitForTimeout(500);
     const bodyDuringSettings = await page.evaluate(() => document.body.innerHTML.length);
     expect(bodyDuringSettings).toBeGreaterThan(0);

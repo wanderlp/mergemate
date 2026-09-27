@@ -8,3 +8,7 @@ Thumbs.db
 .claude/
 .codegraph/
 .omo/
+test-results/
+playwright-report/
+blob-report/
+.playwright/
