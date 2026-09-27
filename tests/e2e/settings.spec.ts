@@ -6,7 +6,7 @@ let page: Page;
 
 test.beforeAll(async () => {
   app = await electron.launch({
-    args: [path.join(__dirname, '..', 'out', 'main', 'index.js')],
+    args: [path.join(__dirname, '..', '..', 'out', 'main', 'index.js')],
     timeout: 30000,
   });
   page = await app.firstWindow();
@@ -26,36 +26,59 @@ test.describe('#13 Settings panel', () => {
   });
 
   test('botón de engranaje en TitleBar navega a Settings', async () => {
-    // El primer window es la startup screen. Click engranaje.
-    await page.getByRole('button', { name: /cambiar.*tema.*oscuro|theme.*dark/i }).first().click();
+    await page.getByRole('button', { name: /configuraci[oó]n|settings\.title|settings/i }).first().click();
     await page.waitForTimeout(500);
-    // Debe haber un h1 con texto "Configuración" o "Settings"
     const h1 = page.locator('h1').first();
     await expect(h1).toBeVisible();
   });
 
-  test('Settings tiene labels con htmlFor', async () => {
-    // El theme selector debe tener un label asociado
-    const themeSelect = page.locator('#settings-theme');
-    const themeLabel = page.locator('label[for="settings-theme"]');
-    await expect(themeSelect).toBeVisible();
-    await expect(themeLabel).toBeVisible();
+  test('Settings tiene labels con htmlFor en los 6 controles', async () => {
+    const ids = [
+      'settings-theme',
+      'settings-diff-algorithm',
+      'settings-font-size',
+      'settings-default-view-mode'
+    ];
+    for (const id of ids) {
+      const control = page.locator(`#${id}`);
+      const label = page.locator(`label[for="${id}"]`);
+      await expect(control, `${id} control should exist`).toHaveCount(1);
+      await expect(label, `${id} label should exist`).toHaveCount(1);
+    }
+    const toggleIds = ['settings-minimap', 'settings-ignore-whitespace'];
+    for (const id of toggleIds) {
+      const toggle = page.locator(`button#${id}`);
+      const label = page.locator(`label[for="${id}"]`);
+      await expect(toggle, `${id} toggle should exist`).toHaveCount(1);
+      await expect(label, `${id} label should exist`).toHaveCount(1);
+    }
   });
 
   test('botón Volver regresa a la vista principal', async () => {
     await page.getByRole('button', { name: /volver|back/i }).first().click();
     await page.waitForTimeout(500);
-    // Debe volver a la vista principal (no debe estar en Settings)
     const themeSelect = page.locator('#settings-theme');
     await expect(themeSelect).toHaveCount(0);
+  });
+
+  test('App no se desmonta al navegar a Settings y volver', async () => {
+    const bodyBefore = await page.evaluate(() => document.body.innerHTML.length);
+    await page.getByRole('button', { name: /configuraci[oó]n|settings\.title|settings/i }).first().click();
+    await page.waitForTimeout(500);
+    const bodyDuringSettings = await page.evaluate(() => document.body.innerHTML.length);
+    expect(bodyDuringSettings).toBeGreaterThan(0);
+    await page.getByRole('button', { name: /volver|back/i }).first().click();
+    await page.waitForTimeout(500);
+    const bodyAfterReturn = await page.evaluate(() => document.body.innerHTML.length);
+    expect(bodyAfterReturn).toBeGreaterThan(0);
+    expect(bodyAfterReturn).toBe(bodyBefore);
   });
 });
 
 test.describe('#14 Light theme', () => {
   test('toggle Sun/Moon cambia data-theme en <html>', async () => {
     const initialTheme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
-    // Click en el toggle (Sun o Moon)
-    await page.getByRole('button', { name: /tema/i }).first().click();
+    await page.locator('button[aria-pressed]').first().click();
     await page.waitForTimeout(200);
     const newTheme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
     expect(newTheme).not.toBe(initialTheme);

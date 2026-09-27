@@ -27,14 +27,15 @@ function Root(): React.JSX.Element {
       </AppProviders>
     );
   }
-  if (page === "settings") {
-    return (
-      <AppProviders>
+
+  return (
+    <AppProviders>
+      {page === "settings" && (
         <Settings onClose={() => { window.location.hash = ""; }} />
-      </AppProviders>
-    );
-  }
-  return <App />;
+      )}
+      <App />
+    </AppProviders>
+  );
 }
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(

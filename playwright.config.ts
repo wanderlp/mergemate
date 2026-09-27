@@ -10,7 +10,7 @@ export default defineConfig({
   projects: [
     {
       name: 'electron',
-      testMatch: /.*\.electron\.spec\.ts$/,
+      testMatch: /.*\.spec\.ts$/,
     },
   ],
 });

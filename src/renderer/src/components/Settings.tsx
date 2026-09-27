@@ -58,6 +58,7 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
             <Field
               label={t("settings.diffAlgorithm")}
               hint={t("settings.diffAlgorithmHint")}
+              htmlFor="settings-diff-algorithm"
             >
               <select
                 id="settings-diff-algorithm"
