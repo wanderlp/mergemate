@@ -35,7 +35,7 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
               {t("settings.sectionAppearance")}
             </legend>
 
-            <Field label={t("settings.theme")}>
+            <Field label={t("settings.theme")} htmlFor="settings-theme">
               <select
                 id="settings-theme"
                 value={settings.theme}
@@ -84,7 +84,7 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
               id="settings-minimap"
             />
 
-            <Field label={t("settings.fontSize")}>
+            <Field label={t("settings.fontSize")} htmlFor="settings-font-size">
               <input
                 id="settings-font-size"
                 type="number"
@@ -113,7 +113,7 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
               {t("settings.sectionStartup")}
             </legend>
 
-            <Field label={t("settings.defaultViewMode")}>
+            <Field label={t("settings.defaultViewMode")} htmlFor="settings-default-view-mode">
               <select
                 id="settings-default-view-mode"
                 value={settings.defaultViewMode}
@@ -153,15 +153,17 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
 function Field({
   label,
   hint,
+  htmlFor,
   children
 }: {
   label: string;
   hint?: string;
+  htmlFor?: string;
   children: React.ReactNode;
 }): React.JSX.Element {
   return (
     <div className="flex items-center justify-between gap-4">
-      <label className="flex-1">
+      <label className="flex-1" htmlFor={htmlFor}>
         <div className="text-sm text-[hsl(var(--foreground))]">{label}</div>
         {hint && <div className="mt-0.5 text-xs text-[hsl(var(--text-muted))]">{hint}</div>}
       </label>
@@ -184,7 +186,7 @@ function ToggleField({
   id: string;
 }): React.JSX.Element {
   return (
-    <Field label={label} hint={hint}>
+    <Field label={label} hint={hint} htmlFor={id}>
       <button
         id={id}
         type="button"
