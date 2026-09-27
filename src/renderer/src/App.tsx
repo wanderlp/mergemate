@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { AnimatePresence } from "framer-motion";
-import { AppProviders } from "./AppProviders";
 import { COMPARISON_TAB_ID, BLANK_TAB_ID } from "./constants";
 import { MergeMateLogo } from "./components/MergeMateLogo";
 import { TitleBar } from "./components/TitleBar";
@@ -748,9 +747,5 @@ function AppContent(): React.JSX.Element {
 }
 
 export default function App(): React.JSX.Element {
-  return (
-    <AppProviders>
-      <AppContent />
-    </AppProviders>
-  );
+  return <AppContent />;
 }
