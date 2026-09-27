@@ -113,6 +113,7 @@ export function FileRow({
       ref={refCallback}
       role="treeitem"
       aria-level={ariaLevel ?? depth + 1}
+      aria-selected={Boolean(isOpen)}
       tabIndex={0}
       className="group flex cursor-pointer items-center border-b border-[hsl(var(--accent))]/50 hover:bg-[hsl(var(--accent))] focus:bg-[hsl(var(--accent))] focus:outline-none transition-colors select-none"
       style={isFocused ? { backgroundColor: "#37373d" } : undefined}

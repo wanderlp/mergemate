@@ -1,5 +1,7 @@
 import js from "@eslint/js";
 import tseslint from "typescript-eslint";
+import react from "eslint-plugin-react";
+import jsxA11y from "eslint-plugin-jsx-a11y";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
 
@@ -7,10 +9,19 @@ export default tseslint.config(
   { ignores: ["out/**", "dist/**", "node_modules/**", "*.tsbuildinfo"] },
   {
     files: ["**/*.{ts,tsx}"],
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.recommended,
+      react.configs.flat.recommended,
+      react.configs.flat["jsx-runtime"],
+      jsxA11y.flatConfigs.recommended
+    ],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: "module"
+    },
+    settings: {
+      react: { version: "detect" }
     },
     plugins: {
       "react-hooks": reactHooks,
@@ -20,7 +31,8 @@ export default tseslint.config(
       ...reactHooks.configs.recommended.rules,
       "react-refresh/only-export-components": ["warn", { allowConstantExport: true }],
       "@typescript-eslint/no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
-      "@typescript-eslint/no-explicit-any": "warn"
+      "@typescript-eslint/no-explicit-any": "warn",
+      "react/prop-types": "off"
     }
   },
   {

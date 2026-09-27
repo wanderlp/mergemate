@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FolderOpen, FileText, Clock, ArrowRight, X, Info, Clipboard } from "lucide-react";
 import { version } from "../../../../package.json";
 import { useTranslation } from "react-i18next";
@@ -58,6 +58,16 @@ export function StartupScreen(): React.JSX.Element {
   const [pendingRemove, setPendingRemove] = useState<RecentComparison | null>(null);
   const [showAbout, setShowAbout] = useState(false);
   const [fileError, setFileError] = useState<string | null>(null);
+  const aboutCloseRef = useRef<HTMLButtonElement>(null);
+  const removeCancelRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (showAbout) aboutCloseRef.current?.focus();
+  }, [showAbout]);
+
+  useEffect(() => {
+    if (pendingRemove) removeCancelRef.current?.focus();
+  }, [pendingRemove]);
 
   useEffect(() => {
     window.electronAPI.getRecentComparisons().then(setRecents);
@@ -144,9 +154,9 @@ export function StartupScreen(): React.JSX.Element {
                 {t("about.repo")}
               </button>
               <button
+                ref={aboutCloseRef}
                 className="rounded px-3 py-1.5 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
                 onClick={() => setShowAbout(false)}
-                autoFocus
               >
                 {t("about.close")}
               </button>
@@ -174,9 +184,9 @@ export function StartupScreen(): React.JSX.Element {
             </p>
             <div className="flex justify-end gap-2">
               <button
+                ref={removeCancelRef}
                 className="rounded px-3 py-1.5 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
                 onClick={() => setPendingRemove(null)}
-                autoFocus
               >
                 {t("startup.removeCancel")}
               </button>
@@ -260,7 +270,6 @@ export function StartupScreen(): React.JSX.Element {
           ) : (
             <ul
               className="mt-2 flex flex-col gap-0.5"
-              role="list"
               aria-label={t("startup.sectionRecent")}
             >
               {recents.map((r, i) => (

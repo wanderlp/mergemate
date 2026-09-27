@@ -343,6 +343,7 @@ export function ImageViewer({ file, onDimsLoaded }: ImageViewerProps): React.JSX
           <span className="text-sm text-[hsl(var(--text-muted))]">{t("image.loading")}</span>
         </div>
       ) : effectiveMode === "slider" && leftUrl && rightUrl ? (
+        // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- drag-to-pan es una interacción de mouse/pointer suplementaria; el zoom ya tiene botones accesibles aparte
         <div
           ref={sliderContainerRef}
           role="img"
@@ -501,6 +502,7 @@ function ImagePanel({
 
   return (
     <div className="flex flex-1 flex-col overflow-hidden">
+      {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- drag-to-pan es una interacción de mouse/pointer suplementaria; el zoom ya tiene botones accesibles aparte */}
       <div
         ref={wheelRef}
         role="img"

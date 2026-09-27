@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FolderOpen, GitCompareArrows, ArrowLeftRight, Download } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { Button } from "./ui/button";
@@ -34,6 +34,11 @@ export function Toolbar({
   const [missingFolders, setMissingFolders] = useState<string[]>([]);
   const [dragOver, setDragOver] = useState<"left" | "right" | null>(null);
   const [dropAnnouncement, setDropAnnouncement] = useState("");
+  const folderNotFoundCancelRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (missingFolders.length > 0) folderNotFoundCancelRef.current?.focus();
+  }, [missingFolders]);
 
   async function handleDrop(
     side: "left" | "right",
@@ -132,9 +137,9 @@ export function Toolbar({
             </ul>
             <div className="flex justify-end gap-2">
               <button
+                ref={folderNotFoundCancelRef}
                 className="rounded px-3 py-1.5 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
                 onClick={() => setMissingFolders([])}
-                autoFocus
               >
                 {t("toolbar.folderNotFoundCancel")}
               </button>
