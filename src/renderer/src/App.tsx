@@ -179,7 +179,7 @@ function CloseConfirmDialog({
   );
 }
 
-export default function App(): React.JSX.Element {
+function AppContent(): React.JSX.Element {
   const { t } = useTranslation();
   const {
     scanResult,
@@ -595,7 +595,6 @@ export default function App(): React.JSX.Element {
   })();
 
   return (
-    <AppProviders>
       <div className="flex h-screen flex-col bg-[hsl(var(--surface-app))]">
         {showCloseDialog && (
           <CloseConfirmDialog
@@ -745,6 +744,13 @@ export default function App(): React.JSX.Element {
           onStatusFilterChange={setStatusFilter}
         />
       </div>
+  );
+}
+
+export default function App(): React.JSX.Element {
+  return (
+    <AppProviders>
+      <AppContent />
     </AppProviders>
   );
 }
