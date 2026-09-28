@@ -13,11 +13,7 @@
     "maximize": "Maximizar",
     "restore": "Restaurar",
     "close": "Fechar",
-    "ariaLabel": "Barra de título",
-    "themeLight": "Mudar para tema claro",
-    "themeDark": "Mudar para tema escuro",
-    "themeLightTooltip": "Mudar para tema claro",
-    "themeDarkTooltip": "Mudar para tema escuro"
+    "ariaLabel": "Barra de título"
   },
   "toolbar": {
     "openLeft": "Selecionar pasta esquerda",

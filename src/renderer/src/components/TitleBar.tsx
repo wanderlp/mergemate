@@ -1,8 +1,6 @@
 import React, { useId, useState, useEffect } from "react";
-import { Minus, X, Settings as SettingsIcon, Sun, Moon } from "lucide-react";
+import { Minus, X, Settings as SettingsIcon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { useAppSettings } from "../hooks/useAppSettings";
-import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 
 export function AppIcon({ size = 24 }: { size?: number }): React.JSX.Element {
   const uid = useId().replace(/:/g, "");
@@ -94,7 +92,6 @@ interface TitleBarProps {
 export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Element {
   const { t } = useTranslation();
   const [isMaximized, setIsMaximized] = useState(false);
-  const { settings, updateSetting } = useAppSettings();
 
   useEffect(() => {
     window.electronAPI.isMaximized().then(setIsMaximized);
@@ -116,40 +113,6 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
       </div>
 
       <div className="ml-auto flex h-full items-center" style={NO_DRAG}>
-        {/* Toggle de tema claro/oscuro */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button
-              type="button"
-              onClick={() =>
-                updateSetting(
-                  "theme",
-                  settings.theme === "dark" ? "light" : "dark"
-                )
-              }
-              aria-label={
-                settings.theme === "dark"
-                  ? t("titleBar.themeLight")
-                  : t("titleBar.themeDark")
-              }
-              aria-pressed={settings.theme === "light"}
-              tabIndex={-1}
-              className="flex h-full items-center px-2 text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))] focus:outline-none"
-            >
-              {settings.theme === "dark" ? (
-                <Sun size={14} aria-hidden="true" />
-              ) : (
-                <Moon size={14} aria-hidden="true" />
-              )}
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>
-            {settings.theme === "dark"
-              ? t("titleBar.themeLightTooltip")
-              : t("titleBar.themeDarkTooltip")}
-          </TooltipContent>
-        </Tooltip>
-
         {/* Botón de configuración */}
         <button
           type="button"

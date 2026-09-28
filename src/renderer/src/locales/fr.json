@@ -13,11 +13,7 @@
     "maximize": "Agrandir",
     "restore": "Restaurer",
     "close": "Fermer",
-    "ariaLabel": "Barre de titre",
-    "themeLight": "Passer au thème clair",
-    "themeDark": "Passer au thème sombre",
-    "themeLightTooltip": "Passer au thème clair",
-    "themeDarkTooltip": "Passer au thème sombre"
+    "ariaLabel": "Barre de titre"
   },
   "toolbar": {
     "openLeft": "Sélectionner le dossier gauche",

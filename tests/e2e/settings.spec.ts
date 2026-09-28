@@ -89,9 +89,17 @@ test.describe('#13 Settings panel', () => {
 });
 
 test.describe('#14 Light theme', () => {
-  test('toggle Sun/Moon cambia data-theme en <html>', async () => {
+  test('<select id="settings-theme"> cambia data-theme en <html>', async () => {
+    // El toggle Sun/Moon de la TitleBar se removio en #29 (redundante con
+    // Settings). El cambio de theme ahora vive en Settings; este test sigue
+    // cubriendo el comportamiento end-to-end (data-theme del <html> cambia).
     const initialTheme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
-    await page.locator('button[aria-pressed]').first().click();
+    await page.getByRole('button', { name: /configuraci[oó]n|settings/i }).first().click();
+    const themeSelect = page.locator('#settings-theme');
+    await themeSelect.waitFor({ state: 'visible' });
+    const currentValue = await themeSelect.evaluate((el) => (el as HTMLSelectElement).value);
+    const targetValue: 'dark' | 'light' = currentValue === 'dark' ? 'light' : 'dark';
+    await themeSelect.selectOption(targetValue);
     await page.waitForTimeout(200);
     const newTheme = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
     expect(newTheme).not.toBe(initialTheme);

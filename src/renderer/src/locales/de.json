@@ -13,11 +13,7 @@
     "maximize": "Maximieren",
     "restore": "Wiederherstellen",
     "close": "Schließen",
-    "ariaLabel": "Titelleiste",
-    "themeLight": "Zu hellem Design wechseln",
-    "themeDark": "Zu dunklem Design wechseln",
-    "themeLightTooltip": "Zu hellem Design wechseln",
-    "themeDarkTooltip": "Zu dunklem Design wechseln"
+    "ariaLabel": "Titelleiste"
   },
   "toolbar": {
     "openLeft": "Linken Ordner auswählen",

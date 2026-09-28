@@ -13,11 +13,7 @@
     "maximize": "Maximize",
     "restore": "Restore",
     "close": "Close",
-    "ariaLabel": "Title bar",
-    "themeLight": "Switch to light theme",
-    "themeDark": "Switch to dark theme",
-    "themeLightTooltip": "Switch to light theme",
-    "themeDarkTooltip": "Switch to dark theme"
+    "ariaLabel": "Title bar"
   },
   "toolbar": {
     "openLeft": "Select left folder",

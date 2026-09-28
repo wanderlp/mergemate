@@ -13,11 +13,7 @@
     "maximize": "Maximizar",
     "restore": "Restaurar",
     "close": "Cerrar",
-    "ariaLabel": "Barra de título",
-    "themeLight": "Cambiar a tema claro",
-    "themeDark": "Cambiar a tema oscuro",
-    "themeLightTooltip": "Cambiar a tema claro",
-    "themeDarkTooltip": "Cambiar a tema oscuro"
+    "ariaLabel": "Barra de título"
   },
   "toolbar": {
     "openLeft": "Seleccionar carpeta izquierda",
