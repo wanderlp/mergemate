@@ -143,9 +143,14 @@ function safeCopyFileWithBak(src: string, dest: string): void {
   const bak = dest + ".bak";
   if (fs.existsSync(dest)) {
     try {
-      fs.copyFileSync(dest, bak);
+      fs.copyFileSync(dest, bak, fs.constants.COPYFILE_EXCL);
     } catch (err) {
-      throw new Error(`Failed to create backup at ${bak}: ${err}`);
+      const e = err as NodeJS.ErrnoException;
+      if (e.code !== "EEXIST") {
+        throw new Error(`Failed to create backup at ${bak}: ${err}`);
+      }
+      // .bak ya existe de una copia anterior: lo conservamos como respaldo
+      // histórico. Si el copy principal falla, restauramos desde este .bak.
     }
   }
   try {
