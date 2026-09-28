@@ -64,6 +64,14 @@ let pendingFiles: { left: string; right: string } | null = null;
 let pendingBlank = false;
 let mainWindowClosing = false;
 
+// Paths autorizados para escritura. Vacío = rechazar todo (caso blank, antes
+// de cualquier scan). Se setea en `scan-folder` (modo carpetas) y en
+// `startup-open-main` con mode="files" (archivos individuales), y se resetea
+// al cerrar la mainWindow. La validación con symlinks resuelve el caso donde
+// `leftFolder` está dentro de un symlink de sistema (p.ej. /tmp → /private/tmp
+// en macOS).
+let authorizedRoots: string[] = [];
+
 function setupMaximizeEvents(win: BrowserWindow): void {
   win.on("maximize", () => win.webContents.send("window-maximize-change", true));
   win.on("unmaximize", () => win.webContents.send("window-maximize-change", false));
@@ -154,6 +162,31 @@ function safeCopyFileWithBak(src: string, dest: string): void {
   }
 }
 
+// Resuelve symlinks de un path. Si el path no existe (caso normal al escribir
+// un archivo nuevo), resuelve el directorio padre y reconstruye el path completo.
+function realPathOrParent(p: string): string {
+  try {
+    return fs.realpathSync(p);
+  } catch {
+    const parent = path.dirname(p);
+    try {
+      return path.join(fs.realpathSync(parent), path.basename(p));
+    } catch {
+      return p;
+    }
+  }
+}
+
+function isPathInsideAnyRoot(filePath: string, roots: string[]): boolean {
+  if (roots.length === 0) return false;
+  const realFile = realPathOrParent(path.resolve(filePath));
+  return roots.some((root) => {
+    const realRoot = realPathOrParent(path.resolve(root));
+    const withSep = realRoot.endsWith(path.sep) ? realRoot : realRoot + path.sep;
+    return realFile === realRoot || realFile.startsWith(withSep);
+  });
+}
+
 function createMainWindow(): void {
   const savedState = store.get("windowState") ?? null;
 
@@ -205,6 +238,7 @@ function createMainWindow(): void {
   });
 
   mainWindow.on("closed", () => {
+    authorizedRoots = [];
     mainWindow = null;
     mainWindowClosing = false;
     createStartupWindow();
@@ -232,6 +266,7 @@ function registerIpcHandlers(): void {
   ipcMain.handle("startup-open-main", (_event, left?: string, right?: string, mode?: string) => {
     if (mode === "blank") {
       pendingBlank = true;
+      authorizedRoots = [];
     } else if (left && right) {
       // Si el mode no viene explícito, detectar por el sistema de archivos
       const effectiveMode =
@@ -250,8 +285,11 @@ function registerIpcHandlers(): void {
         assertFile(left, "left");
         assertFile(right, "right");
         pendingFiles = { left, right };
+        // Modo files: autorizar los archivos individuales (no carpetas).
+        authorizedRoots = [path.resolve(left), path.resolve(right)];
       } else {
         pendingFolders = { left, right };
+        // Modo folders: no autorizamos acá — se autoriza al ejecutar scan-folder.
       }
     }
     createMainWindow();
@@ -330,6 +368,10 @@ function registerIpcHandlers(): void {
     scanController?.abort();
     scanController = new AbortController();
     const signal = scanController.signal;
+    // El usuario autorizó estas carpetas para escritura; el handler `write-file`
+    // las usará como allowlist hasta que la mainWindow se cierre o se escaneen
+    // otras carpetas.
+    authorizedRoots = [path.resolve(leftPath), path.resolve(rightPath)];
     try {
       const result = await scanFolders(leftPath, rightPath, (percent, currentFile) => {
         win?.webContents.send("scan-progress", { percent, currentFile });
@@ -354,6 +396,11 @@ function registerIpcHandlers(): void {
   );
 
   ipcMain.handle("write-file", async (_event, filePath: string, content: string) => {
+    if (!isPathInsideAnyRoot(filePath, authorizedRoots)) {
+      throw new Error(
+        `write-file rejected: "${filePath}" is outside authorized roots (${authorizedRoots.join(", ") || "<none>"})`
+      );
+    }
     safeWriteFile(filePath, content);
   });
 
