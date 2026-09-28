@@ -1,7 +1,6 @@
 import React, { useId, useState, useEffect } from "react";
 import { Minus, X, Settings as SettingsIcon, Sun, Moon } from "lucide-react";
 import { useTranslation } from "react-i18next";
-import { LANGUAGES } from "../i18n";
 import { useAppSettings } from "../hooks/useAppSettings";
 import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip";
 
@@ -93,7 +92,7 @@ interface TitleBarProps {
 }
 
 export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Element {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const [isMaximized, setIsMaximized] = useState(false);
   const { settings, updateSetting } = useAppSettings();
 
@@ -117,26 +116,6 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
       </div>
 
       <div className="ml-auto flex h-full items-center" style={NO_DRAG}>
-        {/* Selector de idioma */}
-        <select
-          value={i18n.resolvedLanguage}
-          onChange={(e) => i18n.changeLanguage(e.target.value)}
-          aria-label={t("titleBar.switchLanguage")}
-          tabIndex={-1}
-          className="h-full cursor-pointer bg-transparent px-2 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))] focus:outline-none [field-sizing:content]"
-          style={{ border: "none" }}
-        >
-          {LANGUAGES.map((l) => (
-            <option
-              key={l.code}
-              value={l.code}
-              style={{ backgroundColor: "hsl(var(--popover))", color: "hsl(var(--foreground))" }}
-            >
-              {l.label}
-            </option>
-          ))}
-        </select>
-
         {/* Toggle de tema claro/oscuro */}
         <Tooltip>
           <TooltipTrigger asChild>
