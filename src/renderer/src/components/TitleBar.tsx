@@ -87,9 +87,15 @@ const NO_DRAG = { WebkitAppRegion: "no-drag" } as React.CSSProperties;
 
 interface TitleBarProps {
   showMaximize?: boolean;
+  /**
+   * Pantalla de origen desde la que se abre Settings via el boton de engranaje.
+   * Root usa este valor para navegar de vuelta al cerrar Settings. Default
+   * "main" porque App es el callsite por defecto; StartupScreen pasa "startup".
+   */
+  from?: "startup" | "main";
 }
 
-export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Element {
+export function TitleBar({ showMaximize = true, from = "main" }: TitleBarProps): React.JSX.Element {
   const { t } = useTranslation();
   const [isMaximized, setIsMaximized] = useState(false);
 
@@ -117,7 +123,7 @@ export function TitleBar({ showMaximize = true }: TitleBarProps): React.JSX.Elem
         <button
           type="button"
           onClick={() => {
-            window.location.hash = "settings";
+            window.location.hash = `settings?from=${from}`;
           }}
           aria-label={t("settings.title")}
           title={t("settings.title")}

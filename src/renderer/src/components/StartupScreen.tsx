@@ -200,7 +200,7 @@ export function StartupScreen(): React.JSX.Element {
           </div>
         </div>
       )}
-      <TitleBar showMaximize={false} />
+      <TitleBar showMaximize={false} from="startup" />
 
       <div className="flex min-h-0 flex-1">
         {/* Panel izquierdo ─ acciones */}
