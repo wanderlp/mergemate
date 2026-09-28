@@ -111,7 +111,7 @@
     "defaultViewModeFiles": "Compare 2 files",
     "defaultViewModeBlank": "Free editor",
     "sectionLanguage": "Language",
-    "languageNote": "Change language from the selector in the title bar. Current language:",
+    "language": "Language",
     "loading": "Loading…"
   },
   "closeDialog": {

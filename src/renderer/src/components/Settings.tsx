@@ -138,12 +138,20 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
               {t("settings.sectionLanguage")}
             </legend>
 
-            <div className="rounded border border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4 py-3 text-sm text-[hsl(var(--muted-foreground))]">
-              {t("settings.languageNote")}
-              <span className="ml-2 inline-flex items-center gap-2 rounded bg-[hsl(var(--surface-app))] px-2 py-0.5 font-mono text-xs text-[hsl(var(--foreground))]">
-                {LANGUAGES.find((l) => l.code === i18n.resolvedLanguage)?.label ?? i18n.resolvedLanguage}
-              </span>
-            </div>
+            <Field label={t("settings.language")} htmlFor="settings-language">
+              <select
+                id="settings-language"
+                value={i18n.resolvedLanguage}
+                onChange={(e) => i18n.changeLanguage(e.target.value)}
+                className="rounded bg-[hsl(var(--surface-app))] px-2 py-1.5 text-sm text-[hsl(var(--foreground))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
+              >
+                {LANGUAGES.map((l) => (
+                  <option key={l.code} value={l.code}>
+                    {l.label}
+                  </option>
+                ))}
+              </select>
+            </Field>
           </fieldset>
         </div>
       </main>

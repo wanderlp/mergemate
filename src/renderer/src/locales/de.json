@@ -111,7 +111,7 @@
     "defaultViewModeFiles": "2 Dateien vergleichen",
     "defaultViewModeBlank": "Freier Editor",
     "sectionLanguage": "Sprache",
-    "languageNote": "Sprache über den Selektor in der Titelleiste wechseln. Aktuelle Sprache:",
+    "language": "Sprache",
     "loading": "Wird geladen…"
   },
   "closeDialog": {
