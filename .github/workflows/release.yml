@@ -60,20 +60,3 @@ jobs:
             dist/*.AppImage
             dist/*.zip
           retention-days: 14
-
-      - name: Crear GitHub Release (auto)
-        if: github.event_name == 'push' && matrix.os == 'ubuntu-latest'
-        needs: build
-        shell: bash
-        run: |
-          tag="${GITHUB_REF#refs/tags/}"
-          echo "Publicando release para tag ${tag}"
-          gh release create "${tag}" \
-            --title "MergeMate v${tag}" \
-            --generate-notes \
-            ./dist/*.exe \
-            ./dist/*.dmg \
-            ./dist/*.AppImage \
-            ./dist/*.zip
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
