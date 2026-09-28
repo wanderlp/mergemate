@@ -7,20 +7,37 @@ import { AppProviders } from "./AppProviders";
 import "./i18n";
 import "./assets/index.css";
 
+type Route =
+  | { path: "main" }
+  | { path: "startup" }
+  | { path: "settings"; from: "startup" | "main" };
+
+// Parsea el hash soportando query string (ej. "settings?from=startup") y
+// retrocompatibilidad con el formato previo ("settings" sin query → from="main").
+function parseHash(hash: string): Route {
+  const raw = hash.replace("#", "");
+  if (raw === "startup") return { path: "startup" };
+  if (raw.startsWith("settings")) {
+    const query = raw.includes("?") ? raw.split("?")[1] ?? "" : "";
+    const fromParam = new URLSearchParams(query).get("from");
+    const from: "startup" | "main" = fromParam === "startup" ? "startup" : "main";
+    return { path: "settings", from };
+  }
+  return { path: "main" };
+}
+
 function Root(): React.JSX.Element {
-  const [page, setPage] = useState(
-    () => window.location.hash.replace("#", "") || "main"
-  );
+  const [route, setRoute] = useState<Route>(() => parseHash(window.location.hash));
 
   useEffect(() => {
     const onHashChange = (): void => {
-      setPage(window.location.hash.replace("#", "") || "main");
+      setRoute(parseHash(window.location.hash));
     };
     window.addEventListener("hashchange", onHashChange);
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
 
-  if (page === "startup") {
+  if (route.path === "startup") {
     return (
       <AppProviders>
         <StartupScreen />
@@ -30,8 +47,12 @@ function Root(): React.JSX.Element {
 
   return (
     <AppProviders>
-      {page === "settings" && (
-        <Settings onClose={() => { window.location.hash = ""; }} />
+      {route.path === "settings" && (
+        <Settings
+          onClose={() => {
+            window.location.hash = route.from;
+          }}
+        />
       )}
       <App />
     </AppProviders>
