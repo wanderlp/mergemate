@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { FolderOpen, FileText, Clock, ArrowRight, X, Info, Clipboard } from "lucide-react";
+import * as Dialog from "@radix-ui/react-dialog";
 import { version } from "../../../../package.json";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
@@ -58,16 +59,6 @@ export function StartupScreen(): React.JSX.Element {
   const [pendingRemove, setPendingRemove] = useState<RecentComparison | null>(null);
   const [showAbout, setShowAbout] = useState(false);
   const [fileError, setFileError] = useState<string | null>(null);
-  const aboutCloseRef = useRef<HTMLButtonElement>(null);
-  const removeCancelRef = useRef<HTMLButtonElement>(null);
-
-  useEffect(() => {
-    if (showAbout) aboutCloseRef.current?.focus();
-  }, [showAbout]);
-
-  useEffect(() => {
-    if (pendingRemove) removeCancelRef.current?.focus();
-  }, [pendingRemove]);
 
   useEffect(() => {
     window.electronAPI.getRecentComparisons().then(setRecents);
@@ -115,20 +106,22 @@ export function StartupScreen(): React.JSX.Element {
 
   return (
     <div className="flex h-screen flex-col bg-[hsl(var(--surface-app))]" role="main">
-      {showAbout && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="about-title"
-        >
-          <div className="mx-4 w-full max-w-md rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-2xl">
+      <Dialog.Root open={showAbout} onOpenChange={(open) => !open && setShowAbout(false)}>
+        <Dialog.Portal>
+          {/* El comportamiento previo NO cerraba con click fuera ni con ESC.
+              Preservamos eso: onInteractOutside y onEscapeKeyDown previenen. */}
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
+          <Dialog.Content
+            onInteractOutside={(e) => e.preventDefault()}
+            onEscapeKeyDown={(e) => e.preventDefault()}
+            className="fixed left-1/2 top-1/2 z-50 mx-4 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-2xl"
+          >
             <div className="mb-4 flex items-center gap-3">
               <Info size={20} className="shrink-0 text-[hsl(var(--primary))]" aria-hidden="true" />
               <div>
-                <h2 id="about-title" className="text-base font-semibold text-[hsl(var(--foreground))]">
+                <Dialog.Title className="text-base font-semibold text-[hsl(var(--foreground))]">
                   {t("about.title")}
-                </h2>
+                </Dialog.Title>
                 <p className="text-xs text-[hsl(var(--text-muted))]">{t("about.version", { version })}</p>
               </div>
             </div>
@@ -154,37 +147,39 @@ export function StartupScreen(): React.JSX.Element {
                 {t("about.repo")}
               </button>
               <button
-                ref={aboutCloseRef}
                 className="rounded px-3 py-1.5 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
                 onClick={() => setShowAbout(false)}
               >
                 {t("about.close")}
               </button>
             </div>
-          </div>
-        </div>
-      )}
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
 
-      {pendingRemove && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="remove-confirm-title"
-        >
-          <div className="mx-4 w-full max-w-sm rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-2xl">
-            <h2 id="remove-confirm-title" className="mb-2 text-base font-semibold text-[hsl(var(--foreground))]">
+      <Dialog.Root
+        open={pendingRemove !== null}
+        onOpenChange={(open) => !open && setPendingRemove(null)}
+      >
+        <Dialog.Portal>
+          {/* Mismo comportamiento previo: NO cierra con click fuera ni con ESC. */}
+          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
+          <Dialog.Content
+            onInteractOutside={(e) => e.preventDefault()}
+            onEscapeKeyDown={(e) => e.preventDefault()}
+            className="fixed left-1/2 top-1/2 z-50 mx-4 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-2xl"
+          >
+            <Dialog.Title className="mb-2 text-base font-semibold text-[hsl(var(--foreground))]">
               {t("startup.removeConfirmTitle")}
-            </h2>
-            <p className="mb-6 text-sm text-[hsl(var(--muted-foreground))]">
+            </Dialog.Title>
+            <Dialog.Description className="mb-6 text-sm text-[hsl(var(--muted-foreground))]">
               {t("startup.removeConfirmMessage", {
-                left: basename(pendingRemove.left),
-                right: basename(pendingRemove.right)
+                left: basename(pendingRemove?.left ?? ""),
+                right: basename(pendingRemove?.right ?? "")
               })}
-            </p>
+            </Dialog.Description>
             <div className="flex justify-end gap-2">
               <button
-                ref={removeCancelRef}
                 className="rounded px-3 py-1.5 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
                 onClick={() => setPendingRemove(null)}
               >
@@ -197,9 +192,9 @@ export function StartupScreen(): React.JSX.Element {
                 {t("startup.removeConfirm")}
               </button>
             </div>
-          </div>
-        </div>
-      )}
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
       <TitleBar showMaximize={false} from="startup" />
 
       <div className="flex min-h-0 flex-1">
