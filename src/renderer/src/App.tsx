@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence } from "framer-motion";
 import { COMPARISON_TAB_ID, BLANK_TAB_ID } from "./constants";
 import { MergeMateLogo } from "./components/MergeMateLogo";
@@ -148,33 +149,35 @@ function CloseConfirmDialog({
   onCancel: () => void;
 }): React.JSX.Element {
   const { t } = useTranslation();
-  const cancelRef = useRef<HTMLButtonElement>(null);
-  useEffect(() => {
-    cancelRef.current?.focus();
-  }, []);
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="close-dialog-title"
-    >
-      <div className="mx-4 w-full max-w-sm rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-2xl">
-        <h2 id="close-dialog-title" className="mb-2 text-base font-semibold text-[hsl(var(--foreground))]">
-          {t("closeDialog.title")}
-        </h2>
-        <p className="mb-6 text-sm text-[hsl(var(--muted-foreground))]">{t("closeDialog.message")}</p>
-        <div className="flex justify-end gap-2">
-          <Button ref={cancelRef} variant="ghost" onClick={onCancel}>
-            {t("closeDialog.cancel")}
-          </Button>
-          <Button variant="primary" onClick={onConfirm}>
-            {t("closeDialog.confirm")}
-          </Button>
-        </div>
-      </div>
-    </div>
+    <Dialog.Root open={true} onOpenChange={(open) => !open && onCancel()}>
+      <Dialog.Portal>
+        {/* Comportamiento previo: NO cerraba con click fuera ni con ESC.
+            El usuario debe elegir explicitamente Cancelar o Cerrar de todos modos. */}
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
+        <Dialog.Content
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          className="fixed left-1/2 top-1/2 z-50 mx-4 w-full max-w-sm -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-2xl"
+        >
+          <Dialog.Title className="mb-2 text-base font-semibold text-[hsl(var(--foreground))]">
+            {t("closeDialog.title")}
+          </Dialog.Title>
+          <Dialog.Description className="mb-6 text-sm text-[hsl(var(--muted-foreground))]">
+            {t("closeDialog.message")}
+          </Dialog.Description>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={onCancel}>
+              {t("closeDialog.cancel")}
+            </Button>
+            <Button variant="primary" onClick={onConfirm}>
+              {t("closeDialog.confirm")}
+            </Button>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
   );
 }
 
