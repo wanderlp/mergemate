@@ -50,10 +50,13 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y xvfb
 
       - name: Tests e2e (Playwright + Electron)
-        if: matrix.os == 'ubuntu-latest'
-        run: xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' npm run test:e2e
-        if: matrix.os != 'ubuntu-latest'
-        run: npm run test:e2e
+        shell: bash
+        run: |
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            xvfb-run --auto-servernum --server-args='-screen 0 1024x768x24' npm run test:e2e
+          else
+            npm run test:e2e
+          fi
 
       - name: Subir reporte de Playwright si fallo
         if: failure()
