@@ -20,7 +20,20 @@ test.afterEach(() => {
 });
 
 test.afterAll(async () => {
-  await app.close();
+  // El diálogo "¿Cerrar comparación?" del renderer intercepta el evento
+  // `close` y bloquea `app.close()` indefinidamente. Para evitar dejar la
+  // app huérfana con un modal visible, destruimos las ventanas directamente
+  // desde el main process sin disparar ese listener.
+  try {
+    await app.evaluate(({ BrowserWindow }) => {
+      BrowserWindow.getAllWindows().forEach((win) => {
+        win.removeAllListeners('close');
+        win.destroy();
+      });
+    });
+  } catch {
+    // Las ventanas ya pueden estar cerradas (runs normales).
+  }
 });
 
 test.describe('#13 Settings panel', () => {
