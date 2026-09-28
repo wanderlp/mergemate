@@ -1,56 +1,58 @@
-name: Release
+name: Release binaries
 
 on:
   push:
-    tags: ['v*']
-  workflow_dispatch:
+    tags:
+      - 'v*'
 
 permissions:
   contents: write
-  id-token: write
 
 jobs:
   build:
-    name: Build + publish
+    name: Build ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-latest]
+        include:
+          - os: windows-latest
+          - os: macos-latest
+          - os: ubuntu-latest
 
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout código
+      - name: Check out source
         uses: actions/checkout@v4
 
-      - name: Instalar Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
 
-      - name: Instalar dependencias
+      - name: Install dependencies
         run: npm ci
 
-      - name: Compilar y publicar (Windows)
+      - name: Build (Windows)
         if: matrix.os == 'windows-latest'
         run: npm run dist:win
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Compilar y publicar (macOS)
+      - name: Build (macOS)
         if: matrix.os == 'macos-latest'
         run: npm run dist:mac
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Compilar y publicar (Linux)
+      - name: Build (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: npm run dist:linux
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Subir binarios como artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist-${{ matrix.os }}
@@ -59,4 +61,40 @@ jobs:
             dist/*.dmg
             dist/*.AppImage
             dist/*.zip
-          retention-days: 14
+          if-no-files-found: warn
+
+  release:
+    name: Publish GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download binary artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: .
+          merge-multiple: true
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: MergeMate ${{ github.ref_name }}
+          body: |
+            ## Binarios compilados automaticamente
+            Auto-generated release para `${{ github.ref_name }}`.
+
+            Binarios adjuntos:
+            - Windows installer (`.exe`)
+            - macOS installer (`.dmg`)
+            - Linux AppImage (`.AppImage`)
+            - Fallback ZIP (`.zip`)
+
+            Notas generadas automaticamente desde commits y PRs.
+          files: |
+            *.exe
+            *.dmg
+            *.AppImage
+            *.zip
+          fail_on_unmatched_files: false
+          generate_release_notes: true
