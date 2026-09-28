@@ -1,15 +1,17 @@
 name: Release
 
 on:
-  release:
-    types: [published, edited]
+  push:
+    tags: ['v*']
   workflow_dispatch:
 
 permissions:
   contents: write
+  id-token: write
 
 jobs:
   build:
+    name: Build + publish
     strategy:
       fail-fast: false
       matrix:
@@ -45,5 +47,33 @@ jobs:
       - name: Compilar y publicar (Linux)
         if: matrix.os == 'ubuntu-latest'
         run: npm run dist:linux
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Subir binarios como artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.os }}
+          path: |
+            dist/*.exe
+            dist/*.dmg
+            dist/*.AppImage
+            dist/*.zip
+          retention-days: 14
+
+      - name: Crear GitHub Release (auto)
+        if: github.event_name == 'push' && matrix.os == 'ubuntu-latest'
+        needs: build
+        shell: bash
+        run: |
+          tag="${GITHUB_REF#refs/tags/}"
+          echo "Publicando release para tag ${tag}"
+          gh release create "${tag}" \
+            --title "MergeMate v${tag}" \
+            --generate-notes \
+            ./dist/*.exe \
+            ./dist/*.dmg \
+            ./dist/*.AppImage \
+            ./dist/*.zip
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
