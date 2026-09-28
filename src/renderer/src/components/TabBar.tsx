@@ -95,9 +95,9 @@ export function TabBar({
               aria-controls={`tab-panel-${tab.id}`}
               className="group flex flex-shrink-0 cursor-pointer select-none items-center gap-1.5 border-r border-[hsl(var(--border))] px-3 text-xs transition-colors"
               style={{
-                backgroundColor: isActive ? "#1e1e1e" : "#2d2d2d",
-                color: isActive ? "#ffffff" : "#969696",
-                borderTop: isActive ? "1px solid #007acc" : "1px solid transparent",
+                backgroundColor: isActive ? "hsl(var(--background))" : "hsl(var(--tabbar-bg))",
+                color: isActive ? "hsl(var(--foreground))" : "hsl(var(--muted-foreground))",
+                borderTop: isActive ? "1px solid hsl(var(--primary))" : "1px solid transparent",
                 minWidth: 80,
                 maxWidth: 200
               }}

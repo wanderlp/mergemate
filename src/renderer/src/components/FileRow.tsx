@@ -105,7 +105,7 @@ export function FileRow({
   };
 
   const fileNameStyle: React.CSSProperties = isOpen
-    ? { color: "#ffffff", fontWeight: 600 }
+    ? { color: "hsl(var(--foreground))", fontWeight: 600 }
     : { color };
 
   return (
@@ -116,7 +116,7 @@ export function FileRow({
       aria-selected={Boolean(isOpen)}
       tabIndex={0}
       className="group flex cursor-pointer items-center border-b border-[hsl(var(--accent))]/50 hover:bg-[hsl(var(--accent))] focus:bg-[hsl(var(--accent))] focus:outline-none transition-colors select-none"
-      style={isFocused ? { backgroundColor: "#37373d" } : undefined}
+      style={isFocused ? { backgroundColor: "hsl(var(--accent))" } : undefined}
       onMouseDown={handleMouseDown}
       onKeyDown={handleKeyDown}
       onMouseEnter={() => onHover(entry.relativePath)}
