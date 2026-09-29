@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import * as Dialog from "@radix-ui/react-dialog";
 import { ArrowLeft, X } from "lucide-react";
 import { useAppSettings } from "../hooks/useAppSettings";
 import { Button } from "./ui/button";
@@ -7,24 +8,64 @@ import { LANGUAGES } from "../i18n";
 
 interface SettingsProps {
   onClose: () => void;
+  /**
+   * "page": pantalla completa con "← Volver", usada cuando se abre desde
+   * StartupScreen (no hay nada de contexto detrás que valga la pena ver).
+   * "dialog": dialogo centrado con "✕", usado cuando se abre desde App (el
+   * usuario probablemente quiere seguir viendo sus tabs/carpetas detrás).
+   */
+  variant: "page" | "dialog";
 }
 
-export function Settings({ onClose }: SettingsProps): React.JSX.Element {
-  const { t, i18n } = useTranslation();
-  const { settings, updateSetting } = useAppSettings();
+export function Settings({ onClose, variant }: SettingsProps): React.JSX.Element {
+  const { t } = useTranslation();
+
+  if (variant === "dialog") {
+    return (
+      <Dialog.Root open={true} onOpenChange={(open) => !open && onClose()}>
+        <Dialog.Portal>
+          <Dialog.Overlay className="fixed inset-0 z-40 bg-black/60" />
+          <Dialog.Content
+            // No-drag por consistencia con la variante de pagina — un dialogo
+            // centrado normalmente no pisa la franja de arrastre de la
+            // TitleBar, pero en ventanas muy bajas podria hacerlo.
+            style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
+            className="fixed left-1/2 top-1/2 z-40 flex max-h-[85vh] w-full max-w-2xl -translate-x-1/2 -translate-y-1/2 flex-col rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] shadow-2xl"
+          >
+            <header className="flex items-center gap-3 border-b border-[hsl(var(--border))] px-4 py-3">
+              <Dialog.Title className="text-base font-semibold">{t("settings.title")}</Dialog.Title>
+              <Button
+                onClick={onClose}
+                aria-label={t("settings.close")}
+                title={t("settings.close")}
+                variant="ghost"
+                size="icon"
+                className="ml-auto"
+              >
+                <X size={16} aria-hidden="true" />
+              </Button>
+            </header>
+            <div className="overflow-y-auto px-6 py-6">
+              <SettingsForm />
+            </div>
+          </Dialog.Content>
+        </Dialog.Portal>
+      </Dialog.Root>
+    );
+  }
 
   return (
-      // WebkitAppRegion "no-drag" explicito: la TitleBar de App/StartupScreen
-      // sigue montada DEBAJO de Settings y marca su franja izquierda como
-      // "drag" (arrastrar ventana). Electron decide la region de arrastre a
-      // nivel nativo, no respeta z-index/position — sin este "no-drag" el
-      // click en "Volver" (que cae justo en esa franja izquierda) se
-      // interpreta como iniciar un arrastre de ventana en vez de un click.
-      <div
-        className="fixed inset-0 z-40 flex flex-col bg-[hsl(var(--surface-app))]"
-        style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
-      >
-        <header className="flex items-center gap-3 border-b border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4 py-2">
+    // WebkitAppRegion "no-drag" explicito: la TitleBar de StartupScreen sigue
+    // montada DEBAJO de esta pantalla y marca su franja izquierda como "drag"
+    // (arrastrar ventana). Electron decide la region de arrastre a nivel
+    // nativo, no respeta z-index/position — sin este "no-drag" el click en
+    // "Volver" (que cae justo en esa franja izquierda) se interpreta como
+    // iniciar un arrastre de ventana en vez de un click.
+    <div
+      className="fixed inset-0 z-40 flex flex-col bg-[hsl(var(--surface-app))]"
+      style={{ WebkitAppRegion: "no-drag" } as React.CSSProperties}
+    >
+      <header className="flex items-center gap-3 border-b border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4 py-2">
         <Button
           onClick={onClose}
           aria-label={t("settings.back")}
@@ -34,146 +75,137 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
         >
           <ArrowLeft size={16} aria-hidden="true" />
         </Button>
-          <h1 className="text-base font-semibold">{t("settings.title")}</h1>
-          <Button
-            onClick={onClose}
-            aria-label={t("settings.close")}
-            title={t("settings.close")}
-            variant="ghost"
-            size="icon"
-            className="ml-auto"
-          >
-            <X size={16} aria-hidden="true" />
-          </Button>
+        <h1 className="text-base font-semibold">{t("settings.title")}</h1>
       </header>
 
       <main className="flex-1 overflow-y-auto px-6 py-6">
-        <div className="mx-auto max-w-2xl space-y-8">
-          <fieldset className="space-y-3">
-            <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[hsl(var(--text-muted))]">
-              {t("settings.sectionAppearance")}
-            </legend>
-
-            <Field label={t("settings.theme")} htmlFor="settings-theme">
-              <select
-                id="settings-theme"
-                value={settings.theme}
-                onChange={(e) =>
-                  updateSetting("theme", e.target.value as "dark" | "light")
-                }
-                className="rounded bg-[hsl(var(--surface-app))] px-2 py-1.5 text-sm text-[hsl(var(--foreground))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
-              >
-                <option value="dark">{t("settings.themeDark")}</option>
-                <option value="light">{t("settings.themeLight")}</option>
-              </select>
-            </Field>
-          </fieldset>
-
-          <fieldset className="space-y-3">
-            <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[hsl(var(--text-muted))]">
-              {t("settings.sectionDiff")}
-            </legend>
-
-            <Field
-              label={t("settings.diffAlgorithm")}
-              hint={t("settings.diffAlgorithmHint")}
-              htmlFor="settings-diff-algorithm"
-            >
-              <select
-                id="settings-diff-algorithm"
-                value={settings.diffAlgorithm}
-                onChange={(e) =>
-                  updateSetting(
-                    "diffAlgorithm",
-                    e.target.value as "advanced" | "Myers" | "experimental"
-                  )
-                }
-                className="rounded bg-[hsl(var(--surface-app))] px-2 py-1.5 text-sm text-[hsl(var(--foreground))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
-              >
-                <option value="advanced">Advanced</option>
-                <option value="Myers">Myers</option>
-                <option value="experimental">Experimental</option>
-              </select>
-            </Field>
-
-            <ToggleField
-              label={t("settings.minimapEnabled")}
-              hint={t("settings.minimapEnabledHint")}
-              checked={settings.minimapEnabled}
-              onChange={(v) => updateSetting("minimapEnabled", v)}
-              id="settings-minimap"
-            />
-
-            <Field label={t("settings.fontSize")} htmlFor="settings-font-size">
-              <input
-                id="settings-font-size"
-                type="number"
-                min={12}
-                max={22}
-                value={settings.fontSize}
-                onChange={(e) => {
-                  const v = Number(e.target.value);
-                  if (v >= 12 && v <= 22) updateSetting("fontSize", v);
-                }}
-                className="w-20 rounded bg-[hsl(var(--surface-app))] px-2 py-1.5 text-sm text-[hsl(var(--foreground))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
-              />
-            </Field>
-
-            <ToggleField
-              label={t("settings.ignoreWhitespace")}
-              hint={t("settings.ignoreWhitespaceHint")}
-              checked={settings.ignoreWhitespace}
-              onChange={(v) => updateSetting("ignoreWhitespace", v)}
-              id="settings-ignore-whitespace"
-            />
-          </fieldset>
-
-          <fieldset className="space-y-3">
-            <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[hsl(var(--text-muted))]">
-              {t("settings.sectionStartup")}
-            </legend>
-
-            <Field label={t("settings.defaultViewMode")} htmlFor="settings-default-view-mode">
-              <select
-                id="settings-default-view-mode"
-                value={settings.defaultViewMode}
-                onChange={(e) =>
-                  updateSetting(
-                    "defaultViewMode",
-                    e.target.value as "folders" | "files" | "blank"
-                  )
-                }
-                className="rounded bg-[hsl(var(--surface-app))] px-2 py-1.5 text-sm text-[hsl(var(--foreground))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
-              >
-                <option value="folders">{t("settings.defaultViewModeFolders")}</option>
-                <option value="files">{t("settings.defaultViewModeFiles")}</option>
-                <option value="blank">{t("settings.defaultViewModeBlank")}</option>
-              </select>
-            </Field>
-          </fieldset>
-
-          <fieldset className="space-y-3">
-            <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[hsl(var(--text-muted))]">
-              {t("settings.sectionLanguage")}
-            </legend>
-
-            <Field label={t("settings.language")} htmlFor="settings-language">
-              <select
-                id="settings-language"
-                value={i18n.resolvedLanguage}
-                onChange={(e) => i18n.changeLanguage(e.target.value)}
-                className="rounded bg-[hsl(var(--surface-app))] px-2 py-1.5 text-sm text-[hsl(var(--foreground))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
-              >
-                {LANGUAGES.map((l) => (
-                  <option key={l.code} value={l.code}>
-                    {l.label}
-                  </option>
-                ))}
-              </select>
-            </Field>
-          </fieldset>
-        </div>
+        <SettingsForm />
       </main>
+    </div>
+  );
+}
+
+function SettingsForm(): React.JSX.Element {
+  const { t, i18n } = useTranslation();
+  const { settings, updateSetting } = useAppSettings();
+
+  return (
+    <div className="mx-auto max-w-2xl space-y-8">
+      <fieldset className="space-y-3">
+        <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[hsl(var(--text-muted))]">
+          {t("settings.sectionAppearance")}
+        </legend>
+
+        <Field label={t("settings.theme")} htmlFor="settings-theme">
+          <select
+            id="settings-theme"
+            value={settings.theme}
+            onChange={(e) => updateSetting("theme", e.target.value as "dark" | "light")}
+            className="rounded bg-[hsl(var(--surface-app))] px-2 py-1.5 text-sm text-[hsl(var(--foreground))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
+          >
+            <option value="dark">{t("settings.themeDark")}</option>
+            <option value="light">{t("settings.themeLight")}</option>
+          </select>
+        </Field>
+      </fieldset>
+
+      <fieldset className="space-y-3">
+        <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[hsl(var(--text-muted))]">
+          {t("settings.sectionDiff")}
+        </legend>
+
+        <Field
+          label={t("settings.diffAlgorithm")}
+          hint={t("settings.diffAlgorithmHint")}
+          htmlFor="settings-diff-algorithm"
+        >
+          <select
+            id="settings-diff-algorithm"
+            value={settings.diffAlgorithm}
+            onChange={(e) =>
+              updateSetting("diffAlgorithm", e.target.value as "advanced" | "Myers" | "experimental")
+            }
+            className="rounded bg-[hsl(var(--surface-app))] px-2 py-1.5 text-sm text-[hsl(var(--foreground))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
+          >
+            <option value="advanced">Advanced</option>
+            <option value="Myers">Myers</option>
+            <option value="experimental">Experimental</option>
+          </select>
+        </Field>
+
+        <ToggleField
+          label={t("settings.minimapEnabled")}
+          hint={t("settings.minimapEnabledHint")}
+          checked={settings.minimapEnabled}
+          onChange={(v) => updateSetting("minimapEnabled", v)}
+          id="settings-minimap"
+        />
+
+        <Field label={t("settings.fontSize")} htmlFor="settings-font-size">
+          <input
+            id="settings-font-size"
+            type="number"
+            min={12}
+            max={22}
+            value={settings.fontSize}
+            onChange={(e) => {
+              const v = Number(e.target.value);
+              if (v >= 12 && v <= 22) updateSetting("fontSize", v);
+            }}
+            className="w-20 rounded bg-[hsl(var(--surface-app))] px-2 py-1.5 text-sm text-[hsl(var(--foreground))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
+          />
+        </Field>
+
+        <ToggleField
+          label={t("settings.ignoreWhitespace")}
+          hint={t("settings.ignoreWhitespaceHint")}
+          checked={settings.ignoreWhitespace}
+          onChange={(v) => updateSetting("ignoreWhitespace", v)}
+          id="settings-ignore-whitespace"
+        />
+      </fieldset>
+
+      <fieldset className="space-y-3">
+        <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[hsl(var(--text-muted))]">
+          {t("settings.sectionStartup")}
+        </legend>
+
+        <Field label={t("settings.defaultViewMode")} htmlFor="settings-default-view-mode">
+          <select
+            id="settings-default-view-mode"
+            value={settings.defaultViewMode}
+            onChange={(e) =>
+              updateSetting("defaultViewMode", e.target.value as "folders" | "files" | "blank")
+            }
+            className="rounded bg-[hsl(var(--surface-app))] px-2 py-1.5 text-sm text-[hsl(var(--foreground))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
+          >
+            <option value="folders">{t("settings.defaultViewModeFolders")}</option>
+            <option value="files">{t("settings.defaultViewModeFiles")}</option>
+            <option value="blank">{t("settings.defaultViewModeBlank")}</option>
+          </select>
+        </Field>
+      </fieldset>
+
+      <fieldset className="space-y-3">
+        <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[hsl(var(--text-muted))]">
+          {t("settings.sectionLanguage")}
+        </legend>
+
+        <Field label={t("settings.language")} htmlFor="settings-language">
+          <select
+            id="settings-language"
+            value={i18n.resolvedLanguage}
+            onChange={(e) => i18n.changeLanguage(e.target.value)}
+            className="rounded bg-[hsl(var(--surface-app))] px-2 py-1.5 text-sm text-[hsl(var(--foreground))] focus:outline-none focus:ring-1 focus:ring-[hsl(var(--primary))]"
+          >
+            {LANGUAGES.map((l) => (
+              <option key={l.code} value={l.code}>
+                {l.label}
+              </option>
+            ))}
+          </select>
+        </Field>
+      </fieldset>
     </div>
   );
 }

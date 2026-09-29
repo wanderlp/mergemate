@@ -51,6 +51,7 @@ function Root(): React.JSX.Element {
       {showStartup ? <StartupScreen /> : <App />}
       {route.path === "settings" && (
         <Settings
+          variant={route.from === "startup" ? "page" : "dialog"}
           onClose={() => {
             window.location.hash = route.from;
           }}
