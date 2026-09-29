@@ -470,24 +470,79 @@ function AppContent(): React.JSX.Element {
     [scanResult]
   );
 
-  // Restaura la sesion anterior: setea carpetas, agrega tabs (metadata),
-  // y dispara scan. El contenido de cada tab se carga on-demand via
-  // loadTabContent al activarlo (ver handleFileOpen mas abajo).
+  // Carga el contenido de un archivo de texto y actualiza el tab. Usado
+  // tanto al abrir un archivo nuevo como al restaurar un tab sin contenido.
+  // isFilesComparison se preserva explicitamente: sin esto, restaurar un tab
+  // de "Comparar 2 archivos" y luego recargar su contenido lo volvia
+  // cerrable (perdia el flag que lo protege, ver linea "closeable: false").
+  const loadTextContent = useCallback(
+    async (id: string, file: FileEntry, isFilesComparison?: boolean) => {
+      setOpenTabs((prev) => {
+        const next = new Map(prev);
+        next.set(id, {
+          file,
+          leftContent: "",
+          rightContent: "",
+          loading: true,
+          unsupported: false,
+          isImage: false,
+          isFilesComparison
+        });
+        return next;
+      });
+      const [left, right] = await Promise.all([
+        file.leftPath ? window.electronAPI.readFile(file.leftPath) : Promise.resolve(""),
+        file.rightPath ? window.electronAPI.readFile(file.rightPath) : Promise.resolve("")
+      ]);
+      const diffStats = computeDiffStats(left, right);
+      setOpenTabs((prev) => {
+        const next = new Map(prev);
+        next.set(id, {
+          file,
+          leftContent: left,
+          rightContent: right,
+          loading: false,
+          unsupported: false,
+          isImage: false,
+          isFilesComparison,
+          diffStats
+        });
+        return next;
+      });
+    },
+    []
+  );
+
+  // Restaura la sesion anterior: setea carpetas, agrega tabs (metadata) y
+  // dispara la carga real de contenido para los tabs de texto (#9: antes
+  // dejaba leftContent/rightContent vacios permanentemente — el tab quedaba
+  // activo mostrando un diff vacio, con "Save left/right" habilitados listos
+  // para sobrescribir los archivos reales con contenido en blanco). Imagenes
+  // y binarios no necesitan carga (su representacion no depende de
+  // leftContent/rightContent), pero si necesitan clasificarse correctamente
+  // — antes de este fix un binario restaurado se trataba como texto y se
+  // intentaba leer como UTF-8.
   const handleRestoreSession = useCallback(() => {
     if (!pendingSession) return;
     if (pendingSession.leftFolder) setLeftFolder(pendingSession.leftFolder);
     if (pendingSession.rightFolder) setRightFolder(pendingSession.rightFolder);
     if (pendingSession.openTabs && pendingSession.openTabs.length > 0) {
+      const textTabs: { id: string; file: FileEntry; isFilesComparison?: boolean }[] = [];
       setOpenTabs((prev) => {
         const next = new Map(prev);
         for (const tab of pendingSession.openTabs) {
+          const isImage = isImageExtension(tab.file.extension);
+          const unsupported = !isImage && isBinaryExtension(tab.file.extension);
+          if (!isImage && !unsupported) {
+            textTabs.push({ id: tab.id, file: tab.file, isFilesComparison: tab.isFilesComparison });
+          }
           next.set(tab.id, {
             file: tab.file,
             leftContent: "",
             rightContent: "",
-            loading: false,
-            unsupported: false,
-            isImage: isImageExtension(tab.file.extension),
+            loading: !isImage && !unsupported,
+            unsupported,
+            isImage,
             isFilesComparison: tab.isFilesComparison
           });
         }
@@ -496,6 +551,9 @@ function AppContent(): React.JSX.Element {
         if (firstId) setActiveTabId(firstId);
         return next;
       });
+      for (const tab of textTabs) {
+        void loadTextContent(tab.id, tab.file, tab.isFilesComparison);
+      }
     }
     setPendingSession(null);
     // Disparar scan si hay carpetas. Lo hacemos fuera del setOpenTabs para
@@ -503,45 +561,10 @@ function AppContent(): React.JSX.Element {
     if (pendingSession.leftFolder && pendingSession.rightFolder) {
       void scan();
     }
-  }, [pendingSession, setLeftFolder, setRightFolder, scan]);
+  }, [pendingSession, setLeftFolder, setRightFolder, scan, loadTextContent]);
 
   const handleDismissSession = useCallback(() => {
     setPendingSession(null);
-  }, []);
-
-  // Carga el contenido de un archivo de texto y actualiza el tab. Usado
-  // tanto al abrir un archivo nuevo como al restaurar un tab sin contenido.
-  const loadTextContent = useCallback(async (id: string, file: FileEntry) => {
-    setOpenTabs((prev) => {
-      const next = new Map(prev);
-      next.set(id, {
-        file,
-        leftContent: "",
-        rightContent: "",
-        loading: true,
-        unsupported: false,
-        isImage: false
-      });
-      return next;
-    });
-    const [left, right] = await Promise.all([
-      file.leftPath ? window.electronAPI.readFile(file.leftPath) : Promise.resolve(""),
-      file.rightPath ? window.electronAPI.readFile(file.rightPath) : Promise.resolve("")
-    ]);
-    const diffStats = computeDiffStats(left, right);
-    setOpenTabs((prev) => {
-      const next = new Map(prev);
-      next.set(id, {
-        file,
-        leftContent: left,
-        rightContent: right,
-        loading: false,
-        unsupported: false,
-        isImage: false,
-        diffStats
-      });
-      return next;
-    });
   }, []);
 
   const handleFileOpen = useCallback(
@@ -560,7 +583,7 @@ function AppContent(): React.JSX.Element {
           !existing.rightContent &&
           existing.file.leftPath
         ) {
-          void loadTextContent(id, existing.file);
+          void loadTextContent(id, existing.file, existing.isFilesComparison);
         }
         return;
       }
