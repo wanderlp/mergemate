@@ -123,7 +123,11 @@ async function collectPaths(
     }
     if (shouldIgnore(entry.name, entry.isDirectory())) continue;
     const rel = path.join(base, entry.name).replace(/\\/g, "/");
-    if (matchesIgnore(rel, ig)) continue;
+    // La libreria `ignore` distingue patrones de solo-directorio ("vendor/")
+    // de patrones generales ("vendor") en base a si el PATH probado trae
+    // barra final — sin ella, un patron como "vendor/" nunca matchea (ver
+    // ig.ignores('vendor') === false vs ig.ignores('vendor/') === true).
+    if (matchesIgnore(entry.isDirectory() ? `${rel}/` : rel, ig)) continue;
     onProgress(rel);
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
