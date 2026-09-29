@@ -5,5 +5,8 @@ export type {
   ScanResult,
   ScanStats,
   ScanProgress,
-  ElectronAPI
+  ElectronAPI,
+  SerializableTab,
+  LastSession,
+  AppSettings
 } from "../../types";

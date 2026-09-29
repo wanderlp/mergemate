@@ -1,12 +1,13 @@
 import { app, shell, BrowserWindow, ipcMain, dialog } from "electron";
 import { join } from "path";
+import * as path from "path";
 import { electronApp, optimizer, is } from "@electron-toolkit/utils";
 import { autoUpdater } from "electron-updater";
 import Store from "electron-store";
 import * as fs from "fs";
 import { scanFolders } from "./scanner";
 import { hashFile, classifyFiles } from "./classifier";
-import type { RecentComparison, ScanResult } from "../types";
+import type { RecentComparison, ScanResult, SerializableTab } from "../types";
 import { serializeCsv, serializeJson, serializeMarkdown, type ExportFormat } from "./services/export.service";
 
 interface WindowState {
