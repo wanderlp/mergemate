@@ -2,9 +2,10 @@
   "about": {
     "title": "Über MergeMate",
     "version": "Version {{version}}",
-    "description": "Desktop-Tool zum Vergleichen und Zusammenführen von Quellcode-Ordnern, entwickelt in Zusammenarbeit mit Claude (Anthropic) als Experiment im beschleunigten Softwareentwicklung.",
-    "origin": "Projekt aus Guatemala 🇬🇹, offen für Beiträge aus der ganzen Welt. Die Hauptsprache des Projekts ist Spanisch.",
-    "activeDev": "Aktiv in Entwicklung — das Projekt wächst kontinuierlich mit neuen Funktionen und Verbesserungen.",
+    "descriptionLabel": "Beschreibung",
+    "description": "Vergleiche und führe Code-Ordner und -Dateien zusammen mit einem leistungsstarken Diff-Viewer und Bildvergleich. Die gesamte Verarbeitung erfolgt auf deinem eigenen Rechner — nichts wird auf externe Server hochgeladen.",
+    "copyrightLabel": "Copyright",
+    "copyright": "© {{year}} Wanderson López — MIT-Lizenz",
     "repo": "Repository auf GitHub ansehen",
     "close": "Schließen"
   },

@@ -4,42 +4,34 @@
   <img src="resources/icon.svg" width="120" alt="MergeMate logo"/>
 </p>
 
-**MergeMate — Compara y fusiona código**
+**Compara y fusiona código sin salir de una sola ventana, sin subir nada a la nube.**
 
 ---
 
-Herramienta de escritorio para comparar y fusionar código. Soporta tres modos: comparación de carpetas completas con árbol unificado por color, comparación de dos archivos individuales (texto e imágenes), y editor libre para pegar código directamente. Incluye visor de diferencias línea por línea con Monaco Editor con capacidades de fusión, comparador de imágenes con zoom y slider, tabs estilo VS Code con icono por tipo de archivo, e interfaz multiidioma.
+## ¿Qué es?
+
+MergeMate es una herramienta de escritorio para comparar y fusionar carpetas y
+archivos de código. Abre dos carpetas completas y ve de un vistazo qué archivos
+son idénticos, cuáles difieren y cuáles solo existen de un lado — o compara dos
+archivos sueltos, dos imágenes, o simplemente pega código en un editor libre
+para diffear al vuelo.
+
+Todo corre localmente: no hay cuentas, no hay subida de archivos a un servidor,
+no hay telemetría.
 
 ---
 
-## Requisitos
+## ¿Por qué usarlo?
 
-- Node.js 18+
-- npm 9+
-
----
-
-## Cómo ejecutar
-
-```bash
-npm install
-npm run dev
-```
+Revisar manualmente si dos versiones de un proyecto son "iguales" —antes de un
+merge, una migración, o una entrega a un cliente— significa abrir carpeta por
+carpeta y archivo por archivo. MergeMate hashea y clasifica todo el árbol de
+una vez, y te muestra directamente dónde mirar: qué cambió de verdad y qué solo
+cambió en comentarios o espacios en blanco.
 
 ---
 
-## Compilar para distribución
-
-| Comando              | Resultado                  |
-| -------------------- | -------------------------- |
-| `npm run dist:win`   | `dist/MergeMate-Setup.exe` |
-| `npm run dist:mac`   | `dist/MergeMate.dmg`       |
-| `npm run dist:linux` | `dist/MergeMate.AppImage`  |
-| `npm run dist`       | Todas las plataformas      |
-
----
-
-## Funcionalidades
+## ¿Qué hace?
 
 - **Tres modos de comparación** — carpetas completas, dos archivos individuales o editor libre para pegar código directamente
 - **Visor de diferencias** — Monaco Editor lado a lado con navegación entre bloques y capacidades de fusión
@@ -51,25 +43,41 @@ npm run dev
 
 ---
 
-## Tecnologías
+## ¿Para quién es?
 
-- **Electron** — shell de escritorio
-- **React 18 + TypeScript** — interfaz de usuario (modo estricto)
-- **Vite + electron-vite** — herramientas de compilación
-- **Monaco Editor** — visor de diferencias
-- **Tailwind CSS** — estilos con tema oscuro
-- **shadcn/ui** — componentes de UI accesibles (Button, Separator, Progress, Tooltip) basados en Radix UI
-- **electron-store** — persistencia del historial de comparaciones recientes y estado de ventana
-- **electron-updater** — actualizaciones automáticas desde GitHub Releases
-- **react-compare-slider** — visor comparativo de imágenes con slider
-- **@iconify/react + @iconify/icons-devicon** — iconos de tipo de archivo por extensión
-- **Lucide React** — íconos de interfaz
-- **i18next + react-i18next** — internacionalización (ES / EN / DE / FR / PT), detección automática del idioma del OS
+- **Desarrolladores** que necesitan confirmar que un merge, un fork o una migración no rompió nada
+- **Revisores de código** que quieren ver diferencias reales sin ruido de formato o comentarios
+- **Cualquiera** que necesite comparar dos versiones de una carpeta o un par de imágenes sin instalar un IDE completo
 
-## Más sobre este proyecto
+---
 
-MergeMate es un experimento en desarrollo acelerado de software: una herramienta completamente funcional construida en colaboración con **Claude** (Anthropic) para demostrar lo que es posible cuando la IA acompaña cada paso del proceso — desde la arquitectura hasta los detalles de UX. Cada funcionalidad, decisión de diseño y línea de código ha sido co-creada en esa dinámica, no generada automáticamente.
+## Privacidad y datos
 
-El proyecto nace en **Guatemala** 🇬🇹 y está abierto a colaboraciones de todo el mundo. El idioma principal del proyecto (código, issues, PRs y discusiones) es el **español**.
+- **Todo el procesamiento es local.** El hash y la clasificación de archivos corren en tu máquina.
+- **Sin telemetría.** La app no reporta uso ni contenido a ningún servidor.
+- **Sin cuentas, sin login.** Abrís la app, seleccionás las carpetas o archivos, listo.
+- La única conexión de red es la verificación silenciosa de actualizaciones contra GitHub Releases.
 
-> 🚧 **En desarrollo activo** — el proyecto crece con nuevas funcionalidades y mejoras de forma continua. Si tienes ideas o quieres contribuir, eres bienvenido.
+---
+
+## Instalación
+
+MergeMate se distribuye como instalador para Windows (NSIS), macOS (DMG) y Linux (AppImage).
+
+```bash
+npm install
+npm run dev          # modo desarrollo
+npm run dist:win     # instalador de Windows
+```
+
+Ver [TECHNICAL.md](TECHNICAL.md) para requisitos, todos los comandos de build y el detalle de CI.
+
+---
+
+## Documentación técnica
+
+¿Buscás el stack, la arquitectura del proyecto o cómo compilarlo? Mirá [**TECHNICAL.md**](TECHNICAL.md).
+
+## Contribuir
+
+El proyecto es de código abierto bajo licencia MIT. Los issues y PRs son bienvenidos — el idioma principal del repositorio (código, issues, discusiones) es el español.

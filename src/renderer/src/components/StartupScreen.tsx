@@ -117,7 +117,7 @@ export function StartupScreen(): React.JSX.Element {
             className="fixed left-1/2 top-1/2 z-50 mx-4 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-2xl"
           >
             <div className="mb-4 flex items-center gap-3">
-              <Info size={20} className="shrink-0 text-[hsl(var(--primary))]" aria-hidden="true" />
+              <MergeMateLogo size={40} />
               <div>
                 <Dialog.Title className="text-base font-semibold text-[hsl(var(--foreground))]">
                   {t("about.title")}
@@ -125,18 +125,14 @@ export function StartupScreen(): React.JSX.Element {
                 <p className="text-xs text-[hsl(var(--text-muted))]">{t("about.version", { version })}</p>
               </div>
             </div>
-            <div className="space-y-4 text-sm leading-relaxed text-[hsl(var(--muted-foreground))]">
-              <p className="text-justify">{t("about.description")}</p>
-              <p className="text-justify">{t("about.origin")}</p>
-              <div className="flex items-start gap-2.5 rounded border border-[hsl(var(--border))] bg-[hsl(var(--surface-app))] px-3 py-2.5">
-                <span className="text-2xl leading-tight" aria-hidden="true">
-                  🚧
-                </span>
-                <p className="text-justify text-xs leading-relaxed text-[hsl(var(--text-muted))]">
-                  {t("about.activeDev")}
-                </p>
-              </div>
-            </div>
+            <dl className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-sm">
+              <dt className="text-[hsl(var(--text-muted))]">{t("about.descriptionLabel")}</dt>
+              <dd className="text-justify text-[hsl(var(--muted-foreground))]">{t("about.description")}</dd>
+              <dt className="text-[hsl(var(--text-muted))]">{t("about.copyrightLabel")}</dt>
+              <dd className="text-[hsl(var(--muted-foreground))]">
+                {t("about.copyright", { year: new Date().getFullYear() })}
+              </dd>
+            </dl>
             <div className="mt-5 flex items-center justify-between">
               <button
                 className="text-xs text-[hsl(var(--primary))] hover:underline"

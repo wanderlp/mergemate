@@ -2,9 +2,10 @@
   "about": {
     "title": "Acerca de MergeMate",
     "version": "Versión {{version}}",
-    "description": "Herramienta de escritorio para comparar y fusionar carpetas de código fuente, construida en colaboración con Claude (Anthropic) como experimento en desarrollo acelerado de software.",
-    "origin": "Proyecto nacido en Guatemala 🇬🇹, abierto a colaboraciones de todo el mundo. El idioma principal del proyecto es el español.",
-    "activeDev": "En desarrollo activo — el proyecto crece con nuevas funcionalidades y mejoras de forma continua.",
+    "descriptionLabel": "Descripción",
+    "description": "Compara y fusiona carpetas y archivos de código con un visor de diferencias potente y comparación de imágenes. Todo el procesamiento ocurre en tu propia máquina — nada se sube a servidores externos.",
+    "copyrightLabel": "Copyright",
+    "copyright": "© {{year}} Wanderson López — Licencia MIT",
     "repo": "Ver repositorio en GitHub",
     "close": "Cerrar"
   },

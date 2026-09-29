@@ -2,9 +2,10 @@
   "about": {
     "title": "About MergeMate",
     "version": "Version {{version}}",
-    "description": "Desktop tool for comparing and merging source code folders, built in collaboration with Claude (Anthropic) as an experiment in accelerated software development.",
-    "origin": "Project born in Guatemala 🇬🇹, open to contributions from around the world. The primary language of the project is Spanish.",
-    "activeDev": "Actively developed — the project grows with new features and improvements on an ongoing basis.",
+    "descriptionLabel": "Description",
+    "description": "Compare and merge code folders and files with a powerful diff viewer and image comparison. All processing happens on your own machine — nothing is uploaded to external servers.",
+    "copyrightLabel": "Copyright",
+    "copyright": "© {{year}} Wanderson López — MIT License",
     "repo": "View repository on GitHub",
     "close": "Close"
   },
