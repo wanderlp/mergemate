@@ -14,7 +14,7 @@ export function Settings({ onClose }: SettingsProps): React.JSX.Element {
   const { settings, updateSetting } = useAppSettings();
 
   return (
-      <div className="flex h-screen flex-col bg-[hsl(var(--surface-app))]">
+      <div className="fixed inset-0 z-40 flex flex-col bg-[hsl(var(--surface-app))]">
         <header className="flex items-center gap-3 border-b border-[hsl(var(--border))] bg-[hsl(var(--card))] px-4 py-2">
         <Button
           onClick={onClose}

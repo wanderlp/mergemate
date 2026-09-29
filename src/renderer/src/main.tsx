@@ -37,16 +37,18 @@ function Root(): React.JSX.Element {
     return () => window.removeEventListener("hashchange", onHashChange);
   }, []);
 
-  if (route.path === "startup") {
-    return (
-      <AppProviders>
-        <StartupScreen />
-      </AppProviders>
-    );
-  }
+  // El fondo (StartupScreen o App) se elige por route.path/route.from y se
+  // mantiene SIEMPRE montado mientras Settings se abre y se cierra encima —
+  // antes, el branch "settings" siempre montaba <App/> de fondo sin importar
+  // el origen, así que abrir Settings desde StartupScreen desmontaba
+  // StartupScreen por completo (y la remontaba al volver), lo que invalidaba
+  // los IDs que useId() genera en TitleBar/AppIcon en cada roundtrip (#31).
+  const showStartup =
+    route.path === "startup" || (route.path === "settings" && route.from === "startup");
 
   return (
     <AppProviders>
+      {showStartup ? <StartupScreen /> : <App />}
       {route.path === "settings" && (
         <Settings
           onClose={() => {
@@ -54,7 +56,6 @@ function Root(): React.JSX.Element {
           }}
         />
       )}
-      <App />
     </AppProviders>
   );
 }
