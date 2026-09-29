@@ -197,11 +197,18 @@ function RestoreSessionDialog({
   return (
     <Dialog.Root open={true} onOpenChange={(open) => !open && onDismiss()}>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
+        {/* z-30 (no z-50): este dialogo puede resolverse de forma asincrona
+            despues de que el usuario ya haya navegado a Settings (z-40) si
+            fue mas rapido que la respuesta de getLastSession(). Con z-50 el
+            overlay quedaba SIEMPRE encima de Settings y bloqueaba el boton
+            "Volver" sin que el usuario entendiera por que. Con z-30 se
+            queda detras de Settings — visible recien cuando el usuario la
+            cierra — que es un fallback razonable y no bloquea la navegacion. */}
+        <Dialog.Overlay className="fixed inset-0 z-30 bg-black/60" />
         <Dialog.Content
           onInteractOutside={(e) => e.preventDefault()}
           onEscapeKeyDown={(e) => e.preventDefault()}
-          className="fixed left-1/2 top-1/2 z-50 mx-4 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-2xl"
+          className="fixed left-1/2 top-1/2 z-30 mx-4 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-2xl"
         >
           <Dialog.Title className="mb-2 text-base font-semibold text-[hsl(var(--foreground))]">
             ¿Reabrir la sesion anterior?
