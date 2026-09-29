@@ -33,6 +33,7 @@ interface StoreSchema {
     leftFolder: string;
     rightFolder: string;
     lastUsed: number;
+    openTabs: SerializableTab[];
   };
 }
 
@@ -49,7 +50,8 @@ const DEFAULT_SETTINGS: StoreSchema["appSettings"] = {
 const DEFAULT_LAST_SESSION: StoreSchema["lastSession"] = {
   leftFolder: "",
   rightFolder: "",
-  lastUsed: 0
+  lastUsed: 0,
+  openTabs: []
 };
 
 const store = new Store<StoreSchema>({

@@ -3,11 +3,11 @@ import { useTranslation } from "react-i18next";
 import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence } from "framer-motion";
 import { COMPARISON_TAB_ID, BLANK_TAB_ID } from "./constants";
-import { MergeMateLogo } from "./components/MergeMateLogo";
+import { AppIcon } from "./components/AppIcon";
 import { TitleBar } from "./components/TitleBar";
 import { Toolbar } from "./components/Toolbar";
 import { FileTree } from "./components/FileTree";
-import type { FileStatus } from "./types";
+import type { FileStatus, SerializableTab } from "./types";
 import { lazy, Suspense } from "react";
 const DiffViewer = lazy(() =>
   import("./components/DiffViewer").then((m) => ({ default: m.DiffViewer }))
@@ -345,6 +345,23 @@ function AppContent(): React.JSX.Element {
     };
   }, []);
 
+  // Persiste los tabs abiertos (metadata, no contenido) con debounce para
+  // no saturar electron-store en cada cambio. El contenido se recarga desde
+  // disco al activar el tab restaurado.
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      const serializable: SerializableTab[] = Array.from(openTabs.entries())
+        .filter(([id]) => id !== BLANK_TAB_ID)
+        .map(([id, tab]) => ({
+          id,
+          file: tab.file,
+          isFilesComparison: tab.isFilesComparison
+        }));
+      void window.electronAPI.setLastSession({ openTabs: serializable });
+    }, 300);
+    return () => clearTimeout(handle);
+  }, [openTabs]);
+
   useGlobalShortcuts({
     openLeft: () => {
       void openLeft();
@@ -637,7 +654,7 @@ function AppContent(): React.JSX.Element {
               role="main"
               aria-label={t("welcome.ariaLabel")}
             >
-              <MergeMateLogo size={160} />
+              <AppIcon size={160} />
               <div className="text-3xl font-bold tracking-wide text-[hsl(var(--foreground))]">MergeMate</div>
               <div className="text-sm">{t("welcome.description")}</div>
               <ul

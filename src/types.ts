@@ -93,6 +93,19 @@ export interface LastSession {
   leftFolder: string;
   rightFolder: string;
   lastUsed: number;
+  openTabs: SerializableTab[];
+}
+
+/**
+ * Metadata serializable de un tab abierto en la sesion anterior. Solo
+ * guardamos paths y extension; el contenido (`leftContent`/`rightContent`)
+ * se recarga desde disco al activar el tab. Esto evita que archivos
+ * grandes (cientos de KB) saturen electron-store (limite ~6 MB).
+ */
+export interface SerializableTab {
+  id: string;
+  file: FileEntry;
+  isFilesComparison?: boolean;
 }
 
 export interface AppSettings {
