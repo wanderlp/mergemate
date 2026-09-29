@@ -10,18 +10,20 @@ import "./assets/index.css";
 type Route =
   | { path: "main" }
   | { path: "startup" }
-  | { path: "settings"; from: "startup" | "main" };
+  | { path: "settings"; from: "startup" | "main"; section?: string };
 
-// Parsea el hash soportando query string (ej. "settings?from=startup") y
-// retrocompatibilidad con el formato previo ("settings" sin query → from="main").
+// Parsea el hash soportando query string (ej. "settings?from=startup&section=about")
+// y retrocompatibilidad con el formato previo ("settings" sin query → from="main").
 function parseHash(hash: string): Route {
   const raw = hash.replace("#", "");
   if (raw === "startup") return { path: "startup" };
   if (raw.startsWith("settings")) {
     const query = raw.includes("?") ? raw.split("?")[1] ?? "" : "";
-    const fromParam = new URLSearchParams(query).get("from");
+    const params = new URLSearchParams(query);
+    const fromParam = params.get("from");
     const from: "startup" | "main" = fromParam === "startup" ? "startup" : "main";
-    return { path: "settings", from };
+    const section = params.get("section") ?? undefined;
+    return { path: "settings", from, section };
   }
   return { path: "main" };
 }
@@ -52,6 +54,7 @@ function Root(): React.JSX.Element {
       {route.path === "settings" && (
         <Settings
           variant={route.from === "startup" ? "page" : "dialog"}
+          initialSection={route.section}
           onClose={() => {
             window.location.hash = route.from;
           }}

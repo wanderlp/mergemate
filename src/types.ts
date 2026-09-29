@@ -87,6 +87,17 @@ export interface ElectronAPI {
   setAppSettings: (partial: Partial<AppSettings>) => Promise<AppSettings>;
   getLastSession: () => Promise<LastSession>;
   setLastSession: (partial: Partial<LastSession>) => Promise<LastSession>;
+  getSystemInfo: () => Promise<SystemInfo>;
+}
+
+export interface SystemInfo {
+  appVersion: string;
+  platform: string;
+  arch: string;
+  electronVersion: string;
+  nodeVersion: string;
+  chromeVersion: string;
+  configPath: string;
 }
 
 export interface LastSession {

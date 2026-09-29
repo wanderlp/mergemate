@@ -57,7 +57,6 @@ export function StartupScreen(): React.JSX.Element {
   const { t } = useTranslation();
   const [recents, setRecents] = useState<RecentComparison[]>([]);
   const [pendingRemove, setPendingRemove] = useState<RecentComparison | null>(null);
-  const [showAbout, setShowAbout] = useState(false);
   const [fileError, setFileError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -106,53 +105,6 @@ export function StartupScreen(): React.JSX.Element {
 
   return (
     <div className="flex h-screen flex-col bg-[hsl(var(--surface-app))]" role="main">
-      <Dialog.Root open={showAbout} onOpenChange={(open) => !open && setShowAbout(false)}>
-        <Dialog.Portal>
-          {/* El comportamiento previo NO cerraba con click fuera ni con ESC.
-              Preservamos eso: onInteractOutside y onEscapeKeyDown previenen. */}
-          <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
-          <Dialog.Content
-            onInteractOutside={(e) => e.preventDefault()}
-            onEscapeKeyDown={(e) => e.preventDefault()}
-            className="fixed left-1/2 top-1/2 z-50 mx-4 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-2xl"
-          >
-            <div className="mb-4 flex items-center gap-3">
-              <MergeMateLogo size={40} />
-              <div>
-                <Dialog.Title className="text-base font-semibold text-[hsl(var(--foreground))]">
-                  {t("about.title")}
-                </Dialog.Title>
-                <p className="text-xs text-[hsl(var(--text-muted))]">{t("about.version", { version })}</p>
-              </div>
-            </div>
-            <dl className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-sm">
-              <dt className="text-[hsl(var(--text-muted))]">{t("about.descriptionLabel")}</dt>
-              <dd className="text-justify text-[hsl(var(--muted-foreground))]">{t("about.description")}</dd>
-              <dt className="text-[hsl(var(--text-muted))]">{t("about.copyrightLabel")}</dt>
-              <dd className="text-[hsl(var(--muted-foreground))]">
-                {t("about.copyright", { year: new Date().getFullYear() })}
-              </dd>
-            </dl>
-            <div className="mt-5 flex items-center justify-between">
-              <button
-                className="text-xs text-[hsl(var(--primary))] hover:underline"
-                onClick={() =>
-                  window.electronAPI.openExternal("https://github.com/wanderlp/mergemate")
-                }
-              >
-                {t("about.repo")}
-              </button>
-              <button
-                className="rounded px-3 py-1.5 text-sm text-[hsl(var(--muted-foreground))] transition-colors hover:bg-[hsl(var(--secondary))] hover:text-[hsl(var(--foreground))]"
-                onClick={() => setShowAbout(false)}
-              >
-                {t("about.close")}
-              </button>
-            </div>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
-
       <Dialog.Root
         open={pendingRemove !== null}
         onOpenChange={(open) => !open && setPendingRemove(null)}
@@ -237,7 +189,9 @@ export function StartupScreen(): React.JSX.Element {
           <div className="mt-auto flex justify-center pt-8">
             <button
               className="flex items-center gap-1.5 text-xs text-[hsl(var(--text-faint))] transition-colors hover:text-[hsl(var(--text-muted))]"
-              onClick={() => setShowAbout(true)}
+              onClick={() => {
+                window.location.hash = "settings?from=startup&section=about";
+              }}
             >
               <Info size={13} aria-hidden="true" />
               {t("about.title")} · v{version}

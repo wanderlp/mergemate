@@ -8,5 +8,6 @@ export type {
   ElectronAPI,
   SerializableTab,
   LastSession,
-  AppSettings
+  AppSettings,
+  SystemInfo
 } from "../../types";

@@ -76,10 +76,14 @@ test.describe('#27 Sincronización Monaco ↔ SettingsContext', () => {
     await themeSelect.selectOption(targetTheme);
     await expect(page.locator('html')).toHaveAttribute('data-theme', targetTheme);
 
-    // Paso 6: volver a la vista principal (cubre ES/EN/DE/FR/PT).
+    // Paso 6: cerrar el dialogo de Settings (abierto desde App usa variante
+    // "dialog" con boton "✕", no "Volver" — ver #settings redesign). Se
+    // busca DENTRO del dialog (role="dialog" de Radix) para no ambiguar con
+    // el boton nativo de cerrar ventana de la TitleBar, que tiene el mismo
+    // aria-label ("Cerrar"/"Close").
     await page
-      .getByRole('button', { name: /volver|back|zur[uü]ck|retour|voltar/i })
-      .first()
+      .getByRole('dialog')
+      .getByRole('button', { name: /^cerrar$|^close$|^schließen$|^fermer$|^fechar$/i })
       .click();
 
     // Paso 7: Monaco refleja el nuevo theme sin recargar el tab.

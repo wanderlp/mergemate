@@ -151,7 +151,10 @@ const api: ElectronAPI = {
   /** Lee la última sesión (leftFolder/rightFolder) para auto-reabrir. */
   getLastSession: () => ipcRenderer.invoke("session-get"),
   /** Persiste la sesión actual para restaurar en el siguiente arranque. */
-  setLastSession: (partial) => ipcRenderer.invoke("session-save", partial)
+  setLastSession: (partial) => ipcRenderer.invoke("session-save", partial),
+
+  /** Version de la app, plataforma, versiones de Electron/Node/Chrome y ruta del archivo de configuración. Usado en Settings > Acerca de. */
+  getSystemInfo: () => ipcRenderer.invoke("get-system-info")
 };
 
 contextBridge.exposeInMainWorld("electronAPI", api);

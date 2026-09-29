@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ArrowLeft, X } from "lucide-react";
+import { ArrowLeft, X, Copy, Check } from "lucide-react";
+import { version } from "../../../../package.json";
 import { useAppSettings } from "../hooks/useAppSettings";
 import { Button } from "./ui/button";
+import { MergeMateLogo } from "./MergeMateLogo";
 import { LANGUAGES } from "../i18n";
+import type { SystemInfo } from "../types";
 
 interface SettingsProps {
   onClose: () => void;
@@ -15,10 +18,27 @@ interface SettingsProps {
    * usuario probablemente quiere seguir viendo sus tabs/carpetas detrás).
    */
   variant: "page" | "dialog";
+  /** Id de sección (sin el prefijo "settings-section-") a la que hacer scroll al montar, ej. "about". */
+  initialSection?: string;
 }
 
-export function Settings({ onClose, variant }: SettingsProps): React.JSX.Element {
+function useScrollToSection(
+  containerRef: React.RefObject<HTMLElement>,
+  section: string | undefined
+): void {
+  useEffect(() => {
+    if (!section) return;
+    const el = document.getElementById(`settings-section-${section}`);
+    el?.scrollIntoView({ block: "start" });
+  }, [containerRef, section]);
+}
+
+export function Settings({ onClose, variant, initialSection }: SettingsProps): React.JSX.Element {
   const { t } = useTranslation();
+  const mainRef = React.useRef<HTMLElement>(null);
+  const dialogBodyRef = React.useRef<HTMLDivElement>(null);
+
+  useScrollToSection(variant === "dialog" ? dialogBodyRef : mainRef, initialSection);
 
   if (variant === "dialog") {
     return (
@@ -45,7 +65,7 @@ export function Settings({ onClose, variant }: SettingsProps): React.JSX.Element
                 <X size={16} aria-hidden="true" />
               </Button>
             </header>
-            <div className="overflow-y-auto px-6 py-6">
+            <div ref={dialogBodyRef} className="overflow-y-auto px-6 py-6">
               <SettingsForm />
             </div>
           </Dialog.Content>
@@ -78,7 +98,7 @@ export function Settings({ onClose, variant }: SettingsProps): React.JSX.Element
         <h1 className="text-base font-semibold">{t("settings.title")}</h1>
       </header>
 
-      <main className="flex-1 overflow-y-auto px-6 py-6">
+      <main ref={mainRef} className="flex-1 overflow-y-auto px-6 py-6">
         <SettingsForm />
       </main>
     </div>
@@ -206,7 +226,124 @@ function SettingsForm(): React.JSX.Element {
           </select>
         </Field>
       </fieldset>
+
+      <AboutSection />
     </div>
+  );
+}
+
+const COPY_FEEDBACK_MS = 2000;
+
+function formatPlatform(info: SystemInfo): string {
+  if (info.platform === "win32") {
+    return info.arch === "x64" ? "Windows (64 bits)" : `Windows (${info.arch})`;
+  }
+  if (info.platform === "darwin") {
+    return info.arch === "arm64" ? "macOS (Apple Silicon)" : `macOS (${info.arch})`;
+  }
+  if (info.platform === "linux") return `Linux (${info.arch})`;
+  return `${info.platform} (${info.arch})`;
+}
+
+function buildDiagnostic(info: SystemInfo): string {
+  return [
+    `MergeMate ${info.appVersion}`,
+    `Plataforma: ${formatPlatform(info)}`,
+    `Electron: ${info.electronVersion}`,
+    `Node: ${info.nodeVersion}`,
+    `Chrome: ${info.chromeVersion}`,
+    `Configuración: ${info.configPath}`
+  ].join("\n");
+}
+
+function AboutSection(): React.JSX.Element {
+  const { t } = useTranslation();
+  const [info, setInfo] = useState<SystemInfo | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    window.electronAPI.getSystemInfo().then((snapshot) => {
+      if (active) setInfo(snapshot);
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!copied) return;
+    const handle = setTimeout(() => setCopied(false), COPY_FEEDBACK_MS);
+    return () => clearTimeout(handle);
+  }, [copied]);
+
+  async function handleCopy(): Promise<void> {
+    if (!info) return;
+    await navigator.clipboard.writeText(buildDiagnostic(info));
+    setCopied(true);
+  }
+
+  return (
+    <fieldset id="settings-section-about" className="space-y-4">
+      <legend className="mb-2 text-sm font-semibold uppercase tracking-wide text-[hsl(var(--text-muted))]">
+        {t("settings.sectionAbout")}
+      </legend>
+
+      <div className="flex items-center gap-3">
+        <MergeMateLogo size={32} />
+        <div>
+          <div className="text-sm font-semibold text-[hsl(var(--foreground))]">MergeMate</div>
+          <div className="text-xs text-[hsl(var(--text-muted))]">{t("about.version", { version })}</div>
+        </div>
+      </div>
+
+      <dl className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-2 text-sm">
+        <dt className="text-[hsl(var(--text-muted))]">{t("about.descriptionLabel")}</dt>
+        <dd className="text-[hsl(var(--muted-foreground))]">{t("about.description")}</dd>
+        <dt className="text-[hsl(var(--text-muted))]">{t("about.copyrightLabel")}</dt>
+        <dd className="text-[hsl(var(--muted-foreground))]">
+          {t("about.copyright", { year: new Date().getFullYear() })}
+        </dd>
+      </dl>
+
+      <button
+        type="button"
+        className="text-xs text-[hsl(var(--primary))] hover:underline"
+        onClick={() => window.electronAPI.openExternal("https://github.com/wanderlp/mergemate")}
+      >
+        {t("about.repo")}
+      </button>
+
+      <div className="space-y-2 rounded border border-[hsl(var(--border))] bg-[hsl(var(--surface-app))] p-3">
+        <h3 className="text-xs font-semibold uppercase tracking-wide text-[hsl(var(--text-muted))]">
+          {t("about.system.title")}
+        </h3>
+
+        {info && (
+          <dl className="grid grid-cols-[max-content_1fr] gap-x-4 gap-y-1.5 text-xs">
+            <dt className="text-[hsl(var(--text-muted))]">{t("about.system.platform")}</dt>
+            <dd className="font-mono text-[hsl(var(--muted-foreground))]">{formatPlatform(info)}</dd>
+            <dt className="text-[hsl(var(--text-muted))]">Electron</dt>
+            <dd className="font-mono text-[hsl(var(--muted-foreground))]">{info.electronVersion}</dd>
+            <dt className="text-[hsl(var(--text-muted))]">Node</dt>
+            <dd className="font-mono text-[hsl(var(--muted-foreground))]">{info.nodeVersion}</dd>
+            <dt className="text-[hsl(var(--text-muted))]">Chrome</dt>
+            <dd className="font-mono text-[hsl(var(--muted-foreground))]">{info.chromeVersion}</dd>
+            <dt className="text-[hsl(var(--text-muted))]">{t("about.system.configPath")}</dt>
+            <dd className="break-all font-mono text-[hsl(var(--muted-foreground))]">{info.configPath}</dd>
+          </dl>
+        )}
+
+        <Button variant="ghost" size="sm" onClick={() => void handleCopy()} disabled={!info}>
+          {copied ? (
+            <Check size={14} aria-hidden="true" className="mr-1.5" />
+          ) : (
+            <Copy size={14} aria-hidden="true" className="mr-1.5" />
+          )}
+          {copied ? t("about.system.copied") : t("about.system.copyButton")}
+        </Button>
+      </div>
+    </fieldset>
   );
 }
 

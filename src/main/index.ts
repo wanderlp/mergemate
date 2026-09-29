@@ -7,7 +7,7 @@ import Store from "electron-store";
 import * as fs from "fs";
 import { scanFolders } from "./scanner";
 import { hashFile, classifyFiles } from "./classifier";
-import type { RecentComparison, ScanResult, SerializableTab } from "../types";
+import type { RecentComparison, ScanResult, SerializableTab, SystemInfo } from "../types";
 import { serializeCsv, serializeJson, serializeMarkdown, type ExportFormat } from "./services/export.service";
 
 interface WindowState {
@@ -518,6 +518,16 @@ function registerIpcHandlers(): void {
     store.set("lastSession", next);
     return next;
   });
+
+  ipcMain.handle("get-system-info", (): SystemInfo => ({
+    appVersion: app.getVersion(),
+    platform: process.platform,
+    arch: process.arch,
+    electronVersion: process.versions.electron,
+    nodeVersion: process.versions.node,
+    chromeVersion: process.versions.chrome,
+    configPath: store.path
+  }));
 
   ipcMain.handle("window-confirm-close", () => {
     mainWindowClosing = true;

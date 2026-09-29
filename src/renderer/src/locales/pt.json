@@ -7,7 +7,13 @@
     "copyrightLabel": "Copyright",
     "copyright": "© {{year}} Wanderson López — Licença MIT",
     "repo": "Ver repositório no GitHub",
-    "close": "Fechar"
+    "system": {
+      "title": "Sistema",
+      "platform": "Plataforma",
+      "configPath": "Arquivo de configuração",
+      "copyButton": "Copiar diagnóstico",
+      "copied": "Copiado"
+    }
   },
   "titleBar": {
     "minimize": "Minimizar",
@@ -109,6 +115,7 @@
     "defaultViewModeBlank": "Editor livre",
     "sectionLanguage": "Idioma",
     "language": "Idioma",
+    "sectionAbout": "Sobre",
     "loading": "Carregando…"
   },
   "closeDialog": {
