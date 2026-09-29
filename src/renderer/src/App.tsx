@@ -3,11 +3,11 @@ import { useTranslation } from "react-i18next";
 import * as Dialog from "@radix-ui/react-dialog";
 import { AnimatePresence } from "framer-motion";
 import { COMPARISON_TAB_ID, BLANK_TAB_ID } from "./constants";
-import { AppIcon } from "./components/AppIcon";
+import { MergeMateLogo } from "./components/MergeMateLogo";
 import { TitleBar } from "./components/TitleBar";
 import { Toolbar } from "./components/Toolbar";
 import { FileTree } from "./components/FileTree";
-import type { FileStatus, SerializableTab } from "./types";
+import type { FileStatus, SerializableTab, LastSession } from "./types";
 import { lazy, Suspense } from "react";
 const DiffViewer = lazy(() =>
   import("./components/DiffViewer").then((m) => ({ default: m.DiffViewer }))
@@ -181,6 +181,63 @@ function CloseConfirmDialog({
   );
 }
 
+function RestoreSessionDialog({
+  session,
+  onRestore,
+  onDismiss
+}: {
+  session: LastSession;
+  onRestore: () => void;
+  onDismiss: () => void;
+}): React.JSX.Element {
+  const tabCount = session.openTabs?.length ?? 0;
+  const folderPair = session.leftFolder && session.rightFolder;
+  const ageDays = Math.floor((Date.now() - session.lastUsed) / (24 * 60 * 60 * 1000));
+
+  return (
+    <Dialog.Root open={true} onOpenChange={(open) => !open && onDismiss()}>
+      <Dialog.Portal>
+        <Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
+        <Dialog.Content
+          onInteractOutside={(e) => e.preventDefault()}
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          className="fixed left-1/2 top-1/2 z-50 mx-4 w-full max-w-md -translate-x-1/2 -translate-y-1/2 rounded-lg border border-[hsl(var(--border))] bg-[hsl(var(--card))] p-6 shadow-2xl"
+        >
+          <Dialog.Title className="mb-2 text-base font-semibold text-[hsl(var(--foreground))]">
+            ¿Reabrir la sesion anterior?
+          </Dialog.Title>
+          <Dialog.Description className="mb-4 text-sm text-[hsl(var(--muted-foreground))]">
+            Detectamos una sesion guardada hace {ageDays === 0 ? "hoy" : `${ageDays} dia${ageDays === 1 ? "" : "s"}`}.
+          </Dialog.Description>
+          <ul className="mb-6 space-y-1 text-sm text-[hsl(var(--foreground))]">
+            {folderPair && (
+              <li>
+                <span className="font-semibold">Carpetas:</span>{" "}
+                <span className="font-mono text-xs text-[hsl(var(--muted-foreground))]">
+                  {session.leftFolder?.split(/[/\\]/).pop()} vs {session.rightFolder?.split(/[/\\]/).pop()}
+                </span>
+              </li>
+            )}
+            {tabCount > 0 && (
+              <li>
+                <span className="font-semibold">Tabs abiertos:</span> {tabCount}
+              </li>
+            )}
+          </ul>
+          <div className="flex justify-end gap-2">
+            <Button variant="ghost" onClick={onDismiss}>
+              No reabrir
+            </Button>
+            <Button variant="primary" onClick={onRestore}>
+              Reabrir
+            </Button>
+          </div>
+        </Dialog.Content>
+      </Dialog.Portal>
+    </Dialog.Root>
+  );
+}
+
 function AppContent(): React.JSX.Element {
   const { t } = useTranslation();
   const {
@@ -200,6 +257,10 @@ function AppContent(): React.JSX.Element {
     patchFileStatus
   } = useFolderScan();
 
+  // Sesion anterior pendiente de restaurar. Se llena al montar y se muestra
+  // un dialogo para que el usuario confirme antes de reabrir (no auto-scan).
+  const [pendingSession, setPendingSession] = useState<LastSession | null>(null);
+
   const [openTabs, setOpenTabs] = useState<Map<string, DiffTabData>>(new Map());
   const [activeTabId, setActiveTabId] = useState<string>("");
   const [statusFilter, setStatusFilter] = useState<FileStatus | null>(null);
@@ -211,6 +272,17 @@ function AppContent(): React.JSX.Element {
   const [showComparisonTab, setShowComparisonTab] = useState(false);
   const [showCloseDialog, setShowCloseDialog] = useState(false);
   const [scanVersion, setScanVersion] = useState(0);
+
+  // Carga lastSession al montar (si no hay pendingFolders/pendingFiles del
+  // startup). El main process ya filtra sesiones >7 dias y devuelve null.
+  // Solo abrimos el dialogo si la sesion tiene algo que restaurar.
+  useEffect(() => {
+    void window.electronAPI.getLastSession().then((session) => {
+      if (!session) return;
+      if (!session.leftFolder && !session.rightFolder && (!session.openTabs || session.openTabs.length === 0)) return;
+      setPendingSession(session);
+    });
+  }, []);
 
   // Modo "comparar 2 archivos": abrir tab directo con los dos archivos
   useEffect(() => {
@@ -391,11 +463,98 @@ function AppContent(): React.JSX.Element {
     [scanResult]
   );
 
+  // Restaura la sesion anterior: setea carpetas, agrega tabs (metadata),
+  // y dispara scan. El contenido de cada tab se carga on-demand via
+  // loadTabContent al activarlo (ver handleFileOpen mas abajo).
+  const handleRestoreSession = useCallback(() => {
+    if (!pendingSession) return;
+    if (pendingSession.leftFolder) setLeftFolder(pendingSession.leftFolder);
+    if (pendingSession.rightFolder) setRightFolder(pendingSession.rightFolder);
+    if (pendingSession.openTabs && pendingSession.openTabs.length > 0) {
+      setOpenTabs((prev) => {
+        const next = new Map(prev);
+        for (const tab of pendingSession.openTabs) {
+          next.set(tab.id, {
+            file: tab.file,
+            leftContent: "",
+            rightContent: "",
+            loading: false,
+            unsupported: false,
+            isImage: isImageExtension(tab.file.extension),
+            isFilesComparison: tab.isFilesComparison
+          });
+        }
+        // Activar el primer tab restaurado.
+        const firstId = pendingSession.openTabs[0]?.id;
+        if (firstId) setActiveTabId(firstId);
+        return next;
+      });
+    }
+    setPendingSession(null);
+    // Disparar scan si hay carpetas. Lo hacemos fuera del setOpenTabs para
+    // que el state ya este actualizado.
+    if (pendingSession.leftFolder && pendingSession.rightFolder) {
+      void scan();
+    }
+  }, [pendingSession, setLeftFolder, setRightFolder, scan]);
+
+  const handleDismissSession = useCallback(() => {
+    setPendingSession(null);
+  }, []);
+
+  // Carga el contenido de un archivo de texto y actualiza el tab. Usado
+  // tanto al abrir un archivo nuevo como al restaurar un tab sin contenido.
+  const loadTextContent = useCallback(async (id: string, file: FileEntry) => {
+    setOpenTabs((prev) => {
+      const next = new Map(prev);
+      next.set(id, {
+        file,
+        leftContent: "",
+        rightContent: "",
+        loading: true,
+        unsupported: false,
+        isImage: false
+      });
+      return next;
+    });
+    const [left, right] = await Promise.all([
+      file.leftPath ? window.electronAPI.readFile(file.leftPath) : Promise.resolve(""),
+      file.rightPath ? window.electronAPI.readFile(file.rightPath) : Promise.resolve("")
+    ]);
+    const diffStats = computeDiffStats(left, right);
+    setOpenTabs((prev) => {
+      const next = new Map(prev);
+      next.set(id, {
+        file,
+        leftContent: left,
+        rightContent: right,
+        loading: false,
+        unsupported: false,
+        isImage: false,
+        diffStats
+      });
+      return next;
+    });
+  }, []);
+
   const handleFileOpen = useCallback(
     async (file: FileEntry) => {
       const id = file.relativePath;
-      if (openTabs.has(id)) {
+      const existing = openTabs.get(id);
+      if (existing) {
         setActiveTabId(id);
+        // Si el tab fue restaurado de lastSession sin contenido y es un
+        // archivo de texto, cargar ahora. Las imagenes y binarios ya tienen
+        // su representacion (no necesitan contenido).
+        if (
+          !existing.isImage &&
+          !existing.unsupported &&
+          !existing.leftContent &&
+          !existing.rightContent &&
+          existing.file.leftPath
+        ) {
+          void loadTextContent(id, existing.file);
+        }
         return;
       }
       // Imágenes: visor dedicado sin necesidad de leer contenido
@@ -433,39 +592,9 @@ function AppContent(): React.JSX.Element {
         return;
       }
       // Archivos de texto: cargar contenido
-      setOpenTabs((prev) => {
-        const next = new Map(prev);
-        next.set(id, {
-          file,
-          leftContent: "",
-          rightContent: "",
-          loading: true,
-          unsupported: false,
-          isImage: false
-        });
-        return next;
-      });
-      setActiveTabId(id);
-      const [left, right] = await Promise.all([
-        file.leftPath ? window.electronAPI.readFile(file.leftPath) : Promise.resolve(""),
-        file.rightPath ? window.electronAPI.readFile(file.rightPath) : Promise.resolve("")
-      ]);
-      const diffStats = computeDiffStats(left, right);
-      setOpenTabs((prev) => {
-        const next = new Map(prev);
-        next.set(id, {
-          file,
-          leftContent: left,
-          rightContent: right,
-          loading: false,
-          unsupported: false,
-          isImage: false,
-          diffStats
-        });
-        return next;
-      });
+      await loadTextContent(id, file);
     },
-    [openTabs]
+    [openTabs, loadTextContent]
   );
 
   const handleCloseTab = useCallback(
@@ -615,6 +744,13 @@ function AppContent(): React.JSX.Element {
 
   return (
       <div className="flex h-screen flex-col bg-[hsl(var(--surface-app))]">
+        {pendingSession && (
+          <RestoreSessionDialog
+            session={pendingSession}
+            onRestore={handleRestoreSession}
+            onDismiss={handleDismissSession}
+          />
+        )}
         {showCloseDialog && (
           <CloseConfirmDialog
             onConfirm={() => window.electronAPI.confirmClose()}
@@ -654,7 +790,7 @@ function AppContent(): React.JSX.Element {
               role="main"
               aria-label={t("welcome.ariaLabel")}
             >
-              <AppIcon size={160} />
+              <MergeMateLogo size={160} />
               <div className="text-3xl font-bold tracking-wide text-[hsl(var(--foreground))]">MergeMate</div>
               <div className="text-sm">{t("welcome.description")}</div>
               <ul

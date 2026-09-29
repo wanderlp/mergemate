@@ -43,6 +43,9 @@ export function useFolderScan(): UseFolderScanReturn {
   const scanAbortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
+    // Auto-restauracion SOLO desde startup window (getPendingFolders). La
+    // restauracion desde lastSession es responsabilidad de App.tsx via dialogo
+    // de confirmacion (el usuario debe elegir si reabrir).
     window.electronAPI.getPendingFolders().then((pending) => {
       if (pending?.left || pending?.right) {
         if (pending?.left) setLeftFolder(pending.left);
@@ -50,14 +53,6 @@ export function useFolderScan(): UseFolderScanReturn {
         if (pending?.left && pending?.right) {
           autoScanRef.current = true;
         }
-      } else {
-        void window.electronAPI.getLastSession().then((session) => {
-          if (session.leftFolder) setLeftFolder(session.leftFolder);
-          if (session.rightFolder) setRightFolder(session.rightFolder);
-          if (session.leftFolder && session.rightFolder) {
-            autoScanRef.current = true;
-          }
-        });
       }
     });
 
