@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import * as path from "path";
+import ignore from "ignore";
 import { classifyFiles } from "./classifier";
 import type { FileEntry, ScanResult, ScanStats } from "../types";
 
@@ -55,64 +56,32 @@ const IGNORE_EXTENSIONS = new Set([
 
 const IGNORE_FILE_NAME = ".mergemate-ignore";
 
-interface CompiledPattern {
-  re: RegExp;
-  dirOnly: boolean;
-  baseOnly: boolean;
-}
-
-function compilePattern(raw: string): CompiledPattern | null {
-  const line = raw.trim();
-  if (!line || line.startsWith("#")) return null;
-  let p = line.replace(/^!/, "");
-  const dirOnly = p.endsWith("/");
-  if (dirOnly) p = p.slice(0, -1);
-  const anchoredStart = p.startsWith("/");
-  if (anchoredStart) p = p.slice(1);
-  const anchoredEnd = !p.includes("*") && !p.includes("?");
-  let regex = "";
-  for (const ch of p) {
-    if (ch === "*") regex += "[^/]*";
-    else if (ch === "?") regex += "[^/]";
-    else if (ch === "." || ch === "+" || ch === "(" || ch === ")" || ch === "{" || ch === "}" || ch === "|" || ch === "^" || ch === "$" || ch === "\\") regex += "\\" + ch;
-    else regex += ch;
-  }
-  regex = (anchoredStart ? "^" : "(^|/)") + regex + (anchoredEnd ? "($|/)" : "");
-  return { re: new RegExp(regex), dirOnly, baseOnly: !p.includes("/") };
-}
-
-function loadIgnorePatterns(folder: string): CompiledPattern[] {
+function loadIgnoreInstance(folder: string): ignore.Ignore | null {
   const file = path.join(folder, IGNORE_FILE_NAME);
   let content: string;
   try {
     content = fs.readFileSync(file, "utf-8");
   } catch {
-    return [];
+    return null;
   }
-  const out: CompiledPattern[] = [];
-  for (const line of content.split(/\r?\n/)) {
-    const compiled = compilePattern(line);
-    if (compiled) out.push(compiled);
-  }
-  return out;
+  // La libreria `ignore` implementa gitignore spec 2.22.1: maneja `**`,
+  // negacion con `!`, anclaje, clases de caracteres `[]`, trailing slash para
+  // directorios, y comentarios con `#`. Los paths que se le pasan a `ignores()`
+  // deben ser relativos al directorio donde esta el .mergemate-ignore.
+  return ignore().add(content);
 }
 
-function matchesIgnore(relPath: string, isDir: boolean, patterns: CompiledPattern[]): boolean {
-  const normalized = relPath.replace(/\\/g, "/");
-  const base = path.posix.basename(normalized);
-  for (const p of patterns) {
-    if (p.dirOnly && !isDir) continue;
-    if (p.baseOnly) {
-      if (p.re.test(base)) return true;
-    } else {
-      if (p.re.test(normalized)) return true;
-    }
-  }
-  return false;
+function matchesIgnore(relPath: string, ig: ignore.Ignore | null): boolean {
+  if (!ig) return false;
+  return ig.ignores(relPath.replace(/\\/g, "/"));
 }
 
 function shouldIgnore(name: string, isDirectory: boolean): boolean {
   if (isDirectory && IGNORE_DIRS.has(name)) return true;
+  // Auto-ignorar el archivo .mergemate-ignore mismo para que no aparezca
+  // en el arbol que escanea. Sin esto, el archivo seria visible en la raiz
+  // del proyecto y el usuario podria intentar compararlo.
+  if (!isDirectory && name === IGNORE_FILE_NAME) return true;
   if (name.endsWith(".bak")) return true;
 
   if (!isDirectory) {
@@ -133,8 +102,8 @@ async function collectPaths(
   dir: string,
   base: string,
   result: Map<string, string>,
-  ignorePatterns: CompiledPattern[],
-  onProgress: (current: string) => void,
+  ig: ignore.Ignore | null,
+  onProgress: (currentFile: string) => void,
   signal?: AbortSignal
 ): Promise<void> {
   if (signal?.aborted) return;
@@ -154,7 +123,7 @@ async function collectPaths(
     }
     if (shouldIgnore(entry.name, entry.isDirectory())) continue;
     const rel = path.join(base, entry.name).replace(/\\/g, "/");
-    if (matchesIgnore(rel, entry.isDirectory(), ignorePatterns)) continue;
+    if (matchesIgnore(rel, ig)) continue;
     onProgress(rel);
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) {
@@ -162,7 +131,7 @@ async function collectPaths(
       await new Promise<void>((resolve) => setImmediate(resolve));
       lastYield = Date.now();
       if (signal?.aborted) return;
-      await collectPaths(full, rel, result, ignorePatterns, onProgress, signal);
+      await collectPaths(full, rel, result, ig, onProgress, signal);
     } else {
       result.set(rel, full);
     }
@@ -376,13 +345,16 @@ export async function scanFolders(
   const leftMap = new Map<string, string>();
   const rightMap = new Map<string, string>();
 
-  const ignorePatterns = [
-    ...loadIgnorePatterns(leftFolder),
-    ...loadIgnorePatterns(rightFolder)
-  ];
+  // Union de los .mergemate-ignore de ambas carpetas: si la izquierda
+  // ignora `vendor/` y la derecha ignora `coverage/`, ambos se aplican.
+  const leftIgnore = loadIgnoreInstance(leftFolder);
+  const rightIgnore = loadIgnoreInstance(rightFolder);
+  const ignoreInstance = leftIgnore
+    ? leftIgnore.add(rightIgnore ? rightIgnore : [])
+    : rightIgnore;
 
-  await collectPaths(leftFolder, "", leftMap, ignorePatterns, onProgress, signal);
-  await collectPaths(rightFolder, "", rightMap, ignorePatterns, onProgress, signal);
+  await collectPaths(leftFolder, "", leftMap, ignoreInstance, (current) => onProgress(0, current), signal);
+  await collectPaths(rightFolder, "", rightMap, ignoreInstance, (current) => onProgress(0, current), signal);
 
   if (signal?.aborted) throw new DOMException("Aborted", "AbortError");
 

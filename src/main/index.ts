@@ -57,6 +57,8 @@ const DEFAULT_LAST_SESSION: StoreSchema["lastSession"] = {
 
 const store = new Store<StoreSchema>({
   defaults: {
+    recentComparisons: [],
+    windowState: null,
     appSettings: DEFAULT_SETTINGS,
     lastSession: DEFAULT_LAST_SESSION
   }

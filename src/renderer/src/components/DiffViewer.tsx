@@ -3,7 +3,7 @@ import { DiffEditor, type DiffEditorProps } from "@monaco-editor/react";
 import { ChevronUp, ChevronDown, ArrowLeftRight, Save, Search, Columns2, Rows } from "lucide-react";
 import { useTranslation } from "react-i18next";
 import type { FileEntry } from "../types";
-import type * as monaco from "monaco-editor";
+import * as monaco from "monaco-editor";
 import { Button } from "./ui/button";
 import { Separator } from "./ui/separator";
 import { Tooltip, TooltipTrigger, TooltipContent } from "./ui/tooltip";
@@ -299,7 +299,12 @@ export function DiffViewer({
             lineNumbers: "on",
             scrollbar: { vertical: "auto", horizontal: "auto" },
             stickyScroll: { enabled: false },
-            diffAlgorithm,
+            diffAlgorithm:
+              diffAlgorithm === "Myers"
+                ? "legacy"
+                : diffAlgorithm === "experimental"
+                  ? undefined
+                  : "advanced",
             ignoreTrimWhitespace: ignoreWhitespace,
             originalEditable: true
           }}
