@@ -92,6 +92,7 @@ export interface ElectronAPI {
 export interface LastSession {
   leftFolder: string;
   rightFolder: string;
+  lastUsed: number;
 }
 
 export interface AppSettings {

@@ -32,6 +32,7 @@ interface StoreSchema {
   lastSession: {
     leftFolder: string;
     rightFolder: string;
+    lastUsed: number;
   };
 }
 
@@ -47,7 +48,8 @@ const DEFAULT_SETTINGS: StoreSchema["appSettings"] = {
 
 const DEFAULT_LAST_SESSION: StoreSchema["lastSession"] = {
   leftFolder: "",
-  rightFolder: ""
+  rightFolder: "",
+  lastUsed: 0
 };
 
 const store = new Store<StoreSchema>({
@@ -492,11 +494,24 @@ function registerIpcHandlers(): void {
     return next;
   });
 
-  ipcMain.handle("session-get", () => store.get("lastSession") ?? DEFAULT_LAST_SESSION);
+  ipcMain.handle("session-get", () => {
+    // Merge con defaults: datos viejos en disco pueden no tener `lastUsed`,
+    // en cuyo caso `lastUsed: 0` filtra la sesión por edad (correcto: no
+    // queremos restaurar sesiones pre-fix sin timestamp).
+    const stored = store.get("lastSession");
+    const session = { ...DEFAULT_LAST_SESSION, ...stored };
+    const SEVEN_DAYS_MS = 7 * 24 * 60 * 60 * 1000;
+    if (session.lastUsed && Date.now() - session.lastUsed > SEVEN_DAYS_MS) {
+      return null;
+    }
+    return session;
+  });
 
   ipcMain.handle("session-save", (_event, partial: Partial<StoreSchema["lastSession"]>) => {
     const current = store.get("lastSession") ?? DEFAULT_LAST_SESSION;
-    const next = { ...current, ...partial };
+    // Cualquier session-save actualiza `lastUsed` automaticamente. Asi no
+    // depende de que el renderer recuerde setear el timestamp.
+    const next = { ...current, ...partial, lastUsed: Date.now() };
     store.set("lastSession", next);
     return next;
   });
