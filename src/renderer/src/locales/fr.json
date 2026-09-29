@@ -89,6 +89,7 @@
   "settings": {
     "title": "Paramètres",
     "back": "Retour",
+    "close": "Fermer",
     "sectionAppearance": "Apparence",
     "theme": "Thème",
     "themeDark": "Sombre",

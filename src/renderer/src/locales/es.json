@@ -89,6 +89,7 @@
   "settings": {
     "title": "Configuración",
     "back": "Volver",
+    "close": "Cerrar",
     "sectionAppearance": "Apariencia",
     "theme": "Tema",
     "themeDark": "Oscuro",

@@ -89,6 +89,7 @@
   "settings": {
     "title": "Einstellungen",
     "back": "Zurück",
+    "close": "Schließen",
     "sectionAppearance": "Erscheinungsbild",
     "theme": "Design",
     "themeDark": "Dunkel",
