@@ -42,7 +42,7 @@ function Root(): React.JSX.Element {
   // antes, el branch "settings" siempre montaba <App/> de fondo sin importar
   // el origen, así que abrir Settings desde StartupScreen desmontaba
   // StartupScreen por completo (y la remontaba al volver), lo que invalidaba
-  // los IDs que useId() genera en TitleBar/AppIcon en cada roundtrip (#31).
+  // los IDs que useId() genera en TitleBar/MergeMateLogo en cada roundtrip (#31).
   const showStartup =
     route.path === "startup" || (route.path === "settings" && route.from === "startup");
 
