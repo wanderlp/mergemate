@@ -14,8 +14,12 @@ import type { ElectronAPI, ScanProgress } from "../types";
  *   otro protocolo (file:, javascript:, etc.) lanza Error.
  * - `exportScan`: el path destino lo elige el usuario via dialog nativo, no el
  *   renderer — por eso no pasa por la validación de writeFile.
- * - `copyFileWithBak`: usa `COPYFILE_EXCL` para preservar el .bak previo y
- *   hace rollback automático desde .bak si el copy principal falla.
+ * - `copyFileWithBak`: el path destino debe estar dentro de las carpetas
+ *   autorizadas de la sesión actual (leftFolder/rightFolder en modo carpetas,
+ *   o los archivos individuales en modo files). Si el destino está fuera, el
+ *   main process rechaza con Error. Crea un .bak previo (preservando uno
+ *   existente via COPYFILE_EXCL) y hace rollback automático desde .bak si el
+ *   copy principal falla.
  * - `readFile`, `readFileBase64`, `getFileHash`, `folderExists`, `classifyFiles`:
  *   leen del filesystem pero no escriben. Sin validación adicional porque el
  *   renderer solo lee archivos dentro de carpetas que el propio usuario

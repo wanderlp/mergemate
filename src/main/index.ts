@@ -410,6 +410,17 @@ function registerIpcHandlers(): void {
   });
 
   ipcMain.handle("copy-file-with-bak", async (_event, src: string, dest: string) => {
+    // El destino es donde escribe safeCopyFileWithBak (crea dest.bak y luego
+    // copia src a dest). Un renderer comprometido puede invocar este handler
+    // con un dest arbitrario fuera de las carpetas autorizadas, evitando
+    // por completo la proteccion que si existe para write-file.
+    // NO validamos src: el renderer ya lee paths arbitrarios via readFile/
+    // getFileHash/classifyFiles sin validacion adicional (ver JSDoc de preload).
+    if (!isPathInsideAnyRoot(dest, authorizedRoots)) {
+      throw new Error(
+        `copy-file-with-bak rejected: "${dest}" is outside authorized roots (${authorizedRoots.join(", ") || "<none>"})`
+      );
+    }
     safeCopyFileWithBak(src, dest);
   });
 
