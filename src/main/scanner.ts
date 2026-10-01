@@ -209,7 +209,7 @@ async function buildTree(
     const ext = path.extname(rel).replace(".", "").toLowerCase();
     const leftPath = leftMap.get(rel) ?? null;
     const rightPath = rightMap.get(rel) ?? null;
-    const status = await classifyFiles(leftPath, rightPath, ext);
+    const status = await classifyFiles(leftPath, rightPath, ext, signal);
 
     stats.total++;
     if (status === "identical") stats.identical++;
